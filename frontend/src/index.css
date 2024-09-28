@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+	font-family: 'nourd';
+	src: url('../src/assets/fonts/nourd/nourd_regular.ttf');
+	font-weight: normal;
+	font-style: normal;
+}
+.nourd-text {
+	font-family: 'nourd' !important;
+}
+
+table {
+	border-collapse: separate;
+	border-spacing: 0;
+}
+td {
+	background: #f6f8fa;
+}
+tr td:first-child {
+	border-top-left-radius: 8px;
+	border-bottom-left-radius: 8px;
+}
+tr td:last-child {
+	border-top-right-radius: 8px;
+	border-bottom-right-radius: 8px;
+}
+tr th:first-child {
+	border-top-left-radius: 8px;
+	border-bottom-left-radius: 8px;
+}
+
+tr th:last-child {
+	border-top-right-radius: 8px;
+	border-bottom-right-radius: 8px;
+}
+.noBorder {
+	border-top-left-radius: 0 !important;
+	border-bottom-left-radius: 0 !important;
+	border-top-right-radius: 0 !important;
+	border-bottom-right-radius: 0 !important;
+}
+.debug {
+	border: 1px red solid;
+}
