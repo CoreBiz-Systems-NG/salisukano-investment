@@ -58,7 +58,16 @@ app.use(express.static('public')); // configure static file to save images local
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors('*'));
-app.use(cors());
+app.use(
+	cors({
+		origin: [
+			'http://localhost:3000',
+			'http://localhost:5173',
+			'https://salisukano.com',
+		],
+		credentials: true,
+	})
+);
 // connectDB();
 
 /* ROUTES */
