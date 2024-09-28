@@ -7,9 +7,12 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchCreditors } from '../hooks/axiosApis.js';
 import getError from '../hooks/getError.js';
 import toast from 'react-hot-toast';
+import EditModal from '../components/modals/EditCreditor.jsx';
 const Creditors = () => {
 	const [loading, setIsLoading] = useState(false);
 	const [isAddModal, setIsAddModal] = useState(false);
+	const [isEditModal, setIsEditModal] = useState(false);
+	const [creditor, setCreditor] = useState({});
 	const { user } = useContext(AuthContext);
 	const { data, isLoading, error } = useQuery({
 		queryKey: ['creditors'],
@@ -33,7 +36,8 @@ const Creditors = () => {
 	};
 	const handelEdit = (data) => {
 		console.log(data);
-		// setIsAddModal(true);
+		setCreditor(data);
+		setIsEditModal(true);
 	};
 	return (
 		<>
@@ -52,6 +56,13 @@ const Creditors = () => {
 				setShow={setIsAddModal}
 				setLoading={setIsLoading}
 				loading={isLoading}
+			/>
+			<EditModal
+				show={isEditModal}
+				setShow={setIsEditModal}
+				setLoading={setIsLoading}
+				loading={isLoading}
+				debtor={creditor}
 			/>
 			{isLoading || (loading && <Loader />)}
 		</>

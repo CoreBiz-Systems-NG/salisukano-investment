@@ -30,7 +30,6 @@ const Transaction = () => {
 	const { user } = useContext(AuthContext);
 	const navigate = useNavigate();
 	// const queryClient = useQueryClient();
-
 	const tableRef = useRef(null);
 
 	const { id } = useParams();
@@ -149,8 +148,8 @@ const Transaction = () => {
 				<TransactionTable
 					data={tableData || []}
 					pageSize={pageSize}
-					handelExportToExcel={onDownload}
 					isLoading={isLoading}
+					handelExportToExcel={onDownload}
 					tableRef={tableRef}
 				/>
 			</main>

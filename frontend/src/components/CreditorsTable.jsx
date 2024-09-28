@@ -116,7 +116,7 @@ const Table = ({ tableData, handelAddModal, handelEdit }) => {
 								Phone
 							</th>
 							<th className="py-3 text-[#212B36] text-sm font-normal whitespace-nowrap ">
-								(₦) Balance
+								Balance ₦
 							</th>
 							<th className="py-3 text-[#212B36] text-sm font-normal whitespace-nowrap md:w-[100px] text-center">
 								Action

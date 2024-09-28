@@ -98,13 +98,13 @@ const Table = ({ tableData, handelEdit, handelDelete }) => {
 								Date
 							</th>
 							<th className="py-3 px-2.5 text-[#212B36] text-sm font-normal whitespace-nowrap w-[50px]">
-								Credit
+								Credit ₦
 							</th>
 							<th className="py-3 text-[#212B36] text-sm font-normal whitespace-nowrap w-[50px]">
-								Debit
+								Debit ₦
 							</th>
 							<th className="py-3 text-[#212B36] text-sm font-normal whitespace-nowrap md:w-[50px]">
-								Balance
+								Balance ₦
 							</th>
 							<th className="py-3 text-[#212B36] text-sm font-normal whitespace-nowrap w-[100px]">
 								Remarks
@@ -124,13 +124,13 @@ const Table = ({ tableData, handelEdit, handelDelete }) => {
 									{moment(data?.date || data?.createdAt).format('ll')}
 								</td>
 								<td className="py-4 px-1 text-sm font-normal text-[#4F80E1] whitespace-nowrap bg-gray-50">
-									₦ {data?.credit}
+									{data?.credit}
 								</td>
 								<td className="py-4 px-1 text-sm font-normal text-[#FB4949] whitespace-nowrap">
-									₦ {data?.debit}
+									{data?.debit}
 								</td>
 								<td className="py-2 px-1 text-sm font-normal text-[#10B860] whitespace-nowrap bg-gray-50">
-									₦ {data?.balance}
+									{data?.balance}
 								</td>
 								<td className="py-2 px-1 text-sm font-normal text-[#637381] whitespace-nowrap bg-gray-50">
 									{data?.remark}

@@ -108,37 +108,37 @@ const Table = ({ tableData }) => {
 								Mix Qty (kg)
 							</th>
 							<th className="p-3 text-[#212B36] text-sm font-normal whitespace-nowrap">
-								(₦) M P
+								M P ₦
 							</th>
 							<th className="p-3 text-[#212B36] text-sm font-normal whitespace-nowrap">
-								(₦) Mix Total
+								Mix Total ₦
 							</th>
 							<th className="p-3 text-[#212B36] text-sm font-normal whitespace-nowrap">
 								Cast Qty (kg)
 							</th>
 							<th className="p-3 text-[#212B36] text-sm font-normal whitespace-nowrap">
-								(₦) C P
+								C P ₦
 							</th>
 							<th className="p-3 text-[#212B36] text-sm font-normal whitespace-nowrap">
-								Cast Total
+								Cast Total ₦
 							</th>
 							<th className="p-3 text-[#212B36] text-sm font-normal whitespace-nowrap">
 								Special Qty (kg)
 							</th>
 							<th className="p-3 text-[#212B36] text-sm font-normal whitespace-nowrap">
-								(₦) S P
+								S P ₦
 							</th>
 							<th className="p-3 text-[#212B36] text-sm font-normal whitespace-nowrap">
-								(₦) Special Total
+								Special Total ₦
 							</th>
 							<th className="py-3 p-2 text-[#212B36] text-sm font-normal whitespace-nowrap">
-								(₦) Credit
+								Credit ₦
 							</th>
 							<th className="py-3 p-2 text-[#212B36] text-sm font-normal whitespace-nowrap">
-								(₦) Debit
+								Debit ₦
 							</th>
 							<th className="py-3 p-2  text-[#212B36] text-sm font-normal whitespace-nowrap">
-								(₦) Balance
+								Balance ₦
 							</th>
 							<th className="py-3 p-2 text-[#212B36] text-sm font-normal whitespace-nowrap">
 								Remark

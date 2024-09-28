@@ -1,7 +1,7 @@
 import AccountsTable from '../components/AccountsTable.jsx';
 import Cards from '../components/AccountCard.jsx';
 import Loader from '../components/Loader.jsx';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import AddAccountModal from '../components/modals/AddAccountModal.jsx';
 import AccountStatusModal from '../components/modals/AccountStatusModal.jsx';
 import AuthContext from '../context/authContext.jsx';
@@ -12,7 +12,7 @@ import toast from 'react-hot-toast';
 import { Link, useParams } from 'react-router-dom';
 import {  FaPlus } from 'react-icons/fa6';
 import { IoMdOptions } from 'react-icons/io';
-
+import { useDownloadExcel } from 'react-export-table-to-excel';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 
 const Transaction = () => {
@@ -22,6 +22,7 @@ const Transaction = () => {
 	const [selectedAccount, setSelectedAccount] = useState(null);
 	const { user } = useContext(AuthContext);
 	const { id } = useParams();
+	const tableRef = useRef(null);
 
 	const { data, isLoading, error } = useQuery({
 		queryKey: ['customers', 'accounts', id],
@@ -48,7 +49,11 @@ const Transaction = () => {
 		setIsStatusModal(true);
 	};
 
-	
+	const { onDownload } = useDownloadExcel({
+		currentTableRef: tableRef.current,
+		filename: `${data?.customer?.name} transactions`,
+		sheet: 'Users',
+	});
 
 	return (
 		<>
@@ -95,6 +100,8 @@ const Transaction = () => {
 				<AccountsTable
 					tableData={data?.accounts}
 					handelChangeActive={handelChangeActive}
+					handelExportToExcel={onDownload}
+					tableRef={tableRef}
 				/>
 			</main>
 			<AddAccountModal

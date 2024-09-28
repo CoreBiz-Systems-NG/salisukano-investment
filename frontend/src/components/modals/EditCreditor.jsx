@@ -35,15 +35,15 @@ const EditModal = ({ show, setShow, setLoading, loading, debtor }) => {
 		setShow(false);
 		try {
 			axios
-				.patch(`${apiUrl}/debtors/${debtor?._id}`, { name, phone }, config)
+				.patch(`${apiUrl}/creditors/${debtor?._id}`, { name, phone }, config)
 				.then((res) => {
 					if (res.data) {
 						queryClient.invalidateQueries({
-							queryKey: ['dashboard', 'accounts', 'customers', 'debtors'],
+							queryKey: ['dashboard', 'accounts', 'customers', 'creditors'],
 						});
 						toast.success('Account updated successfully');
 					}
-					navigate(`/debtors/${debtor?._id}`);
+					navigate(`/creditors/${debtor?._id}`);
 				})
 				.catch((error) => {
 					const message = getError(error);
@@ -66,7 +66,9 @@ const EditModal = ({ show, setShow, setLoading, loading, debtor }) => {
 				<div className="space-y-5 p-4">
 					<div className="flex justify-between">
 						<div>
-							<p className="font-semibold text-lg text-primary">Edit Debtor</p>
+							<p className="font-semibold text-lg text-primary">
+								Edit Creditor
+							</p>
 						</div>
 						<button
 							onClick={() => setShow(false)}
@@ -103,7 +105,7 @@ const EditModal = ({ show, setShow, setLoading, loading, debtor }) => {
 						className="bg-blue-500 hover:bg-blue-700 text-white font-semibold h-10 py-1 w-full flex items-center justify-center rounded-md transition-all duration-500 ease-in-out"
 						onClick={handleSubmit}
 					>
-						<span>Update Debtor</span>
+						<span>Update Creditor</span>
 					</button>
 				</div>
 			</div>

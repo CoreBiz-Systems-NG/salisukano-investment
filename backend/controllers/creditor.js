@@ -276,6 +276,52 @@ export const newDeposit = async (req, res) => {
 	}
 };
 
+export const deleteCredit = async (req, res) => {
+	try {
+		const { creditorId, creditId } = req.params;
+
+		if (!creditorId || !creditId) {
+			return res.status(404).json({ error: 'Invalid creditor or credit ID' });
+		}
+
+		// Find the creditor by ID
+		const creditor = await Creditor.findById({ _id: creditorId });
+		if (!creditor) {
+			return res.status(404).json({ error: 'creditor not found' });
+		}
+
+		// Find the transaction within the creditor's transactions
+		const transaction = await Credit.findById({ _id: creditId });
+
+		if (!transaction) {
+			return res.status(404).json({ error: 'Transaction not found' });
+		}
+
+		// Adjust the creditor's balance based on whether the transaction is a credit or debit
+		if (transaction.credit) {
+			creditor.balance -= transaction.credit; // Subtract the credit amount
+		} else if (transaction.debit) {
+			creditor.balance += transaction.debit; // Add back the debit amount
+		}
+
+		// Remove the transaction
+		const updatedTransaction = await Credit.findByIdAndDelete({
+			_id: creditId,
+		});
+
+		// Save the updated creditor
+		creditor.save();
+
+		res.status(200).json({
+			message: 'Transaction deleted and Creditor updated successfully',
+		});
+	} catch (error) {
+		console.log(error);
+		res.status(500).json({ message: error.message });
+	}
+};
+
+
 export const addCreditFunction = async (req, res) => {
 	try {
 		const { creditorId, creditAmount, remark = '', date } = req.body;

@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import OrderDetails from '../components/CreditDetails.jsx';
-import DeleteModal from '../components/modals/DeleteModal.jsx';
+import DeleteCreditModal from '../components/modals/DeleteCreditModal.jsx';
 import Loader from '../components/Loader.jsx';
 import { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -11,7 +11,7 @@ import DepositeModal from '../components/modals/DepositeModal.jsx';
 import getError from '../hooks/getError.js';
 import toast from 'react-hot-toast';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
-import { AiFillEdit, AiFillDelete } from 'react-icons/ai';
+import { AiFillDelete } from 'react-icons/ai';
 import { IoMdOptions } from 'react-icons/io';
 import { FiPrinter } from 'react-icons/fi';
 import { downloadPDF } from './../hooks/downLoadPdf';
@@ -46,19 +46,19 @@ const TransactionDetail = ({ openSideBar }) => {
 	const handelPrint = async () => {
 		await downloadPDF('receipt');
 	};
-	const handelEdit = () => {
-		if (!data) {
-			return;
-		}
+	// const handelEdit = () => {
+	// 	if (!data) {
+	// 		return;
+	// 	}
 
-		return navigate(`/creditors/${id}`);
-	};
+	// 	return navigate(`/creditors/${id}`);
+	// };
 	const handelDelete = async () => {
 		if (!data) {
 			return;
 		}
 		console.log(data);
-		// setIsDeleteModal(true);
+		setIsDeleteModal(true);
 	};
 	return (
 		<>
@@ -94,14 +94,14 @@ const TransactionDetail = ({ openSideBar }) => {
 							transition
 							className="absolute right-0 z-10 mt-0 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
 						>
-							<MenuItem
+							{/* <MenuItem
 								as="button"
 								className="pl-3 py-2 px-2  flex w-full justify-start items-center gap-1 rounded text-sm  text-gray-700 hover:bg-blue-100 font-normal"
 								onClick={handelEdit}
 							>
 								<AiFillEdit className="text-blue-500" />
 								Edit
-							</MenuItem>
+							</MenuItem> */}
 							<MenuItem
 								as="button"
 								className="pl-3 py-2 px-2 flex w-full justify-start items-center gap-1 rounded text-sm  text-gray-700 hover:bg-red-100 font-normal"
@@ -218,12 +218,13 @@ const TransactionDetail = ({ openSideBar }) => {
 				loading={isLoading}
 				account={data?.credit}
 			/>
-			<DeleteModal
+			<DeleteCreditModal
 				show={isDeleteModal}
 				setShow={setIsDeleteModal}
 				setLoading={setIsLoading}
 				loading={loading}
-				account={data}
+				debtorId={creditId}
+				account={data?.creditor}
 			/>
 			{isLoading || (loading && <Loader />)}
 		</>

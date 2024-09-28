@@ -187,7 +187,7 @@ const NewCredit = () => {
 							<span className="inline-block bg-blue-500/60 w-[4px] h-[4px] rounded-full"></span>
 						</li>
 						<li className="breadcrumb-item capitalize text-blue-500 hover:text-blue-500/50 cursor-pointer">
-							<Link to={`/creditors/${id}`}>{data?.name}</Link>
+							<Link to={`/creditors/${id}`}>{data?.creditor?.name}</Link>
 						</li>
 					</ul>
 				</div>

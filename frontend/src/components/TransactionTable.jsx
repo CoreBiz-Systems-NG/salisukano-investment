@@ -47,7 +47,7 @@ const Tablle = ({
 			),
 		},
 		{
-			Header: 'M P (₦)',
+			Header: 'M P ₦',
 			accessor: 'mixPrice',
 			Cell: ({ value }) => (
 				<span className={` text-[#637381]`}>{value || ' '}</span>
@@ -68,14 +68,14 @@ const Tablle = ({
 			),
 		},
 		{
-			Header: 'C P (₦)',
+			Header: 'C P ₦',
 			accessor: 'castPrice',
 			Cell: ({ value }) => (
 				<span className={` text-[#637381]`}>{value || ' '}</span>
 			),
 		},
 		{
-			Header: 'Cast Total (₦)',
+			Header: 'Cast Total ₦',
 			accessor: 'castTotal',
 			Cell: ({ value }) => (
 				<span className={` text-[#DD6107]`}>{value || ' '}</span>
@@ -89,35 +89,35 @@ const Tablle = ({
 			),
 		},
 		{
-			Header: 'S P (₦)',
+			Header: 'S P ₦',
 			accessor: 'specialPrice',
 			Cell: ({ value }) => (
 				<span className={` text-[#637381]`}>{value || ' '}</span>
 			),
 		},
 		{
-			Header: 'Special Total (₦)',
+			Header: 'Special Total ₦',
 			accessor: 'specialTotal',
 			Cell: ({ value }) => (
 				<span className={` text-[#DD6107]`}>{value || ' '}</span>
 			),
 		},
 		{
-			Header: 'Credit (₦)',
+			Header: 'Credit ₦',
 			accessor: 'credit',
 			Cell: ({ value }) => (
 				<span className={`text-[#4F80E1] `}>{value || ' '}</span>
 			),
 		},
 		{
-			Header: 'Dedit (₦)',
+			Header: 'Dedit ₦',
 			accessor: 'debit',
 			Cell: ({ value }) => (
 				<span className={`text-[#FB4949] `}>{value || ' '}</span>
 			),
 		},
 		{
-			Header: 'Balance (₦)',
+			Header: 'Balance ₦',
 			accessor: 'balance',
 			Cell: ({ value }) => <span className={`text-[#10B860] `}>{value}</span>,
 		},

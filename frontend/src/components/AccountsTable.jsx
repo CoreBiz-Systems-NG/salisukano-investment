@@ -2,13 +2,14 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SiMicrosoftexcel } from 'react-icons/si';
-// import { formatPrice } from '../hooks/formatPrice';
 import moment from 'moment';
+// import { formatPrice } from '../hooks/formatPrice';
 
 const TransactionTable = ({
 	tableData,
 	handelExportToExcel,
 	handelChangeActive,
+	tableRef,
 }) => {
 	const navigate = useNavigate();
 	const [query, setQuery] = useState('');
@@ -111,23 +112,26 @@ const TransactionTable = ({
 				</svg>
 			</div>
 			<div className="w-full overflow-x-scroll md:overflow-auto max-w-xl xs:max-w-xl sm:max-w-xl md:max-w-7xl 2xl:max-w-none mt-1">
-				<table className="table-auto overflow-scroll md:overflow-auto w-full text-left font-inter border-separate border-spacing-y-1">
+				<table
+					ref={tableRef}
+					className="table-auto overflow-scroll md:overflow-auto w-full text-left font-inter border-separate border-spacing-y-1"
+				>
 					<thead className="bg-[#222E3A]/[6%] rounded-lg text-base text-white font-semibold w-full">
 						<tr className="">
 							<th className="py-3 pl-3 text-[#212B36] text-sm font-normal whitespace-nowrap rounded-l-lg">
 								Month
 							</th>
 							<th className="py-3 text-[#212B36] text-sm font-normal whitespace-nowrap md:w-[150px]">
-								(₦) Opening balance
+								Opening balance ₦
 							</th>
 							<th className="py-3 px-2.5 text-[#212B36] text-sm font-normal whitespace-nowrap md:w-[150px]">
-								(₦) Credit
+								Credit ₦
 							</th>
 							<th className="py-3 text-[#212B36] text-sm font-normal whitespace-nowrap md:w-[150px]">
-								(₦) Debit
+								Debit ₦
 							</th>
 							<th className="py-3 text-[#212B36] text-sm font-normal whitespace-nowrap ">
-								(₦) Balance
+								Balance ₦
 							</th>
 							<th className="py-3 text-[#212B36] text-sm font-normal whitespace-nowrap md:w-[100px]">
 								Status

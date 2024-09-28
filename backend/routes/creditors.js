@@ -8,6 +8,7 @@ import {
 	editCreditor,
 	addCreditFunction,
 	createDeposit,
+	deleteCredit,
 } from '../controllers/creditor.js';
 // import { uploadMiddleware } from '../utils/uploadMiddleware.js';
 
@@ -22,5 +23,6 @@ router.post('/:id', newCredit);
 router.patch('/credit', addCreditFunction);
 router.patch('/credit', addCreditFunction);
 router.patch('/:id', editCreditor);
+router.delete('/:creditorId/:creditId', deleteCredit);
 
 export default router;
