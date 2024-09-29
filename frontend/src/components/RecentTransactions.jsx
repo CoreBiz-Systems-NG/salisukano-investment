@@ -50,13 +50,13 @@ const RecentTransactions = ({ orderTableData, handelAddModal }) => {
 								Qunatity (kg)
 							</th>
 							<th className="py-3 px-2.5 text-[#212B36] text-sm font-normal whitespace-nowrap md:w-[100px]">
-								Credit (₦)
+								Credit ₦
 							</th>
 							<th className="py-3 text-[#212B36] text-sm font-normal whitespace-nowrap md:w-[100px]">
-								Debit (₦)
+								Debit ₦
 							</th>
 							<th className="py-3 text-[#212B36] text-sm font-normal whitespace-nowrap md:w-[100px]">
-								Balance (₦)
+								Balance ₦
 							</th>
 						</tr>
 					</thead>

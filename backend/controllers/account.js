@@ -234,11 +234,12 @@ export const updateOpeningBalance = async (req, res) => {
 			.session(session);
 
 		// Set the initial balance
-		let currentBalance = openingBalance;
+		let currentBalance = Number(openingBalance);
 
 		// Update the account's opening balance and set its current balance
 		account.openingBalance = openingBalance;
-		account.balance = currentBalance;
+		account.balance = Number(currentBalance);
+		// console.log('currentBalance 1', currentBalance);
 
 		// Iterate through each transaction, calculate credit using materials, update account balance
 		for (const transaction of transactions) {
@@ -255,23 +256,26 @@ export const updateOpeningBalance = async (req, res) => {
 
 				// Round up the total to get the transaction credit
 				const roundedTotal = Math.ceil(total);
-				transaction.credit = roundedTotal; // Assign the rounded total as credit
+				// console.log("roundedTotal 1", roundedTotal);
+				transaction.credit = Number(roundedTotal); // Assign the rounded total as credit
 			}
 
 			// Update the current balance based on credit or debit
 			if (transaction.credit) {
-				currentBalance += transaction.credit;
+				currentBalance += Number(transaction.credit);
 			} else if (transaction.debit) {
 				currentBalance -= transaction.debit;
+				// console.log("currentBalance 3", currentBalance);
 			}
 
+			// console.log("currentBalance 3", currentBalance);
 			// Update the transaction balance and save
-			transaction.balance = currentBalance;
+			transaction.balance = Number(currentBalance);
 			await transaction.save({ session });
 		}
 
 		// Save the updated account balance
-		account.balance = currentBalance;
+		account.balance = Number(currentBalance);
 		await account.save({ session });
 
 		// Commit the transaction

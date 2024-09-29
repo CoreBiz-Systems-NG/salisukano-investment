@@ -17,6 +17,7 @@ const DeleteModal = ({ show, setShow, setLoading, loading, account }) => {
 			Authorization: `Bearer ${user?.token}`,
 		},
 	};
+	console.log('account', account);
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
 	const handleSubmit = (e) => {
@@ -46,7 +47,7 @@ const DeleteModal = ({ show, setShow, setLoading, loading, account }) => {
 						});
 						toast.success(' Transaction deleted successfully');
 					}
-					navigate('/');
+					navigate(`/accounts/${account?.accountId}`);
 				})
 				.catch((error) => {
 					const message = getError(error);

@@ -122,7 +122,7 @@ const TransactionTable = ({
 								Month
 							</th>
 							<th className="py-3 text-[#212B36] text-sm font-normal whitespace-nowrap md:w-[150px]">
-								Opening balance ₦
+								Opening Balance ₦
 							</th>
 							<th className="py-3 px-2.5 text-[#212B36] text-sm font-normal whitespace-nowrap md:w-[150px]">
 								Credit ₦

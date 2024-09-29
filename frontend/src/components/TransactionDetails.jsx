@@ -56,10 +56,10 @@ const OrderDetails = ({ data }) => {
 											Quantity
 										</th>
 										<th className="py-3 px-2.5 text-[#768594] text-sm font-normal whitespace-nowrap md:w-[100px]">
-											Rate
+											Rate (kg)
 										</th>
 										<th className="py-3 text-[#212B36] text-sm font-normal whitespace-nowrap md:w-[100px]">
-											Cost
+											Cost ₦
 										</th>
 									</tr>
 								</thead>
@@ -73,14 +73,14 @@ const OrderDetails = ({ data }) => {
 												{data?.product}
 											</td>
 											<td className="py-4 px-1 text-sm font-normal text-[#637381] whitespace-nowrap">
-												{data?.qty} (kg)
+												{data?.qty}
 											</td>
 
 											<td className="py-4 px-1 text-sm font-normal text-[#637381] noBorder whitespace-nowrap">
 												{data?.rate || ''}
 											</td>
 											<td className="py-4 px-1 text-sm font-normal text-[#637381] noBorder whitespace-nowrap">
-												₦ {data?.cost || ''}
+												{data?.cost || ''}
 											</td>
 										</tr>
 									))}

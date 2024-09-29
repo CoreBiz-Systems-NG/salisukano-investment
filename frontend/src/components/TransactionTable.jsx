@@ -54,7 +54,7 @@ const Tablle = ({
 			),
 		},
 		{
-			Header: 'Mix Total',
+			Header: 'Mix Total ₦',
 			accessor: 'mixTotal',
 			Cell: ({ value }) => (
 				<span className={` text-[#DD6107]`}>{value || ' '}</span>
