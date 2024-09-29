@@ -171,7 +171,9 @@ export const getAccount = async (req, res) => {
 			return res.status(404).json({ message: 'Account not found' });
 		}
 		const customer = await Customer.findById({ _id: account.customerId });
-		const transactions = await Transaction.find({ accountId: account._id });
+		const transactions = await Transaction.find({
+			accountId: account._id,
+		}).sort({ date: 1 }); 
 		res.status(200).json({ account, customer, transactions });
 	} catch (error) {
 		console.error(error);

@@ -28,7 +28,7 @@ export const getCreditor = async (req, res) => {
 		if (!creditor) {
 			return res.status(404).json({ error: 'creditor not found' });
 		}
-		const credits = await Credit.find({ creditorId: id }).sort({ date: -1 });
+		const credits = await Credit.find({ creditorId: id }).sort({ date: 1 });
 		res.status(200).json({ creditor, credits });
 	} catch (error) {
 		res.status(404).json({ message: error.message });
@@ -320,7 +320,6 @@ export const deleteCredit = async (req, res) => {
 		res.status(500).json({ message: error.message });
 	}
 };
-
 
 export const addCreditFunction = async (req, res) => {
 	try {
