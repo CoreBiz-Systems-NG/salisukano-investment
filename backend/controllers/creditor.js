@@ -168,7 +168,7 @@ export const createDeposit = async (req, res) => {
 	session.startTransaction();
 
 	try {
-		const { creditorId, amount, remark = '', date } = req.body;
+		const { creditorId, amount, description,remark = '', date } = req.body;
 		const creditor = await Creditor.findOneAndUpdate(
 			{ _id: creditorId },
 			{ $inc: { balance: -amount } },
@@ -186,7 +186,8 @@ export const createDeposit = async (req, res) => {
 					total: amount,
 					debit: amount,
 					balance: creditor.balance,
-					description: remark,
+					vehicleNumber: description,
+					remark,
 				},
 			],
 			{ session }

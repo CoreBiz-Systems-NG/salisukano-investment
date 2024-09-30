@@ -13,6 +13,7 @@ const AddModal = ({ show, setShow, setLoading, loading, account }) => {
 	const { user } = useContext(AuthContext);
 	const [balance, setBalance] = useState(0);
 	const [remark, setRemark] = useState('');
+	const [description, setDescription] = useState('');
 	const [date, setDate] = useState('');
 
 	const apiUrl = import.meta.env.VITE_API_URL;
@@ -35,7 +36,13 @@ const AddModal = ({ show, setShow, setLoading, loading, account }) => {
 			axios
 				.patch(
 					`${apiUrl}/debtors/debit`,
-					{ debtorId: account._id, debitAmount: balance, date, remark },
+					{
+						debtorId: account._id,
+						debitAmount: balance,
+						date,
+						description,
+						remark,
+					},
 					config
 				)
 				.then((res) => {
@@ -104,6 +111,17 @@ const AddModal = ({ show, setShow, setLoading, loading, account }) => {
 									onChange={(e) => setDate(e.target.value)}
 								/>
 							</div>
+						</div>
+						<div className="mb-2">
+							<label className="mb-0 text-base text-black">
+								Description <span className="text-red-600">*</span>
+							</label>
+							<input
+								className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
+								type="text"
+								value={description}
+								onChange={(e) => setDescription(e.target.value)}
+							/>
 						</div>
 						<div className="mb-2">
 							<label className="mb-0 text-base text-black">Remark</label>

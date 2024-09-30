@@ -77,7 +77,7 @@ export const editDebtor = async (req, res) => {
 // Add credit to a debtor
 export const addCreditFunction = async (req, res) => {
 	try {
-		const { debtorId, creditAmount, remark = '', date } = req.body;
+		const { debtorId, creditAmount, description, remark = '', date } = req.body;
 
 		// Find the debtor by ID
 		const debtor = await Debtor.findById(debtorId);
@@ -91,7 +91,7 @@ export const addCreditFunction = async (req, res) => {
 		// Create a new transaction with the credit
 		const newTransaction = {
 			credit: creditAmount,
-			balance: newBalance,
+			balance: newBalance,description,
 			remark: remark || 'Credit added',
 			date: date || new Date(),
 		};
@@ -112,7 +112,7 @@ export const addCreditFunction = async (req, res) => {
 // Add debit to a debtor
 export const addDebitFunction = async (req, res) => {
 	try {
-		const { debtorId, debitAmount, remark = '', date } = req.body;
+		const { debtorId, debitAmount, description, remark = '', date } = req.body;
 
 		// Find the debtor by ID
 		const debtor = await Debtor.findById(debtorId);
@@ -127,6 +127,7 @@ export const addDebitFunction = async (req, res) => {
 		const newTransaction = {
 			debit: debitAmount,
 			balance: newBalance,
+			description,
 			remark: remark || 'Debit added',
 			date: date || new Date(),
 		};
@@ -147,7 +148,7 @@ export const addDebitFunction = async (req, res) => {
 export const editDebt = async (req, res) => {
 	try {
 		const { id } = req.params; // Debtor ID
-		const { debtId, date, amount, remark } = req.body; // Transaction details to update
+		const { debtId, date, amount, remark, description } = req.body; // Transaction details to update
 
 		if (!id) {
 			return res.status(404).json({ error: 'Invalid Debtor id' });
@@ -190,6 +191,7 @@ export const editDebt = async (req, res) => {
 
 		// Update optional fields (remark, date)
 		transaction.remark = remark ?? transaction.remark;
+		transaction.description = description ?? transaction.description;
 		transaction.date = date ?? transaction.date;
 
 		// Save the updated debtor

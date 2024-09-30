@@ -43,6 +43,10 @@ const CreditSchema = new mongoose.Schema(
 			type: String,
 			default: '',
 		},
+		remark: {
+			type: String,
+			default: '',
+		},
 		materials: [MaterialSchema],
 		quantity: {
 			type: Number,

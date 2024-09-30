@@ -3,7 +3,7 @@ import { useState, useMemo } from 'react';
 import { AiFillEdit, AiFillDelete } from 'react-icons/ai';
 import moment from 'moment';
 
-const Table = ({ tableData, handelEdit, handelDelete }) => {
+const Table = ({ tableData, handelEdit, handelDelete, tableRef }) => {
 	const [query, setQuery] = useState('');
 	const handleChange = (e) => {
 		setQuery(e.target.value);
@@ -16,6 +16,7 @@ const Table = ({ tableData, handelEdit, handelDelete }) => {
 				data._id?.toLowerCase().includes(query.toLowerCase()) ||
 				data.name?.toLowerCase().includes(query.toLowerCase()) ||
 				data.phone?.toLowerCase().includes(query.toLowerCase()) ||
+				data.description?.toLowerCase().includes(query.toLowerCase()) ||
 				data.credit?.toString().includes(query) ||
 				data.debit?.toString().includes(query) ||
 				data.balance?.toString().includes(query) ||
@@ -91,11 +92,17 @@ const Table = ({ tableData, handelEdit, handelDelete }) => {
 				</svg>
 			</div>
 			<div className="w-full overflow-x-scroll md:overflow-auto max-w-xl xs:max-w-xl sm:max-w-xl md:max-w-7xl 2xl:max-w-none mt-1">
-				<table className="table-auto overflow-scroll md:overflow-auto w-full text-left font-inter border-separate border-spacing-y-1">
+				<table
+					ref={tableRef}
+					className="table-auto overflow-scroll md:overflow-auto w-full text-left font-inter border-separate border-spacing-y-1"
+				>
 					<thead className="bg-[#222E3A]/[6%] rounded-lg text-base text-white font-semibold w-full">
 						<tr className="">
 							<th className="py-3 pl-3 text-[#212B36] text-sm font-normal whitespace-nowrap rounded-l-lg w-[50px]">
 								Date
+							</th>
+							<th className="py-3 px-2.5 text-[#212B36] text-sm font-normal whitespace-nowrap w-[50px]">
+								Desc
 							</th>
 							<th className="py-3 px-2.5 text-[#212B36] text-sm font-normal whitespace-nowrap w-[50px]">
 								Credit ₦
@@ -122,6 +129,9 @@ const Table = ({ tableData, handelEdit, handelDelete }) => {
 							>
 								<td className="py-2 px-2.5 text-sm font-normal text-[#637381] whitespace-nowrap">
 									{moment(data?.date || data?.createdAt).format('ll')}
+								</td>
+								<td className="py-4 px-1 text-sm font-normal text-[#4F80E1] whitespace-nowrap bg-gray-50">
+									{data?.description}
 								</td>
 								<td className="py-4 px-1 text-sm font-normal text-[#4F80E1] whitespace-nowrap bg-gray-50">
 									{data?.credit}

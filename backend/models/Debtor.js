@@ -14,6 +14,10 @@ const TransactionSchema = new mongoose.Schema({
 		type: Number,
 		default: 0,
 	},
+	description: {
+		type: String,
+		default: '',
+	},
 	remark: {
 		type: String,
 		default: '',

@@ -17,7 +17,7 @@ import DepositeModal from '../components/modals/DepositeModal.jsx';
 import { MdSaveAlt } from 'react-icons/md';
 const Creditors = () => {
 	const [loading, setIsLoading] = useState(false);
-	// const [isAddModal, setIsAddModal] = useState(false);	
+	// const [isAddModal, setIsAddModal] = useState(false);
 	const [isDepositModal, setIsDepositModal] = useState(false);
 	const [tableData, setTableDate] = useState([]);
 	const { user } = useContext(AuthContext);

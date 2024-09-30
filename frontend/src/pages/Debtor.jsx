@@ -1,6 +1,6 @@
 import DebtorTable from '../components/DebtorTable.jsx';
 import Loader from '../components/Loader.jsx';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useRef } from 'react';
 import CreditModal from '../components/modals/CreditModal.jsx';
 import DebitModal from '../components/modals/DebitModal.jsx';
 import DeleteDebitModal from '../components/modals/DeleteDebt.jsx';
@@ -14,6 +14,8 @@ import { FaMinus, FaPlus } from 'react-icons/fa6';
 import { IoMdOptions } from 'react-icons/io';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { Link, useParams } from 'react-router-dom';
+import { useDownloadExcel } from 'react-export-table-to-excel';
+import { SiMicrosoftexcel } from 'react-icons/si';
 const Debtors = () => {
 	const [loading, setIsLoading] = useState(false);
 	const [isAddModal, setIsAddModal] = useState(false);
@@ -23,6 +25,7 @@ const Debtors = () => {
 	const [isDeleteDebitModal, setIsDeleteDebitModal] = useState(false);
 	const { user } = useContext(AuthContext);
 	const { id } = useParams();
+	const tableRef = useRef(null);
 	const { data, isLoading, error } = useQuery({
 		queryKey: ['debtors', id],
 		queryFn: async () => fetchDebtor({ user, id }),
@@ -51,7 +54,11 @@ const Debtors = () => {
 		setAccount(data);
 		setIsDeleteDebitModal(true);
 	};
-
+	const { onDownload } = useDownloadExcel({
+		currentTableRef: tableRef.current,
+		filename: `${data?.customer?.name} transactions`,
+		sheet: 'Users',
+	});
 	return (
 		<>
 			<main className=" w-full py-3 pl-7 pr-5 gap-5 flex flex-col space-y-3">
@@ -99,12 +106,20 @@ const Debtors = () => {
 								<FaMinus />
 								Debit
 							</MenuItem>
+							<MenuItem
+								as="button"
+								className="pl-3 py-2 px-2 flex w-full justify-start items-center gap-1 rounded text-sm  text-gray-700 hover:bg-red-100 font-normal"
+								onClick={onDownload}
+							>
+								<SiMicrosoftexcel className="text-green-500" />
+								Export
+							</MenuItem>
 						</MenuItems>
 					</Menu>
 				</div>
 				<div>
-					<div className="p-5 mb-4  bg-white flex flex-col md:max-w-xs 2xl:max-w-none w-full rounded-xl gap-2 border border-[#E7E7E7] hover:shadow-xl cursor-pointer">
-						<div className={`flex justify-between`}>
+					<div className="p-5 mb-4  bg-white flex flex-col md:max-w-md w-full rounded-xl gap-2 border border-[#E7E7E7] hover:shadow-xl cursor-pointer">
+						<div className={`flex justify-between `}>
 							<span className="text-[#637381] text-sm font-medium">
 								Account Balance
 							</span>

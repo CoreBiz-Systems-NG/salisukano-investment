@@ -13,24 +13,35 @@ const Debtors = () => {
 	const [isAddModal, setIsAddModal] = useState(false);
 	const [isEditModal, setIsEditModal] = useState(false);
 	const [debtor, setDebtor] = useState(false);
+	const [total, setTotal] = useState(0);
 	const { user } = useContext(AuthContext);
 	const { data, isLoading, error } = useQuery({
 		queryKey: ['debtors'],
 		queryFn: async () => fetchDebtors(user),
 	});
 	useEffect(() => {
-		// if (data && data.length > 0) {
-		if (data) {
-			// setBusiness(data);
-			console.log(data);
+		// If data is present and has at least one entry
+		if (data?.length > 0) {
+			// Use reduce to calculate the total balance
+			const totalBalance = data.reduce(
+				(total, item) => total + item.balance,
+				0
+			);
+			setTotal(totalBalance);
+			console.log(totalBalance);
+
+			// Optionally navigate or handle other side effects
 			// navigate('/');
 		}
+
+		// Handle error
 		if (error) {
 			console.log(error);
 			const message = getError(error);
 			toast.error(message);
 		}
 	}, [data, error]);
+
 	const handelAddModal = () => {
 		setIsAddModal(true);
 	};
@@ -45,6 +56,29 @@ const Debtors = () => {
 			<main className=" w-full  py-3 pl-7 pr-5 gap-5 flex flex-col space-y-3">
 				<div className="flex justify-between">
 					<h4 className="font-semibold text-lg text-primary">Debtors</h4>
+				</div>
+				<div className="p-5 mb-4  bg-white flex flex-col md:max-w-md w-full rounded-xl gap-2 border border-[#E7E7E7] hover:shadow-xl cursor-pointer">
+					<div className={`flex justify-between `}>
+						<span className="text-[#637381] text-sm font-medium">
+							Total Balance
+						</span>
+						<div className="flex gap-1 items-center">
+							<span className="">100%</span>
+							<img src="/assets/admin/dashboard/uparrow.svg" alt="graph" />
+						</div>
+					</div>
+					<div
+						className={`flex gap-4 justify-between flex-nowrap items-center`}
+					>
+						<span className="text-xl font-bold whitespace-nowrap">
+							₦ {total || 0}
+						</span>
+						<img
+							src="/assets/admin/dashboard/graph1.svg"
+							className="w-10 h-10"
+							alt="graph"
+						/>
+					</div>
 				</div>
 				<DebtorsTable
 					tableData={data || []}
