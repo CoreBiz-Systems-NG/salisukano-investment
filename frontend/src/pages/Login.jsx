@@ -6,6 +6,7 @@ import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { LocalStorage } from '../hooks/LocalStorage';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
+import logo from '../assets/techbg.svg';
 import getError from '../hooks/getError';
 const Login = () => {
 	const { user, setUser } = useContext(AuthContext);
@@ -62,35 +63,35 @@ const Login = () => {
 		}
 	};
 	// const backgroundImageUrl = ;
-	const logo = 'https://picsum.photos/500/400';
+	// const logo = 'https://picsum.photos/500/400';
 	const bgImage = {
 		backgroundImage: `url(${logo})`,
 	};
 	return (
 		<>
 			<div
-				className="flex h-screen w-full items-center justify-center bg-gray-900 bg-cover bg-no-repeat"
+				className="flex h-screen w-full items-center justify-center bg-gray-300 bg-cover bg-no-repeat"
 				style={bgImage}
 			>
-				<div className="rounded-xl bg-gray-800 bg-opacity-50 px-6 py-10 shadow-lg backdrop-blur-md max-sm:px-8 w-full mx-4 sm:w-[500px] md:mx-4">
-					<div className="text-white">
+				<div className="rounded-xl bg-white bg-opacity-50 px-6 py-10 shadow-lg backdrop-blur-md max-sm:px-8 w-full mx-4 sm:w-[500px] md:mx-4">
+					<div className="text-black">
 						<div className="mb-8 flex flex-col items-center">
 							<img
 								src="./logo.jpg"
 								className="mx-auto h-20 w-auto rounded-full"
 								alt="Workflow"
 							/>
-							<h1 className="mb-2 text-lg uppercase">
+							<h1 className="mb-2 text-lg font-semibold uppercase">
 								Salisu Kano International Limited
 							</h1>
 						</div>
 						<form onSubmit={handleSubmit} className="w-full">
 							<div className="mb-4 text-lg">
-								<p className="mb-0 text-base text-white">
+								<p className="mb-0 text-base text-black">
 									Email <span className="text-red-500">*</span>
 								</p>
 								<input
-									className="rounded-lg border-none bg-slate-400 bg-opacity-50 px-4 w-full py-2 text-inherit placeholder-slate-200 shadow-lg outline-none backdrop-blur-md"
+									className="rounded-lg border-none bg-slate-400 bg-opacity-50 px-4 w-full py-2 text-inherit placeholder-slate-800 shadow-lg outline-none backdrop-blur-md"
 									type="text"
 									name="name"
 									placeholder="salisu@email.com"
@@ -100,11 +101,11 @@ const Login = () => {
 							</div>
 
 							<div className="mb-4 text-lg relative">
-								<p className="mb-0 text-base text-white">
+								<p className="mb-0 text-base text-black">
 									Password <span className="text-red-500">*</span>
 								</p>
 								<input
-									className="rounded-lg border-none bg-slate-400 bg-opacity-50 px-4 w-full py-2  text-inherit placeholder-slate-200 shadow-lg outline-none backdrop-blur-md"
+									className="rounded-lg border-none bg-slate-400 bg-opacity-50 px-4 w-full py-2  text-inherit placeholder-slate-800 shadow-lg outline-none backdrop-blur-md"
 									type={showPassword ? 'text' : 'password'}
 									name="password"
 									placeholder="*********"
@@ -115,12 +116,12 @@ const Login = () => {
 									{showPassword ? (
 										<FiEyeOff
 											onClick={() => setShowPassword(false)}
-											className="text-white cursor-pointer"
+											className="text-black cursor-pointer"
 										/>
 									) : (
 										<FiEye
 											onClick={() => setShowPassword(true)}
-											className="text-white cursor-pointer"
+											className="text-black cursor-pointer"
 										/>
 									)}
 								</span>
@@ -133,7 +134,7 @@ const Login = () => {
 										type="checkbox"
 										checked={rememberMe}
 										onChange={() => setRememberMe(!rememberMe)}
-										className="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out"
+										className="form-checkbox h-4 w-4 text-indigo-800 transition duration-150 ease-in-out"
 									/>
 									<label
 										htmlFor="remember_me"
@@ -146,7 +147,7 @@ const Login = () => {
 								<div className="text-sm leading-5">
 									<Link
 										to="/forgot-password"
-										className="font-medium text-blue-500 hover:text-blue-500 focus:outline-none focus:underline transition ease-in-out duration-150"
+										className="font-medium text-blue-800 hover:text-blue-600 focus:outline-none focus:underline transition ease-in-out duration-150"
 									>
 										Forgot your password?
 									</Link>
@@ -155,7 +156,7 @@ const Login = () => {
 							<div className="mt-6 flex justify-center text-lg text-black">
 								<button
 									type="submit"
-									className="rounded-lg bg-blue-500 hover:bg-blue-600 bg-opacity-50 px-10 w-full py-2 text-white shadow-xl backdrop-blur-md transition-colors duration-300 "
+									className="rounded-lg bg-blue-800 hover:bg-blue-600 hover:bg-opacity-50 px-10 w-full py-2 text-white shadow-xl backdrop-blur-md transition-colors duration-300 "
 								>
 									Login
 								</button>

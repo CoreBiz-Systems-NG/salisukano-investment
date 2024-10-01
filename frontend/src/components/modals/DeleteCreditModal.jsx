@@ -54,9 +54,9 @@ const DeleteModal = ({
 								account?._id,
 							],
 						});
-						toast.success(' Transaction deleted successfully');
+						toast.success('Transaction deleted successfully');
 					}
-					navigate('/creditors');
+					navigate(`/creditors/${debtorId}`);
 				})
 				.catch((error) => {
 					const message = getError(error);

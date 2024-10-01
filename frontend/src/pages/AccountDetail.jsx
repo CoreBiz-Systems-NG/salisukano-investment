@@ -69,7 +69,7 @@ const Transaction = () => {
 	const { onDownload } = useDownloadExcel({
 		currentTableRef: tableRef.current,
 		filename: `${data?.customer?.name} ${moment(data?.account?.month).format(
-			'll'
+			'MMM YYYY'
 		)} transactions`,
 		sheet: 'Users',
 	});

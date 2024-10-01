@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 // import { AiFillEdit } from 'react-icons/ai';
 import moment from 'moment';
 
-const Table = ({ tableData }) => {
+const Table = ({ tableData, tableRef }) => {
 	const navigate = useNavigate();
 	const [query, setQuery] = useState('');
 	const handelClick = (item) => {
@@ -95,7 +95,10 @@ const Table = ({ tableData }) => {
 				</svg>
 			</div>
 			<div className="w-full overflow-x-scroll md:overflow-auto max-w-xl xs:max-w-xl sm:max-w-xl md:max-w-7xl 2xl:max-w-none mt-1">
-				<table className="table-auto overflow-scroll md:overflow-auto w-full text-left font-inter border-separate border-spacing-y-1">
+				<table
+					ref={tableRef}
+					className="table-auto overflow-scroll md:overflow-auto w-full text-left font-inter border-separate border-spacing-y-1"
+				>
 					<thead className="bg-[#222E3A]/[6%] rounded-lg text-base text-white font-semibold w-full">
 						<tr className="">
 							<th className="py-3 pl-3 text-[#212B36] text-sm font-normal whitespace-nowrap rounded-l-lg">

@@ -1,6 +1,6 @@
 import CreditorTable from '../components/CreditorTable.jsx';
 import Loader from '../components/Loader.jsx';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useRef } from 'react';
 import AuthContext from '../context/authContext.jsx';
 import { useQuery } from '@tanstack/react-query';
 import { fetchCreditorMonthlyCredits } from '../hooks/axiosApis.js';
@@ -12,15 +12,17 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { cleanCreditorsData } from '../hooks/cleanData';
 import { SiMicrosoftexcel } from 'react-icons/si';
-import { exportToExcel } from '../components/ExportToExcel';
 import DepositeModal from '../components/modals/DepositeModal.jsx';
+import { useDownloadExcel } from 'react-export-table-to-excel';
 import { MdSaveAlt } from 'react-icons/md';
+import moment from 'moment';
 const Creditor = () => {
 	const [loading, setIsLoading] = useState(false);
 	// const [isAddModal, setIsAddModal] = useState(false);
 	const [isDepositModal, setIsDepositModal] = useState(false);
 	const [tableData, setTableDate] = useState([]);
 	const { user } = useContext(AuthContext);
+	const tableRef = useRef(null);
 
 	const navigate = useNavigate();
 	const { id, month } = useParams();
@@ -43,9 +45,13 @@ const Creditor = () => {
 		}
 	}, [data, error]);
 
-	const handleExport = () => {
-		exportToExcel(tableData, `${data?.creditor?.name} transactions`);
-	};
+	const { onDownload } = useDownloadExcel({
+		currentTableRef: tableRef.current,
+		filename: `${data?.creditor?.name} ${moment(
+			data?.creditMonth?.month
+		).format('MMM YYYY')} transactions`,
+		sheet: 'Users',
+	});
 
 	return (
 		<>
@@ -95,7 +101,7 @@ const Creditor = () => {
 							<MenuItem
 								as="button"
 								className="pl-3 py-2 px-2 flex w-full justify-start items-center gap-1 rounded text-sm  text-gray-700 hover:bg-green-100 font-normal"
-								onClick={handleExport}
+								onClick={onDownload}
 							>
 								<SiMicrosoftexcel className="text-green-500" />
 								Export
@@ -127,7 +133,7 @@ const Creditor = () => {
 						/>
 					</div>
 				</div>
-				<CreditorTable tableData={tableData || []} />
+				<CreditorTable tableData={tableData || []} tableRef={tableRef} />
 			</main>
 			<DepositeModal
 				show={isDepositModal}
