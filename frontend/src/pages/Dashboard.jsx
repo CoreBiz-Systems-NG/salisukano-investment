@@ -30,7 +30,7 @@ const Dashboard = ({ openSideBar }) => {
 		}
 	}, [data, error]);
 	const handelAddModal = () => {
-		navigate('/add-supply');
+		navigate('/companies');
 	};
 	return (
 		<>

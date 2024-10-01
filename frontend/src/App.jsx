@@ -17,6 +17,7 @@ import Settings from './pages/Settings';
 import Accounts from './pages/Accounts';
 import AccountDetail from './pages/AccountDetail';
 import Customers from './pages/Customers';
+import Pricing from './pages/Pricing';
 import CustomerAddPayment from './pages/CustomerPayment';
 import CustomerAddSupply from './pages/CustomerSupply';
 import Loader from './components/Loader';
@@ -70,11 +71,15 @@ function App() {
 							/>
 							<Route path="/transactions/:id" element={<TransactionDetail />} />
 							<Route path="/suppliers/:id" element={<Suppliers />} />
+							<Route path="/pricing/:id" element={<Pricing />} />
 							<Route path="/debtors" element={<Debtors />} />
 							<Route path="/debtors/:id" element={<Debtor />} />
 							<Route path="/creditors" element={<Creditors />} />
 							<Route path="/creditors/:id" element={<Creditor />} />
-							<Route path="/creditors/:id/:months/:month" element={<MonthlyCredits />} />
+							<Route
+								path="/creditors/:id/:months/:month"
+								element={<MonthlyCredits />}
+							/>
 							<Route path="/creditors/:id/new-credit" element={<NewCredit />} />
 							<Route
 								path="/creditors/:id/credit/:creditId"

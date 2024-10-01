@@ -9,10 +9,11 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchCustomer } from '../hooks/axiosApis.js';
 import getError from '../hooks/getError.js';
 import toast from 'react-hot-toast';
-import { Link, useParams } from 'react-router-dom';
-import {  FaPlus } from 'react-icons/fa6';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import { FaPlus } from 'react-icons/fa6';
 import { IoMdOptions } from 'react-icons/io';
 import { useDownloadExcel } from 'react-export-table-to-excel';
+import { TbCurrencyNaira } from 'react-icons/tb';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 
 const Transaction = () => {
@@ -22,6 +23,7 @@ const Transaction = () => {
 	const [selectedAccount, setSelectedAccount] = useState(null);
 	const { user } = useContext(AuthContext);
 	const { id } = useParams();
+	const navigate = useNavigate();
 	const tableRef = useRef(null);
 
 	const { data, isLoading, error } = useQuery({
@@ -92,6 +94,13 @@ const Transaction = () => {
 							>
 								<FaPlus />
 								New Account
+							</MenuItem>
+							<MenuItem
+								as="button"
+								className="pl-3 py-2 px-2  flex w-full justify-start items-center gap-1 rounded text-sm  text-gray-700 hover:bg-blue-100 font-normal"
+								onClick={() => navigate(`/pricing/${id}`)}
+							>
+								<TbCurrencyNaira /> Pricing
 							</MenuItem>
 						</MenuItems>
 					</Menu>

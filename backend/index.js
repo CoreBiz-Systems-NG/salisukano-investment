@@ -23,6 +23,7 @@ import customerRoutes from './routes/customer.js';
 import debtorRoutes from './routes/debtor.js';
 import creditorRoutes from './routes/creditors.js';
 import accountRoutes from './routes/account.js';
+import priceRoutes from './routes/price.js';
 // import errorHandler from './middleware/errorHandler.js';
 
 /* CONFIGURATION */
@@ -78,6 +79,7 @@ app.use('/transactions', transactionRoutes);
 app.use('/general', generalRoutes);
 app.use('/supplies', supplyRoutes);
 app.use('/payments', paymentRoutes);
+app.use('/prices', priceRoutes);
 app.use('/customers', customerRoutes);
 app.use('/debtors', debtorRoutes);
 app.use('/creditors', creditorRoutes);

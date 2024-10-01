@@ -362,7 +362,10 @@ export const fetchCreditorMonthlyCredits = async (prop) => {
 				Authorization: `Bearer ${token}`,
 			},
 		};
-		const { data } = await axios.get(`${apiUrl}/creditors/${id}/month/${month}`, config);
+		const { data } = await axios.get(
+			`${apiUrl}/creditors/${id}/month/${month}`,
+			config
+		);
 		return data;
 	} catch (error) {
 		console.log(error.message);
@@ -526,6 +529,20 @@ export const fetchCurrentAccount = async (prop) => {
 			`${apiUrl}/accounts/active/${prop.id}`,
 			config
 		);
+		return data;
+	} catch (error) {
+		console.log(error.message);
+		return error;
+	}
+};
+export const fetchPrices = async (prop) => {
+	try {
+		const config = {
+			headers: {
+				Authorization: `Bearer ${prop?.token}`,
+			},
+		};
+		const { data } = await axios.get(`${apiUrl}/prices/${prop.id}`, config);
 		return data;
 	} catch (error) {
 		console.log(error.message);
