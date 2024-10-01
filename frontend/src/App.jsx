@@ -24,6 +24,7 @@ import { useState, useEffect } from 'react';
 import Debtors from './pages/Debtors';
 import Debtor from './pages/Debtor';
 import Creditors from './pages/Creditors';
+import MonthlyCredits from './pages/MonthlyCredits';
 import Creditor from './pages/Creditor';
 import NewCredit from './pages/NewCredit';
 import CreditDetails from './pages/CreditDetails';
@@ -72,12 +73,13 @@ function App() {
 							<Route path="/debtors" element={<Debtors />} />
 							<Route path="/debtors/:id" element={<Debtor />} />
 							<Route path="/creditors" element={<Creditors />} />
+							<Route path="/creditors/:id" element={<Creditor />} />
+							<Route path="/creditors/:id/:months/:month" element={<MonthlyCredits />} />
+							<Route path="/creditors/:id/new-credit" element={<NewCredit />} />
 							<Route
 								path="/creditors/:id/credit/:creditId"
 								element={<CreditDetails />}
 							/>
-							<Route path="/creditors/:id/new-credit" element={<NewCredit />} />
-							<Route path="/creditors/:id" element={<Creditor />} />
 							<Route path="/settings" element={<Settings />} />
 						</Route>
 					</Route>

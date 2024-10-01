@@ -2,7 +2,9 @@ import express from 'express';
 import {
 	createCreditor,
 	getCreditors,
-	getCreditor,
+	getMonthlyCredits,
+	getMonthlyCredit,
+	// getCreditor,
 	newCredit,
 	getCredit,
 	editCreditor,
@@ -15,8 +17,10 @@ import {
 const router = express.Router();
 
 router.get('/', getCreditors);
-router.get('/:id', getCreditor);
+router.get('/:id/month', getMonthlyCredit);
+router.get('/:id/month/:monthId', getMonthlyCredits);
 router.get('/:id/credit', getCredit);
+// router.get('/:id', getCreditor);
 router.post('/', createCreditor);
 router.post('/deposit', createDeposit);
 router.post('/:id', newCredit);

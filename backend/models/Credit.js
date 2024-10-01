@@ -36,6 +36,11 @@ const CreditSchema = new mongoose.Schema(
 			ref: 'Creditor',
 			required: true,
 		},
+		monthId: {
+			type: Schema.Types.ObjectId,
+			ref: 'CreditMonth',
+			required: true,
+		},
 		vehicleNumber: {
 			type: String,
 		},

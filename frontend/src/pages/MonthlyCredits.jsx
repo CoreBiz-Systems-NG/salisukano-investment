@@ -1,37 +1,39 @@
-import CreditorTable from '../components/CreditTable.jsx';
+import CreditorTable from '../components/CreditorTable.jsx';
 import Loader from '../components/Loader.jsx';
 import { useContext, useEffect, useState } from 'react';
 import AuthContext from '../context/authContext.jsx';
 import { useQuery } from '@tanstack/react-query';
-import { fetchCreditor } from '../hooks/axiosApis.js';
+import { fetchCreditorMonthlyCredits } from '../hooks/axiosApis.js';
 import getError from '../hooks/getError.js';
 import toast from 'react-hot-toast';
 import { FaPlus } from 'react-icons/fa6';
 import { IoMdOptions } from 'react-icons/io';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import { cleanCreditorsData } from '../hooks/cleanData';
 import { SiMicrosoftexcel } from 'react-icons/si';
+import { exportToExcel } from '../components/ExportToExcel';
 import DepositeModal from '../components/modals/DepositeModal.jsx';
 import { MdSaveAlt } from 'react-icons/md';
 const Creditor = () => {
 	const [loading, setIsLoading] = useState(false);
 	// const [isAddModal, setIsAddModal] = useState(false);
 	const [isDepositModal, setIsDepositModal] = useState(false);
-	// const [tableData, setTableDate] = useState([]);
+	const [tableData, setTableDate] = useState([]);
 	const { user } = useContext(AuthContext);
 
 	const navigate = useNavigate();
-	const { id } = useParams();
+	const { id, month } = useParams();
 	const { data, isLoading, error } = useQuery({
-		queryKey: ['creditors', id],
-		queryFn: async () => fetchCreditor({ user, id }),
+		queryKey: ['creditors', id, month],
+		queryFn: async () => fetchCreditorMonthlyCredits({ user, id, month }),
 	});
 	useEffect(() => {
 		// if (data && data.length > 0) {
 		if (data) {
 			// setBusiness(data);
-			// setTableDate(() => );
 			console.log('Business Creditor', data);
+			setTableDate(() => cleanCreditorsData(data?.credits));
 			// navigate('/');
 		}
 		if (error) {
@@ -42,7 +44,7 @@ const Creditor = () => {
 	}, [data, error]);
 
 	const handleExport = () => {
-		console.log('export');
+		exportToExcel(tableData, `${data?.creditor?.name} transactions`);
 	};
 
 	return (
@@ -116,7 +118,7 @@ const Creditor = () => {
 						className={`flex gap-4 justify-between flex-nowrap items-center`}
 					>
 						<span className="text-xl font-bold whitespace-nowrap">
-							₦ {data?.creditor?.balance || 0}
+							₦ {data?.creditMonth?.balance || 0}
 						</span>
 						<img
 							src="/assets/admin/dashboard/graph1.svg"
@@ -125,10 +127,7 @@ const Creditor = () => {
 						/>
 					</div>
 				</div>
-				<CreditorTable
-					tableData={data?.monthlyData || []}
-					creditorId={data?.creditor?._id}
-				/>
+				<CreditorTable tableData={tableData || []} />
 			</main>
 			<DepositeModal
 				show={isDepositModal}

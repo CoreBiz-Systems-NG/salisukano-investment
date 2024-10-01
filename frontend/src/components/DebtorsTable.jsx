@@ -138,7 +138,7 @@ const Table = ({ tableData, handelAddModal, handelEdit }) => {
 
 								<td
 									onClick={() => handelClick(data?._id)}
-									className="py-2 px-2.5 text-sm font-normal text-[#637381] whitespace-nowrap cursor-pointer"
+									className="py-2 px-2.5 text-sm font-normal text-[#637381] whitespace-nowrap cursor-pointer uppercase"
 								>
 									{data?.name}
 								</td>

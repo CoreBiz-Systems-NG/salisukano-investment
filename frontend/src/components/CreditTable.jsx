@@ -1,20 +1,14 @@
 /* eslint-disable react/prop-types */
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SiMicrosoftexcel } from 'react-icons/si';
+// import { AiFillEdit } from 'react-icons/ai';
 import moment from 'moment';
-// import { formatPrice } from '../hooks/formatPrice';
 
-const TransactionTable = ({
-	tableData,
-	handelExportToExcel,
-	handelChangeActive,
-	tableRef,
-}) => {
+const Table = ({ tableData, creditorId }) => {
 	const navigate = useNavigate();
 	const [query, setQuery] = useState('');
 	const handelClick = (item) => {
-		navigate(`/accounts/${item}`);
+		navigate(`/creditors/${creditorId}/months/${item._id}`);
 	};
 	const handleChange = (e) => {
 		setQuery(e.target.value);
@@ -24,12 +18,12 @@ const TransactionTable = ({
 		return tableData?.filter((data) => {
 			// Filter by query (search)
 			const matchesQuery =
-				data._id?.toLowerCase().includes(query.toLowerCase()) ||
-				data.name?.toLowerCase().includes(query.toLowerCase()) ||
-				data.vehicleNumber?.toLowerCase().includes(query.toLowerCase()) ||
-				data.quantity?.toString().includes(query) ||
-				data.balance?.toString().includes(query) ||
-				moment(data.createdAt).format('DD-MM-YYYY').includes(query);
+				data?.month?.toLowerCase().includes(query.toLowerCase()) ||
+				// data?.total?.toLowerCase().includes(query.toLowerCase()) ||
+				// data?.vehicleNumber?.toLowerCase().includes(query.toLowerCase()) ||
+				// data?.description?.toLowerCase().includes(query.toLowerCase()) ||
+				data?.balance?.toString().includes(query) ||
+				moment(data?.createdAt).format('DD-MM-YYYY').includes(query);
 
 			return matchesQuery;
 		});
@@ -37,9 +31,6 @@ const TransactionTable = ({
 	return (
 		<div className="w-full p-3 bg-white flex flex-col col-span-12 rounded-xl border border-[#E7E7E7] lg:row-start-4">
 			<div className="flex items-center justify-between flex-wrap gap-1">
-				<h3 className="text-[#212B36] text-base font-semibold -tracking-[0.15px] whitespace-nowrap">
-					Transactions
-				</h3>
 				<div className="flex gap-2 items-center justify-center w-fit">
 					<div className="lg:max-w-sm  border focus-within:border-blue-600 rounded-lg border-[#E7E7E7] py-3 px-4 justify-between items-center max-h-10 hidden md:flex">
 						<input
@@ -70,14 +61,6 @@ const TransactionTable = ({
 							/>
 						</svg>
 					</div>
-					<button
-						className="py-2.5 px-2 border border-[#E7E7E7] flex
-					justify-center items-center gap-1 rounded text-sm text-white bg-blue-500 hover:bg-blue-700
-					font-normal"
-						onClick={handelExportToExcel}
-					>
-						Export <SiMicrosoftexcel className="text-white" />
-					</button>
 				</div>
 			</div>
 
@@ -112,82 +95,35 @@ const TransactionTable = ({
 				</svg>
 			</div>
 			<div className="w-full overflow-x-scroll md:overflow-auto max-w-xl xs:max-w-xl sm:max-w-xl md:max-w-7xl 2xl:max-w-none mt-1">
-				<table
-					ref={tableRef}
-					className="table-auto overflow-scroll md:overflow-auto w-full text-left font-inter border-separate border-spacing-y-1"
-				>
+				<table className="table-auto overflow-scroll md:overflow-auto w-full text-left font-inter border-separate border-spacing-y-1">
 					<thead className="bg-[#222E3A]/[6%] rounded-lg text-base text-white font-semibold w-full">
 						<tr className="">
-							<th className="py-3 pl-3 text-[#212B36] text-sm font-normal whitespace-nowrap rounded-l-lg">
-								Month
+							<th className="py-3 pl-3 text-[#212B36] text-sm font-normal whitespace-nowrap rounded-l-lg md:w-[50px]">
+								S/N
 							</th>
-							<th className="py-3 text-[#212B36] text-sm font-normal whitespace-nowrap md:w-[150px]">
-								Opening Balance ₦
+							<th className="py-3 p-2 text-[#212B36] text-sm font-normal whitespace-nowrap md:w-[100px]">
+								Date
 							</th>
-							<th className="py-3 px-2.5 text-[#212B36] text-sm font-normal whitespace-nowrap md:w-[150px]">
-								Credit ₦
-							</th>
-							<th className="py-3 text-[#212B36] text-sm font-normal whitespace-nowrap md:w-[150px]">
-								Debit ₦
-							</th>
-							<th className="py-3 text-[#212B36] text-sm font-normal whitespace-nowrap ">
+							<th className="py-3 p-2  text-[#212B36] text-sm font-normal whitespace-nowrap">
 								Balance ₦
-							</th>
-							<th className="py-3 text-[#212B36] text-sm font-normal whitespace-nowrap md:w-[100px]">
-								Status
 							</th>
 						</tr>
 					</thead>
 					<tbody>
-						{filteredData?.map((data) => (
+						{filteredData?.map((data, index) => (
 							<tr
-								key={data._id}
-								className="drop-shadow-[0_0_10px_rgba(34,46,58,0.02)] bg-[#f6f8fa] hover:shadow-2xl p-2"
+								key={data?._id || index}
+								onClick={() => handelClick(data)}
+								className="drop-shadow-[0_0_10px_rgba(34,46,58,0.02)] bg-[#f6f8fa] hover:shadow-2xl p-2 cursor-pointer"
 							>
-								<td
-									onClick={() => handelClick(data._id)}
-									className="py-2 pl-3 text-sm font-normal text-[#637381] rounded-l-lg whitespace-nowrap cursor-pointer"
-								>
-									{moment(data?.month).format('MMMM YY')}
+								<td className="py-2 pl-3 text-sm font-normal text-[#637381] whitespace-nowrap">
+									{index + 1}
 								</td>
-
-								<td
-									onClick={() => handelClick(data._id)}
-									className="py-2 px-2.5 text-sm font-normal text-[#DD6107] whitespace-nowrap cursor-pointer"
-								>
-									{data?.openingBalance}
+								<td className="py-2 px-2 text-sm font-normal text-[#637381] whitespace-nowrap capitalize">
+									{moment(data?.month).format('MMM YYYY')}
 								</td>
-								<td
-									onClick={() => handelClick(data._id)}
-									className="py-4 px-1 text-sm font-normal text-[#4F80E1] whitespace-nowrap bg-gray-50 cursor-pointer"
-								>
-									{data?.credit}
-								</td>
-								<td
-									onClick={() => handelClick(data._id)}
-									className="py-4 px-1 text-sm font-normal text-[#FB4949] whitespace-nowrap cursor-pointer"
-								>
-									{data?.debit}
-								</td>
-								<td
-									onClick={() => handelClick(data._id)}
-									className="py-2 px-1 text-sm font-normal text-[#10B860] whitespace-nowrap bg-gray-50 cursor-pointer"
-								>
-									{data?.balance}
-								</td>
-								<td
-									onClick={() => handelChangeActive(data)}
-									className="py-1 px-1 text-sm font-normal  whitespace-nowrap cursor-pointer"
-								>
-									<span
-										className={` p-1 rounded-md capitalize ${
-											data?.status === 'active'
-												? 'border-b bg-[#10B860] text-white'
-												: 'text-[#637381]'
-										}`}
-									>
-										{data?.status || ''}
-									</span>
+								<td className="py-2 px-2 text-sm font-normal text-[#10B860] whitespace-nowrap">
+									{data?.balance || '-'}
 								</td>
 							</tr>
 						))}
@@ -198,4 +134,4 @@ const TransactionTable = ({
 	);
 };
 
-export default TransactionTable;
+export default Table;
