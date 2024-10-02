@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import Transaction from '../models/Transaction.js';
 import Customer from '../models/Customer.js';
 import Account from '../models/Account.js';
+import Payment from '../models/Payment.js';
 import fs from 'fs';
 import { uploader } from '../utils/cloudinary.js';
 import dotenv from 'dotenv';
@@ -12,7 +13,117 @@ cloudinary.config({
 	api_key: process.env.CLOUDINARY_API_KEY,
 	api_secret: process.env.CLOUDINARY_API_SECRET,
 });
+export const newPayment = async (req, res) => {
+	const session = await mongoose.startSession();
+	session.startTransaction();
 
+	try {
+		const { amount, date, customerId, remark } = req.body;
+
+		// Find the last payment by customer sorted by date
+		const lastPayment = await Payment.findOne({ customerId })
+			.sort({ date: -1 })
+			.session(session);
+
+		// Calculate new balance
+		let newBalance = 0;
+		if (lastPayment) {
+			newBalance = Number(lastPayment.balance) + Number(amount);
+		} else {
+			newBalance = Number(amount);
+		}
+
+		// Create new payment
+		const newPayment = await Payment.create(
+			[
+				{
+					customerId,
+					date,
+					balance: newBalance,
+					remark,
+				},
+			],
+			{ session }
+		);
+
+		await session.commitTransaction();
+
+		return res.status(201).json({
+			payment: newPayment,
+			message: 'Payment created successfully',
+		});
+	} catch (error) {
+		await session.abortTransaction();
+		console.error('Error creating payment:', error);
+		res.status(500).json({ message: 'Internal server error' });
+	} finally {
+		session.endSession();
+	}
+};
+
+export const getPayments = async (req, res) => {
+	try {
+		const { id } = req.params;
+
+		// Validate the company ID
+		if (!id) {
+			return res.status(400).json({ message: 'Invalid company ID' });
+		}
+
+		// Find the account by ID and populate the customer details
+		const account = await Account.findById(id).populate('customerId');
+		if (!account) {
+			return res.status(404).json({ message: 'Account not found' });
+		}
+
+		// Use aggregation to calculate total quantity and total credit
+		const [result] = await Transaction.aggregate([
+			{
+				$match: {
+					accountId: new mongoose.Types.ObjectId(id), // Filter transactions by accountId
+					debit: { $exists: true, $ne: 0 }, // Only consider supplies with a vehicleNumber
+				},
+			},
+			{
+				$group: {
+					_id: null,
+
+					totalDebit: { $sum: '$debit' }, // Sum up the total debit
+					payments: {
+						$push: {
+							vehicleNumber: '$vehicleNumber',
+							createdAt: '$createdAt',
+							date: '$date',
+							name: '$name',
+							debit: '$debit',
+							remark: '$vehicleNumber',
+							description: '$description',
+						},
+					}, // Collect all supply data
+				},
+			},
+		]);
+		if (!result) {
+			return res.status(200).json({
+				account,
+				totalDebit: 0,
+				payments: [],
+				message: 'No payment found',
+			});
+		}
+
+		// Respond with the account, supplies data, and aggregated totals
+		res.status(200).json({
+			account,
+			totalDebit: result.totalDebit,
+			payments: result.payments,
+			message: 'Payments fetched successfully',
+		});
+	} catch (error) {
+		console.error('Error fetching payments:', error.message);
+		res.status(500).json({ error: 'Internal Server Error' });
+	}
+};
 export const createPayment = async (req, res) => {
 	const session = await mongoose.startSession();
 	session.startTransaction();

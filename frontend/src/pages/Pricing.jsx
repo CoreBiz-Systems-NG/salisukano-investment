@@ -69,7 +69,7 @@ const Debtors = () => {
 						<li className="breadcrumb-item text-muted">
 							<Link
 								to={'/companies'}
-								className="text-blue-500/60 hover:text-blue-500"
+								className="font-semibold text-lg text-blue-500/60 hover:text-blue-500"
 							>
 								Pricing
 							</Link>

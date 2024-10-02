@@ -98,7 +98,7 @@ const Table = ({ tableData, handelDelete }) => {
 					<thead className="bg-[#222E3A]/[6%] rounded-lg text-base text-white font-semibold w-full">
 						<tr className="">
 							<th className="py-3 pl-3 text-[#212B36] text-sm font-normal whitespace-nowrap rounded-l-lg md:w-[100px]">
-								S/N
+								Date
 							</th>
 							<th className="py-3 text-[#212B36] text-sm font-normal whitespace-nowrap md:w-[100px]">
 								Old Mix ₦
@@ -124,7 +124,7 @@ const Table = ({ tableData, handelDelete }) => {
 							<th className="py-3 text-[#212B36] text-sm font-normal whitespace-nowrap md:w-[100px]">
 								New Special ₦
 							</th>
-							<th className="py-3 text-[#212B36] text-sm font-normal whitespace-nowrap md:w-[100px]">
+							<th className="py-3 text-[#212B36] text-sm font-normal whitespace-nowrap">
 								Diff ₦
 							</th>
 							<th className="py-3 text-[#212B36] text-sm font-normal whitespace-nowrap md:w-[100px] text-center">
@@ -135,7 +135,7 @@ const Table = ({ tableData, handelDelete }) => {
 					<tbody>
 						{filteredData?.map((data, index) => (
 							<tr
-								key={data?._id}
+								key={data?._id || index}
 								className="drop-shadow-[0_0_10px_rgba(34,46,58,0.02)] bg-[#f6f8fa] hover:shadow-2xl p-2 cursor-pointer"
 							>
 								<td className="py-2 pl-3 text-sm font-normal text-[#637381] rounded-l-lg whitespace-nowrap cursor-pointer">
@@ -163,11 +163,11 @@ const Table = ({ tableData, handelDelete }) => {
 								<td className="py-4 px-1 text-sm font-normal text-[#637381] whitespace-nowrap bg-gray-50 cursor-pointer">
 									{data?.oldSpecial}
 								</td>
-								<td className="py-4 px-1 text-sm font-normal text-[#637381] whitespace-nowrap bg-gray-50 cursor-pointer">
-									{data?.oldSpecial - data?.newSpecial}
-								</td>
 								<td className="py-2 px-2.5 text-sm font-normal text-[#637381] whitespace-nowrap cursor-pointer uppercase">
 									{data?.newSpecial}
+								</td>
+								<td className="py-4 px-1 text-sm font-normal text-[#637381] whitespace-nowrap bg-gray-50 cursor-pointer">
+									{data?.oldSpecial - data?.newSpecial}
 								</td>
 								<td className="py-2 px-1 text-sm font-normal whitespace-nowrap bg-gray-50 flex gap-2 justify-center items-center h-full">
 									{/* <span

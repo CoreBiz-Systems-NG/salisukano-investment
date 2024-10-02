@@ -549,6 +549,20 @@ export const fetchPrices = async (prop) => {
 		return error;
 	}
 };
+export const fetchPayments = async (prop) => {
+	try {
+		const config = {
+			headers: {
+				Authorization: `Bearer ${prop?.token}`,
+			},
+		};
+		const { data } = await axios.get(`${apiUrl}/payments/${prop.id}`, config);
+		return data;
+	} catch (error) {
+		console.log(error.message);
+		return error;
+	}
+};
 const fetchTransactingCustomers = async (prop) => {
 	try {
 		const config = {

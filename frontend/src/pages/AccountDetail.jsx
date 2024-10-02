@@ -17,6 +17,7 @@ import OpeningBalanceModal from '../components/modals/OpeningBalance.jsx';
 import { cleanTableData } from '../hooks/cleanData';
 import { IoMdOptions } from 'react-icons/io';
 import { TfiTruck } from 'react-icons/tfi';
+import { GiReceiveMoney } from 'react-icons/gi';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { useDownloadExcel } from 'react-export-table-to-excel';
 // import axios from 'axios';
@@ -61,7 +62,7 @@ const Transaction = () => {
 		navigate(`/payment/${id}`);
 	};
 	const handelSuppliers = () => {
-		navigate(`/suppliers/${id}`);
+		navigate(`/supplies/${id}`);
 	};
 	const handleOpeningBalance = () => {
 		setIsBalanceModal(true);
@@ -136,7 +137,14 @@ const Transaction = () => {
 								className="pl-3 py-2 px-2 flex w-full justify-start items-center gap-1 rounded text-sm  text-gray-700 hover:bg-green-100 font-normal"
 								onClick={handelSuppliers}
 							>
-								<TfiTruck /> Suppliers
+								<TfiTruck /> Supplies
+							</MenuItem>
+							<MenuItem
+								as="button"
+								className="pl-3 py-2 px-2  flex w-full justify-start items-center gap-1 rounded text-sm  text-gray-700 hover:bg-blue-100 font-normal"
+								onClick={() => navigate(`/payments/${id}`)}
+							>
+								<GiReceiveMoney className="" /> Payments
 							</MenuItem>
 						</MenuItems>
 					</Menu>

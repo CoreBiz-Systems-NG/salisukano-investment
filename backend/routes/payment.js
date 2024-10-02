@@ -1,5 +1,6 @@
 import express from 'express';
 import {
+	getPayments,
 	createPayment,
 	updatePayment,
 	updateCustomerPayment,
@@ -10,6 +11,7 @@ import {
 
 const router = express.Router();
 
+router.get('/:id', getPayments);
 router.post('/', createPayment);
 router.post('/customers', createCustomerPayment);
 router.patch('/customers/:id', updateCustomerPayment);

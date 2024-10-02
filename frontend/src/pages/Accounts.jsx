@@ -100,8 +100,9 @@ const Transaction = () => {
 								className="pl-3 py-2 px-2  flex w-full justify-start items-center gap-1 rounded text-sm  text-gray-700 hover:bg-blue-100 font-normal"
 								onClick={() => navigate(`/pricing/${id}`)}
 							>
-								<TbCurrencyNaira /> Pricing
+								<TbCurrencyNaira className='text-lg' /> Pricing
 							</MenuItem>
+							
 						</MenuItems>
 					</Menu>
 				</div>

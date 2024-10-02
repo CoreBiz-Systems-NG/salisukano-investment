@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useNavigate } from 'react-router-dom';
 import { useState, useMemo } from 'react';
+import { FaPlus } from 'react-icons/fa6';
 import moment from 'moment';
 import { SiMicrosoftexcel } from 'react-icons/si';
 
@@ -115,50 +116,38 @@ const TransactionTable = ({ tableData, tableRef, handelExportToExcel }) => {
 				>
 					<thead className="bg-[#222E3A]/[6%] rounded-lg text-base text-white font-semibold w-full">
 						<tr className="">
-							<th className="py-3 pl-3 text-[#212B36] text-sm font-normal whitespace-nowrap rounded-l-lg">
-								S/N
-							</th>
-							<th className="py-3 pl-3 text-[#212B36] text-sm font-normal whitespace-nowrap">
+							<th className="py-3 pl-3 text-[#212B36] text-sm font-normal whitespace-nowrap rounded-l-lg md:w-[100px]">
 								Date
 							</th>
-							<th className="py-3 pl-3 text-[#212B36] text-sm font-normal whitespace-nowrap">
-								Customers
+							<th className="py-3 pl-3 text-[#212B36] text-sm font-normal whitespace-nowrap md:w-[100px] ">
+								Description
 							</th>
-							<th className="py-3 text-[#212B36] text-sm font-normal whitespace-nowrap">
-								Vehicle
-							</th>
-							<th className="py-3 pl-1 text-[#212B36] text-sm font-normal whitespace-nowrap">
-								Tonnage (kg)
-							</th>
-							<th className="py-3 pl-1 text-[#212B36] text-sm font-normal whitespace-nowrap">
+							<th className="py-3 pl-1 text-[#212B36] text-sm font-normal whitespace-nowrap md:w-[100px]">
 								Amount ₦
+							</th>
+							<th className="py-3 pl-1 text-[#212B36] text-sm font-normal whitespace-nowrap">
+								Remarks
 							</th>
 						</tr>
 					</thead>
 					<tbody>
 						{filteredData?.map((data, index) => (
 							<tr
-								key={data._id}
+								key={data._id || index}
 								onClick={() => handelClick(data._id)}
 								className="drop-shadow-[0_0_10px_rgba(34,46,58,0.02)] bg-[#f6f8fa] hover:shadow-2xl cursor-pointer"
 							>
 								<td className="py-2 pl-3 text-sm font-normal text-[#637381] rounded-l-lg whitespace-nowrap">
-									{index + 1}
-								</td>
-								<td className="py-2 pl-3 text-sm font-normal text-[#637381] rounded-l-lg whitespace-nowrap">
 									{moment(data?.date || data?.createdAt).format('ll')}
 								</td>
-								<td className="py-2 pl-3 text-sm font-normal text-[#637381] rounded-l-lg whitespace-nowrap uppercase">
+								<td className="py-2 pl-3 text-sm font-normal text-[#637381]bg-gray-50 rounded-l-lg whitespace-nowrap uppercase">
 									{data?.name}
 								</td>
-								<td className="py-2 px-1 text-sm font-normal text-[#637381] rounded-r-[8px] bg-gray-50 whitespace-nowrap">
-									{data?.vehicleNumber?.substr(0, 30)}
+								<td className="py-4 px-1 text-sm font-normal text-[#DD6107] whitespace-nowrap bg-gray-50">
+									{data?.debit || ''}
 								</td>
-								<td className="py-4 px-1 text-sm font-normal text-[#10B860] whitespace-nowrap bg-gray-50">
-									{data?.quantity || ''}
-								</td>
-								<td className="py-4 px-1 text-sm font-normal text-[#4F80E1] whitespace-nowrap bg-gray-50">
-									{data?.credit || ''}
+								<td className="py-4 px-1 text-sm font-normal text-[#637381]  whitespace-nowrap bg-gray-50">
+									{data?.remark || data?.description || ''}
 								</td>
 							</tr>
 						))}

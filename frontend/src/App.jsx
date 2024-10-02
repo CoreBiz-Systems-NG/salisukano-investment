@@ -10,9 +10,10 @@ import EditTransaction from './pages/EditTransaction';
 import TransactionDetail from './pages/TransactionDetail';
 import AddSupply from './pages/AddSupply';
 import Payment from './pages/Payment';
+import Payments from './pages/Payments';
+import Supplies from './pages/Supplies';
 import EditPayment from './pages/EditPayment';
 import ChangePassword from './pages/ChangePassword';
-import Suppliers from './pages/Suppliers';
 import Settings from './pages/Settings';
 import Accounts from './pages/Accounts';
 import AccountDetail from './pages/AccountDetail';
@@ -63,14 +64,15 @@ function App() {
 							<Route path="/accounts/:id" element={<AccountDetail />} />
 							<Route path="/add-supply/:id" element={<AddSupply />} />
 							<Route path="/transactions" element={<Transactions />} />
-							<Route path="/payment/:id" element={<Payment />} />
+							<Route path="/payments/new/:id" element={<Payment />} />
 							<Route path="/payment/edit/:id" element={<EditPayment />} />
 							<Route
 								path="/transactions/edit/:id"
 								element={<EditTransaction />}
 							/>
 							<Route path="/transactions/:id" element={<TransactionDetail />} />
-							<Route path="/suppliers/:id" element={<Suppliers />} />
+							<Route path="/supplies/:id" element={<Supplies />} />
+							<Route path="/payments/:id" element={<Payments />} />
 							<Route path="/pricing/:id" element={<Pricing />} />
 							<Route path="/debtors" element={<Debtors />} />
 							<Route path="/debtors/:id" element={<Debtor />} />

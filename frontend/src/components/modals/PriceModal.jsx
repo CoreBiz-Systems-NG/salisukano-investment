@@ -24,12 +24,14 @@ const PriceModal = ({
 	const [oldSpecial, setOldSpecial] = useState(0);
 	const [newMix, setNewMix] = useState(0);
 	const [oldMix, setOldMix] = useState(0);
+	const [disableInput, setDisableInput] = useState(false);
 	const apiUrl = import.meta.env.VITE_API_URL;
 
 	useEffect(() => {
 		setOldMix(priceData?.oldMix);
 		setOldSpecial(priceData?.oldSpecial);
 		setOldCast(priceData?.oldCast);
+		setDisableInput(true);
 	}, [priceData]);
 	const config = {
 		headers: {
@@ -114,6 +116,8 @@ const PriceModal = ({
 									className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
 									type="number"
 									value={oldMix}
+									disabled={disableInput}
+									readOnly={disableInput}
 									onChange={(e) => setOldMix(e.target.value)}
 								/>
 							</div>
@@ -138,6 +142,8 @@ const PriceModal = ({
 									className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
 									type="number"
 									value={oldCast}
+									disabled={disableInput}
+									readOnly={disableInput}
 									onChange={(e) => setOldCast(e.target.value)}
 								/>
 							</div>
@@ -162,6 +168,8 @@ const PriceModal = ({
 									className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
 									type="number"
 									value={oldSpecial}
+									disabled={disableInput}
+									readOnly={disableInput}
 									onChange={(e) => setOldSpecial(e.target.value)}
 								/>
 							</div>

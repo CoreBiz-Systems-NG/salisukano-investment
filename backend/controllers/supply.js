@@ -366,21 +366,71 @@ export const getSuppliers = async (req, res) => {
 export const getSupplies = async (req, res) => {
 	try {
 		const { id } = req.params;
-		if (!id) {
-			res.status(402).json({ message: 'Invalid company id' });
-		}
-		const account = await Account.findById(id).populate('customerId');
-		const supplies = await Transaction.find({
-			accountId: id,
-			vehicleNumber: { $exists: true, $ne: '' },
-		})
-			.sort({ date: -1 })
-			.select('vehicleNumber quantity createdAt date name')
-			.lean(); // Use lean for faster read operations if no mongoose features are required
 
+		// Validate the company ID
+		if (!id) {
+			return res.status(400).json({ message: 'Invalid company ID' });
+		}
+
+		// Find the account by ID and populate the customer details
+		const account = await Account.findById(id).populate('customerId');
+		if (!account) {
+			return res.status(404).json({ message: 'Account not found' });
+		}
+
+		// Use aggregation to calculate total quantity and total credit
+		const [result] = await Transaction.aggregate([
+			{
+				$match: {
+					accountId: new mongoose.Types.ObjectId(id), // Filter transactions by accountId
+					vehicleNumber: { $exists: true, $ne: '' }, // Only consider supplies with a vehicleNumber
+				},
+			},
+			{
+				$group: {
+					_id: null,
+					totalQuantity: { $sum: '$quantity' }, // Sum up the total quantity
+					totalCredit: { $sum: '$credit' }, // Sum up the total credit
+					supplies: {
+						$push: {
+							vehicleNumber: '$vehicleNumber',
+							quantity: '$quantity',
+							createdAt: '$createdAt',
+							date: '$date',
+							name: '$name',
+							credit: '$credit',
+						},
+					}, // Collect all supply data
+				},
+			},
+		]);
+
+		// Handle case where no supplies were found
+		if (!result) {
+			return res.status(200).json({
+				account,
+				totalQuantity: 0,
+				totalCredit: 0,
+				supplies: [],
+				message: 'No supplies found',
+			});
+		}
+
+		// Get supplies data without aggregation (for displaying individual records)
+		// const supplies = await Transaction.find({
+		// 	accountId: id,
+		// 	vehicleNumber: { $exists: true, $ne: '' }, // Only fetch records where vehicleNumber exists and is not empty
+		// })
+		// 	.sort({ date: -1 }) // Sort by the latest date
+		// 	.select('vehicleNumber quantity createdAt date name credit') // Select only necessary fields
+		// 	.lean(); // Use lean to improve performance for read operations
+
+		// Respond with the account, supplies data, and aggregated totals
 		res.status(200).json({
 			account,
-			supplies,
+			totalQuantity: result.totalQuantity,
+			totalCredit: result.totalCredit,
+			supplies: result.supplies,
 			message: 'Supplies fetched successfully',
 		});
 	} catch (error) {

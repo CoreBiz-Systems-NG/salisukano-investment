@@ -51,7 +51,10 @@ const Creditor = () => {
 				<div className="flex justify-between">
 					<ul className="text-tiny font-medium flex items-center space-x-2 text-text3">
 						<li className="breadcrumb-item text-muted">
-							<Link to={'/creditors'} className="hover:text-blue-500">
+							<Link
+								to={'/creditors'}
+								className="font-semibold text-lg hover:text-blue-500"
+							>
 								{' '}
 								Creditors
 							</Link>
