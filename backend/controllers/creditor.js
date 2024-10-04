@@ -55,7 +55,7 @@ export const editCreditor = async (req, res) => {
 		}
 
 		const updatedCreditor = await Creditor.findByIdAndUpdate(
-			id,
+			{ _id: id },
 			{ name, phone }, // Use the new image path or keep the old one
 			{ new: true } // Return the updated document
 		);
@@ -146,7 +146,7 @@ export const getMonthlyCredits = async (req, res) => {
 export const getCredit = async (req, res) => {
 	try {
 		const { id } = req.params;
-		
+
 		const credit = await Credit.findById(id);
 		if (!credit) {
 			return res.status(404).json({ error: 'Credit not found' });
