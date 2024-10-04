@@ -39,12 +39,10 @@ export const createDebtor = async (req, res) => {
 		if (!name) {
 			return res.status(401).json({ message: 'Debtor name is required!' });
 		}
-
 		const debtor = await Debtor.create({
 			name,
 			phone,
 			balance,
-			openingbalance: balance,
 		});
 		res.status(200).json(debtor);
 	} catch (error) {

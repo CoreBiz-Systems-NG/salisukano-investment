@@ -118,27 +118,29 @@ const Debtors = () => {
 					</Menu>
 				</div>
 				<div>
-					<div className="p-5 mb-4  bg-white flex flex-col md:max-w-md w-full rounded-xl gap-2 border border-[#E7E7E7] hover:shadow-xl cursor-pointer">
-						<div className={`flex justify-between `}>
-							<span className="text-[#637381] text-sm font-medium">
-								Account Balance
-							</span>
-							<div className="flex gap-1 items-center">
-								<span className="">100%</span>
-								<img src="/assets/admin/dashboard/uparrow.svg" alt="graph" />
+					<div className="w-full grid sm:grid-cols-2 md:grid-cols-4 gap-5 col-span-12">
+						<div className="p-5 mb-4  bg-white flex flex-col md:max-w-md w-full rounded-xl gap-2 border border-[#E7E7E7] hover:shadow-xl cursor-pointer">
+							<div className={`flex justify-between `}>
+								<span className="text-[#637381] text-sm font-medium">
+									Account Balance
+								</span>
+								<div className="flex gap-1 items-center">
+									<span className="">100%</span>
+									<img src="/assets/admin/dashboard/uparrow.svg" alt="graph" />
+								</div>
 							</div>
-						</div>
-						<div
-							className={`flex gap-4 justify-between flex-nowrap items-center`}
-						>
-							<span className="text-xl font-bold whitespace-nowrap">
-								₦ {data?.debtor?.balance || 0}
-							</span>
-							<img
-								src="/assets/admin/dashboard/graph1.svg"
-								className="w-10 h-10"
-								alt="graph"
-							/>
+							<div
+								className={`flex gap-4 justify-between flex-nowrap items-center`}
+							>
+								<span className="text-xl font-bold whitespace-nowrap">
+									₦ {data?.debtor?.balance || 0}
+								</span>
+								<img
+									src="/assets/admin/dashboard/graph1.svg"
+									className="w-10 h-10"
+									alt="graph"
+								/>
+							</div>
 						</div>
 					</div>
 
@@ -146,6 +148,8 @@ const Debtors = () => {
 						tableData={data?.debtor?.transactions || []}
 						handelEdit={handelEdit}
 						handelDelete={handelDelete}
+						handelExportToExcel={onDownload}
+						tableRef={tableRef}
 					/>
 				</div>
 			</main>

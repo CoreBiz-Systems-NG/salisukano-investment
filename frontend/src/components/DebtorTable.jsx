@@ -2,8 +2,15 @@
 import { useState, useMemo } from 'react';
 import { AiFillEdit, AiFillDelete } from 'react-icons/ai';
 import moment from 'moment';
+import { SiMicrosoftexcel } from 'react-icons/si';
 
-const Table = ({ tableData, handelEdit, handelDelete, tableRef }) => {
+const Table = ({
+	tableData,
+	handelEdit,
+	handelDelete,
+	tableRef,
+	handelExportToExcel,
+}) => {
 	const [query, setQuery] = useState('');
 	const handleChange = (e) => {
 		setQuery(e.target.value);
@@ -59,6 +66,14 @@ const Table = ({ tableData, handelEdit, handelDelete, tableRef }) => {
 						</svg>
 					</div>
 				</div>
+				<button
+					className="py-2.5 px-2 border border-[#E7E7E7] flex
+					justify-center items-center gap-1 rounded text-sm text-white bg-green-500 hover:bg-green-700
+					font-normal"
+					onClick={handelExportToExcel}
+				>
+					Export <SiMicrosoftexcel className="text-white" />
+				</button>
 			</div>
 
 			<div className="mt-4 flex border focus-within:border-blue-600 rounded-lg border-[#E7E7E7] py-3 px-4 justify-between items-center max-h-12  md:hidden">
@@ -133,10 +148,10 @@ const Table = ({ tableData, handelEdit, handelDelete, tableRef }) => {
 								<td className="py-4 px-1 text-sm font-normal text-[#4F80E1] whitespace-nowrap bg-gray-50 capitalize">
 									{data?.description}
 								</td>
-								<td className="py-4 px-1 text-sm font-normal text-[#4F80E1] whitespace-nowrap bg-gray-50">
+								<td className="py-4 px-1 text-sm font-normal text-[#FB4949]  whitespace-nowrap bg-gray-50">
 									{data?.credit}
 								</td>
-								<td className="py-4 px-1 text-sm font-normal text-[#FB4949] whitespace-nowrap">
+								<td className="py-4 px-1 text-sm font-normal text-[#4F80E1] whitespace-nowrap">
 									{data?.debit}
 								</td>
 								<td className="py-2 px-1 text-sm font-normal text-[#10B860] whitespace-nowrap bg-gray-50">

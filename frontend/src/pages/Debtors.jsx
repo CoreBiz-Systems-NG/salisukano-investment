@@ -1,6 +1,6 @@
 import DebtorsTable from '../components/DebtorsTable.jsx';
 import Loader from '../components/Loader.jsx';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useRef } from 'react';
 import AddDebtorModal from '../components/modals/AddDebtorModal.jsx';
 import EditModal from '../components/modals/EditDebtor.jsx';
 import AuthContext from '../context/authContext.jsx';
@@ -8,6 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchDebtors } from '../hooks/axiosApis.js';
 import getError from '../hooks/getError.js';
 import toast from 'react-hot-toast';
+import { useDownloadExcel } from 'react-export-table-to-excel';
 const Debtors = () => {
 	const [loading, setIsLoading] = useState(false);
 	const [isAddModal, setIsAddModal] = useState(false);
@@ -15,6 +16,7 @@ const Debtors = () => {
 	const [debtor, setDebtor] = useState(false);
 	const [total, setTotal] = useState(0);
 	const { user } = useContext(AuthContext);
+	const tableRef = useRef(null);
 	const { data, isLoading, error } = useQuery({
 		queryKey: ['debtors'],
 		queryFn: async () => fetchDebtors(user),
@@ -50,6 +52,11 @@ const Debtors = () => {
 		setDebtor(data);
 		setIsEditModal(true);
 	};
+	const { onDownload } = useDownloadExcel({
+		currentTableRef: tableRef.current,
+		filename: `${data?.debtor?.name} transactions`,
+		sheet: 'Users',
+	});
 
 	return (
 		<>
@@ -84,6 +91,7 @@ const Debtors = () => {
 					tableData={data || []}
 					handelAddModal={handelAddModal}
 					handelEdit={handelEdit}
+					handelExportToExcel={onDownload}
 				/>
 			</main>
 			<AddDebtorModal
