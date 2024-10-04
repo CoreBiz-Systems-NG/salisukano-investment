@@ -388,12 +388,12 @@ export const getSupplies = async (req, res) => {
 			},
 			{
 				$group: {
-					// _id: null,
+					_id: null,
 					totalQuantity: { $sum: '$quantity' }, // Sum up the total quantity
 					totalCredit: { $sum: '$credit' }, // Sum up the total credit
 					supplies: {
 						$push: {
-							
+							_id: '$_id',
 							vehicleNumber: '$vehicleNumber',
 							quantity: '$quantity',
 							createdAt: '$createdAt',
