@@ -87,10 +87,10 @@ export const getPayments = async (req, res) => {
 			{
 				$group: {
 					_id: null,
-
 					totalDebit: { $sum: '$debit' }, // Sum up the total debit
 					payments: {
 						$push: {
+							_id: '$_id',
 							vehicleNumber: '$vehicleNumber',
 							createdAt: '$createdAt',
 							date: '$date',
@@ -99,7 +99,7 @@ export const getPayments = async (req, res) => {
 							remark: '$vehicleNumber',
 							description: '$description',
 						},
-					}, // Collect all supply data
+					},
 				},
 			},
 		]);

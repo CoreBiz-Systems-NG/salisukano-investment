@@ -102,7 +102,7 @@ const Table = ({ tableData, handelEdit, handelDelete, tableRef }) => {
 								Date
 							</th>
 							<th className="py-3 px-2.5 text-[#212B36] text-sm font-normal whitespace-nowrap w-[50px]">
-								Desc
+								Description
 							</th>
 							<th className="py-3 px-2.5 text-[#212B36] text-sm font-normal whitespace-nowrap w-[50px]">
 								Credit ₦
@@ -130,7 +130,7 @@ const Table = ({ tableData, handelEdit, handelDelete, tableRef }) => {
 								<td className="py-2 px-2.5 text-sm font-normal text-[#637381] whitespace-nowrap">
 									{moment(data?.date || data?.createdAt).format('ll')}
 								</td>
-								<td className="py-4 px-1 text-sm font-normal text-[#4F80E1] whitespace-nowrap bg-gray-50">
+								<td className="py-4 px-1 text-sm font-normal text-[#4F80E1] whitespace-nowrap bg-gray-50 capitalize">
 									{data?.description}
 								</td>
 								<td className="py-4 px-1 text-sm font-normal text-[#4F80E1] whitespace-nowrap bg-gray-50">
