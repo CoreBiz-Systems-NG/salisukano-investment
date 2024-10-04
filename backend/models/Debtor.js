@@ -10,6 +10,10 @@ const TransactionSchema = new mongoose.Schema({
 		type: Number,
 		default: 0,
 	},
+	openingBalance: {
+		type: Number,
+		default: 0,
+	},
 	balance: {
 		type: Number,
 		default: 0,

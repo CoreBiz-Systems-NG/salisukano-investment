@@ -40,7 +40,12 @@ export const createDebtor = async (req, res) => {
 			return res.status(401).json({ message: 'Debtor name is required!' });
 		}
 
-		const debtor = await Debtor.create({ name, phone, balance });
+		const debtor = await Debtor.create({
+			name,
+			phone,
+			balance,
+			openingbalance: balance,
+		});
 		res.status(200).json(debtor);
 	} catch (error) {
 		res.status(404).json({ message: error.message });
@@ -91,7 +96,8 @@ export const addCreditFunction = async (req, res) => {
 		// Create a new transaction with the credit
 		const newTransaction = {
 			credit: creditAmount,
-			balance: newBalance,description,
+			balance: newBalance,
+			description,
 			remark: remark || 'Credit added',
 			date: date || new Date(),
 		};
