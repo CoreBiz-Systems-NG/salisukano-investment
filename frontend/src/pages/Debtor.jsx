@@ -16,7 +16,8 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { Link, useParams } from 'react-router-dom';
 import { useDownloadExcel } from 'react-export-table-to-excel';
 import { SiMicrosoftexcel } from 'react-icons/si';
-import Receipt from '../components/Receipt.jsx';
+import Receipt from '../components/DebtorReceipt.jsx';
+import { FiPrinter } from 'react-icons/fi';
 const Debtors = () => {
 	const [loading, setIsLoading] = useState(false);
 	const [isAddModal, setIsAddModal] = useState(false);
@@ -47,18 +48,18 @@ const Debtors = () => {
 	}, [data, error]);
 
 	const handelEdit = (data) => {
-		console.log('Edit debt', data);
 		setIsEditDebitModal(true);
 		setAccount(data);
 	};
 	const handelDelete = (data) => {
-		console.log('Delete debt', data);
 		setAccount(data);
 		setIsDeleteDebitModal(true);
 	};
 	const handelPrint = () => {
-		setIsPrintModal(true)
-		console.log('handelPrint debt');
+		if (!data) {
+			return;
+		}
+		setIsPrintModal(true);
 	};
 	const { onDownload } = useDownloadExcel({
 		currentTableRef: tableRef.current,
@@ -122,10 +123,10 @@ const Debtors = () => {
 							</MenuItem>
 							<MenuItem
 								as="button"
-								className="pl-3 py-2 px-2 flex w-full justify-start items-center gap-1 rounded text-sm  text-gray-700 hover:bg-red-100 font-normal"
+								className="pl-3 py-2 px-2 flex w-full justify-start items-center gap-1 rounded text-sm  text-gray-700 hover:bg-orange-100 font-normal"
 								onClick={handelPrint}
 							>
-								<SiMicrosoftexcel className="text-green-500" />
+								<FiPrinter className="text-orange-500" />
 								Print Reciept
 							</MenuItem>
 						</MenuItems>
@@ -164,15 +165,15 @@ const Debtors = () => {
 						handelExportToExcel={onDownload}
 						tableRef={tableRef}
 					/>
-					<Receipt
-						show={isPrintModal}
-						setShow={setIsPrintModal}
-						title="Payment Voucher"
-						infoData={data?.debtor || []}
-						tableData={data?.debtor.transactions || []}
-					/>
 				</div>
 			</main>
+			<Receipt
+				show={isPrintModal}
+				setShow={setIsPrintModal}
+				title="Payment Voucher"
+				infoData={data?.debtor}
+				tableData={data?.debtor?.transactions || []}
+			/>
 			<CreditModal
 				show={isAddModal}
 				setShow={setIsAddModal}

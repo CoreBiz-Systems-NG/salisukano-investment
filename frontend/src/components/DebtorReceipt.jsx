@@ -2,7 +2,7 @@
 import React from 'react';
 import logo from '../assets/logo.jpg';
 import Modal from './modals/Modal';
-import { downloadPDF, generateRandomNumber } from './../hooks/downLoadPdf';
+import { downloadPDF, generateRandomNumber } from '../hooks/downLoadPdf';
 
 const Receipt = ({
 	tableData,
@@ -17,10 +17,7 @@ const Receipt = ({
 		(total, item) => total + item.credit,
 		0
 	);
-	const totalDebit = tableData?.reduce(
-		(total, item) => total + Number(item.debit),
-		0
-	);
+	const totalDebit = tableData?.reduce((total, item) => total + item.debit, 0);
 	// console.log('totalDebit', totalDebit);
 	// console.log('totalCredit', totalCredit);
 	const handelPrint = async () => {
@@ -28,12 +25,9 @@ const Receipt = ({
 	};
 	return (
 		<Modal show={show}>
-			<div className="transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all font-josefin w-full max-w-2xl">
+			<div className="transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all font-josefin w-full">
 				<div className="w-full  bg-white mx-auto rounded-md mt-4 p-2 md:p-4 ">
-					<div
-						id="receipt"
-						className="w-full bg-white mx-auto rounded-md h-full overflow-auto"
-					>
+					<div id="receipt" className="w-full bg-white mx-auto rounded-md">
 						<div className="w-full text-black">
 							<div className="w-full sm:flex justify-between">
 								<div>
@@ -88,8 +82,8 @@ const Receipt = ({
 						</div>
 						<div className="w-full mt-6">
 							<table className="table-auto debug:table-auto overflow-scroll md:overflow-auto w-full text-left font-inter border-separate border-spacing-y-1">
-								<thead className="">
-									<tr className="bg-black text-white rounded-none">
+								<thead className="p-3 ">
+									<tr className="bg-black text-white rounded-none p-3">
 										<th
 											className="p-0.5 px-1 rounded-none"
 											style={{ borderRadius: 'none' }}
@@ -97,8 +91,7 @@ const Receipt = ({
 											Date
 										</th>
 										<th>Description</th>
-										<th>₦ Debit</th>
-										<th>₦ Credit</th>
+										<th>₦ Amount</th>
 										<th className="p-2">₦ Balance</th>
 									</tr>
 								</thead>
@@ -108,8 +101,13 @@ const Receipt = ({
 												<tr key={index}>
 													<td>{new Date(item.date).toLocaleDateString()}</td>
 													<td>{item.description}</td>
-													<td>{item?.debit}</td>
-													<td>{item?.credit}</td>
+													<td
+														className={`${
+															item?.credit ? 'text-red-500' : 'text-[#4F80E1]'
+														}  whitespace-nowrap`}
+													>
+														₦{item?.credit || item?.debit}
+													</td>
 													<td className="whitespace-nowrap">{item.balance}</td>
 												</tr>
 										  ))

@@ -1,7 +1,7 @@
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
-function generateRandomNumber(min, max) {
+export function generateRandomNumber(min = 1, max = 1000) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
@@ -32,6 +32,6 @@ export const downloadPDF = (name) => {
 			heightLeft -= pageHeight;
 		}
 		const randomNum = generateRandomNumber(1, 100);
-		pdf.save(`${name}-${randomNum()}.pdf`);
+		pdf.save(`${name}-${randomNum}.pdf`);
 	});
 };

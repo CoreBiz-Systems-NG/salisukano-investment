@@ -30,7 +30,7 @@ const Debtors = () => {
 				0
 			);
 			setTotal(totalBalance);
-			console.log(totalBalance);
+			// console.log(totalBalance);
 
 			// Optionally navigate or handle other side effects
 			// navigate('/');
