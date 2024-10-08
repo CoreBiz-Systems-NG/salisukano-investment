@@ -368,7 +368,7 @@ const NewCredit = () => {
 								className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
 								id="deposit"
 								type="number"
-								placeholder="Intial deposite"
+								placeholder="Intial deposit"
 								value={deposit}
 								onChange={(e) => setDeposit(e.target.value)}
 							/>

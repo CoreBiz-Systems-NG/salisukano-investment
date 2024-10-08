@@ -19,6 +19,9 @@ const TransactionTable = ({ tableData, tableRef, handelExportToExcel }) => {
 
 	// Optimized filtering with useMemo
 	const filteredData = useMemo(() => {
+		if (tableData.length < 0) {
+			return;
+		}
 		return tableData?.filter((data) => {
 			// Filter by query (search)
 			const matchesQuery =

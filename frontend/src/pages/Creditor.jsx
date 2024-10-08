@@ -91,7 +91,7 @@ const Creditor = () => {
 								onClick={() => setIsDepositModal(true)}
 							>
 								<MdSaveAlt className="text-green-500" />
-								Deposite
+								Deposit
 							</MenuItem>
 							<MenuItem
 								as="button"

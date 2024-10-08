@@ -35,11 +35,14 @@ const AddModal = ({ show, setShow, setLoading, loading }) => {
 				.post(`${apiUrl}/debtors`, { name, balance, phone }, config)
 				.then((res) => {
 					if (res.data) {
-						queryClient.invalidateQueries({
-							queryKey: ['dashboard', 'accounts', 'customers', 'debtors'],
-						});
+						queryClient.invalidateQueries({});
 						toast.success('Account created successfully');
 					}
+					// refetch all active queries partially matching a query key:
+					queryClient.refetchQueries({
+						queryKey: ['dashboard', 'accounts', 'customers', 'debtors'],
+						type: 'active',
+					});
 					setName('');
 					setPhone('');
 					setBalance(0);

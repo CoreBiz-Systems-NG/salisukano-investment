@@ -16,10 +16,12 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { Link, useParams } from 'react-router-dom';
 import { useDownloadExcel } from 'react-export-table-to-excel';
 import { SiMicrosoftexcel } from 'react-icons/si';
+import Receipt from '../components/Receipt.jsx';
 const Debtors = () => {
 	const [loading, setIsLoading] = useState(false);
 	const [isAddModal, setIsAddModal] = useState(false);
 	const [isDebitModal, setIsDebitModal] = useState(false);
+	const [isPrintModal, setIsPrintModal] = useState(false);
 	const [account, setAccount] = useState();
 	const [isEditDebitModal, setIsEditDebitModal] = useState(false);
 	const [isDeleteDebitModal, setIsDeleteDebitModal] = useState(false);
@@ -53,6 +55,10 @@ const Debtors = () => {
 		console.log('Delete debt', data);
 		setAccount(data);
 		setIsDeleteDebitModal(true);
+	};
+	const handelPrint = () => {
+		setIsPrintModal(true)
+		console.log('handelPrint debt');
 	};
 	const { onDownload } = useDownloadExcel({
 		currentTableRef: tableRef.current,
@@ -114,6 +120,14 @@ const Debtors = () => {
 								<SiMicrosoftexcel className="text-green-500" />
 								Export
 							</MenuItem>
+							<MenuItem
+								as="button"
+								className="pl-3 py-2 px-2 flex w-full justify-start items-center gap-1 rounded text-sm  text-gray-700 hover:bg-red-100 font-normal"
+								onClick={handelPrint}
+							>
+								<SiMicrosoftexcel className="text-green-500" />
+								Print Reciept
+							</MenuItem>
 						</MenuItems>
 					</Menu>
 				</div>
@@ -143,13 +157,19 @@ const Debtors = () => {
 							</div>
 						</div>
 					</div>
-
 					<DebtorTable
 						tableData={data?.debtor?.transactions || []}
 						handelEdit={handelEdit}
 						handelDelete={handelDelete}
 						handelExportToExcel={onDownload}
 						tableRef={tableRef}
+					/>
+					<Receipt
+						show={isPrintModal}
+						setShow={setIsPrintModal}
+						title="Payment Voucher"
+						infoData={data?.debtor || []}
+						tableData={data?.debtor.transactions || []}
 					/>
 				</div>
 			</main>
