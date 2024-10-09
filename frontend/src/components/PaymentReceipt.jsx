@@ -1,8 +1,8 @@
 /* eslint-disable react/prop-types */
-import React from 'react';
 import logo from '../assets/logo.jpg';
 import Modal from './modals/Modal';
-import { downloadPDF, generateRandomNumber } from './../hooks/downLoadPdf';
+import { downloadPDF, generateRandomNumber } from '../hooks/downLoadPdf';
+import moment from 'moment';
 
 const Receipt = ({
 	tableData,
@@ -11,21 +11,10 @@ const Receipt = ({
 	title,
 	infoData,
 	InvoiceDate,
-	totalCredit,
 	totalDebit,
 }) => {
 	const invoiceNumber = generateRandomNumber();
-	console.log('tableData', tableData);
-	// const totalCredit = tableData?.reduce(
-	// 	(total, item) => total + item.credit,
-	// 	0
-	// );
-	// const totalDebit = tableData?.reduce(
-	// 	(total, item) => total + Number(item.debit),
-	// 	0
-	// );
-	// console.log('totalDebit', totalDebit);
-	// console.log('totalCredit', totalCredit);
+	console.log('infoData', infoData);
 	const handelPrint = async () => {
 		await downloadPDF('receipt');
 	};
@@ -81,11 +70,11 @@ const Receipt = ({
 										</p>
 										{InvoiceDate && (
 											<p className="text-sm font-normal text-[#637381]">
-												From:{InvoiceDate}{' '}
+												For: {InvoiceDate}{' '}
 											</p>
 										)}
 										<p className="text-sm font-normal text-[#637381]">
-											To Date: {new Date().toLocaleDateString()}
+											Date: {new Date().toLocaleDateString()}
 										</p>
 									</div>
 								</div>
@@ -94,36 +83,37 @@ const Receipt = ({
 								<table className="table-auto debug:table-auto overflow-scroll md:overflow-auto w-full text-left font-inter border-separate border-spacing-y-1">
 									<thead className="">
 										<tr className="bg-[#222E3A]/[15%] text-[#212B36] rounded-none ">
-											<th
-												className="p-0.5 px-1 rounded-none"
-												style={{ borderRadius: 'none' }}
-											>
+											<th className="p-3 text-[#212B36] text-sm font-normal whitespace-nowrap">
 												Date
 											</th>
 											<th className="p-3 text-[#212B36] text-sm font-normal whitespace-nowrap">
-												Customer
-											</th>											
-											<th className="p-3 text-[#212B36] text-sm font-normal whitespace-nowrap">
-												₦ Debit
+												Description
 											</th>
 											<th className="p-3 text-[#212B36] text-sm font-normal whitespace-nowrap">
-												₦ Credit
+												Amount ₦
 											</th>
 											<th className="p-3 text-[#212B36] text-sm font-normal whitespace-nowrap">
-												₦ Balance
+												Remarks
 											</th>
 										</tr>
 									</thead>
 									<tbody>
-										{tableData && tableData.length > 0
-											? tableData.map((item, index) => (
+										{tableData && tableData?.length > 0
+											? tableData?.map((item, index) => (
 													<tr key={index}>
-														<td>{new Date(item.date).toLocaleDateString()}</td>
-														<td className="">{item.description}</td>
-														<td>{item?.debit}</td>
-														<td>{item?.credit}</td>
-														<td className="whitespace-nowrap">
-															{item.balance}
+														<td className="py-2 pl-3 text-sm font-normal rounded-l-lg whitespace-nowrap">
+															{moment(item?.date || item?.createdAt).format(
+																'll'
+															)}{' '}
+														</td>
+														<td className="py-2 pl-3 text-sm font-normal uppercase">
+															{item.name}
+														</td>
+														<td className="py-2 pl-3 text-sm font-normal rounded-l-lg whitespace-nowrap">
+															{item?.debit}
+														</td>
+														<td className="py-2 pl-3 text-sm font-normal rounded-l-lg whitespace-nowrap">
+															{item?.remark || item?.description || ''}
 														</td>
 													</tr>
 											  ))
@@ -134,20 +124,8 @@ const Receipt = ({
 							<div>
 								<div className="flex  justify-end">
 									<div className="mt-6">
-										<p className="text-sm font-bold p-1">
-											Credit Total:
-											<span className="ml-6 text-black font-bold">
-												₦{totalCredit}
-											</span>
-										</p>
-										<p className="text-sm font-normal text-[#637381] p-1">
-											Debit Total:{' '}
-											<span className="ml-6 text-black font-bold">
-												₦{totalDebit}
-											</span>
-										</p>
 										<p className="text-sm font-bold bg-[#cccfd1] text-black p-1 px-2">
-											Balance: ₦{infoData?.balance}
+											Total Payment: ₦{totalDebit}
 										</p>
 									</div>
 								</div>

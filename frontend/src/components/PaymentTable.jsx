@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useNavigate } from 'react-router-dom';
 import { useState, useMemo } from 'react';
-import { FaPlus } from 'react-icons/fa6';
 import moment from 'moment';
 import { SiMicrosoftexcel } from 'react-icons/si';
 
@@ -19,7 +18,7 @@ const TransactionTable = ({ tableData, tableRef, handelExportToExcel }) => {
 
 	// Optimized filtering with useMemo
 	const filteredData = useMemo(() => {
-		if (tableData.length < 0) {
+		if (tableData?.length < 0) {
 			return;
 		}
 		return tableData?.filter((data) => {

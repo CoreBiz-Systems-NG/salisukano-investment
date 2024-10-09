@@ -14,7 +14,7 @@ const Modal = ({ show, children }) => {
 					leaveFrom="opacity-100"
 					leaveTo="opacity-0"
 				>
-					<div className="fixed inset-0 bg-black/70 bg-opacity-25 z-50" />
+					<div className="fixed inset-0 bg-black/70 bg-opacity-25 z-50 " />
 				</Transition.Child>
 
 				<div className="fixed inset-0 overflow-y-auto flex place-content-center z-50">

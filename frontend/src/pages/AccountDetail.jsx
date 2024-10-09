@@ -1,7 +1,6 @@
 import TransactionTable from '../components/TransactionTable.jsx';
 import Cards from '../components/AccountDetailCard.jsx';
 import Loader from '../components/Loader.jsx';
-import Receipt from '../components/Receipt.jsx';
 import { useContext, useEffect, useState, useRef } from 'react';
 import AddModal from '../components/modals/AddAccountModal.jsx';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -21,14 +20,12 @@ import { TfiTruck } from 'react-icons/tfi';
 import { GiReceiveMoney } from 'react-icons/gi';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { useDownloadExcel } from 'react-export-table-to-excel';
-import { FiPrinter } from 'react-icons/fi';
 // import axios from 'axios';
 
 const Transaction = () => {
 	const [loading, setIsLoading] = useState(false);
 	const [isAddModal, setIsAddModal] = useState(false);
 	const [isBalanceModal, setIsBalanceModal] = useState(false);
-	const [isPrintModal, setIsPrintModal] = useState(false);
 	const [tableData, setTableData] = useState([]);
 	const [pageSize, setPageSize] = useState(20);
 	const { user } = useContext(AuthContext);
@@ -77,12 +74,7 @@ const Transaction = () => {
 		)} transactions`,
 		sheet: 'Users',
 	});
-	// const handelExportToExcel = async () => {
-	// 	const dataToExport =
-	// 		(await formatDataForExcel(data?.transactions)) || data?.transactions;
-	// 	// console.log('handelExportToExcel', dataToExport);
-	// 	exportToExcel(dataToExport, 'Transactions');
-	// };
+
 	return (
 		<>
 			<main className="w-full py-3 pl-7 pr-5 gap-5 flex flex-col space-y-3">
@@ -149,14 +141,6 @@ const Transaction = () => {
 							>
 								<GiReceiveMoney className="" /> Payments
 							</MenuItem>
-							<MenuItem
-								as="button"
-								className="pl-3 py-2 px-2 flex w-full justify-start items-center gap-1 rounded text-sm  text-gray-700 hover:bg-orange-100 font-normal"
-								onClick={() => setIsPrintModal(true)}
-							>
-								<FiPrinter className="text-orange-500" />
-								Print Reciept
-							</MenuItem>
 						</MenuItems>
 					</Menu>
 				</div>
@@ -172,13 +156,7 @@ const Transaction = () => {
 					tableRef={tableRef}
 				/>
 			</main>
-			<Receipt
-				show={isPrintModal}
-				setShow={setIsPrintModal}
-				title="Payment Voucher"
-				infoData={data?.account}
-				tableData={tableData || []}
-			/>
+
 			<AddModal
 				show={isAddModal}
 				setShow={setIsAddModal}

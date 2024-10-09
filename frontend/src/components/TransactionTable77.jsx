@@ -180,7 +180,7 @@ const TransactionTable = ({ tableData, handelExportToExcel }) => {
 								onClick={() => handelClick(data._id)}
 								className="drop-shadow-[0_0_10px_rgba(34,46,58,0.02)] bg-[#f6f8fa] hover:shadow-2xl cursor-pointer text-center"
 							>
-								<td className="py-2 pl-3 text-sm font-normal text-[#637381] rounded-l-lg whitespace-nowrap">
+								<td className="relative w-auto translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out text-[#637381] rounded-l-lg whitespace-nowrap">
 									{index + 1}
 								</td>
 								<td className="py-2 pl-3 text-sm font-normal text-[#637381] whitespace-nowrap">
