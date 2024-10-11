@@ -30,6 +30,7 @@ const AddModal = ({ show, setShow, setLoading, loading }) => {
 	const navigate = useNavigate();
 
 	const { id } = useParams();
+	console.log('customerId', id);
 	const queryClient = useQueryClient();
 	const handleSubmit = (e) => {
 		e.preventDefault();

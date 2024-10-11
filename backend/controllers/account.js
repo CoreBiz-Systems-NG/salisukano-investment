@@ -81,6 +81,7 @@ export const createAccount = async (req, res) => {
 			message: 'Account created successfully',
 		});
 	} catch (error) {
+		console.log('error', error)
 		await session.abortTransaction();
 		console.error('Error creating account:', error.message);
 		res.status(500).json({ message: 'Internal server error' });
@@ -194,7 +195,7 @@ export const changeAccountStatus = async (req, res) => {
 		// If the status is 'current', set all other accounts to 'inactive'
 		if (status === 'active') {
 			await Account.updateMany(
-				{ customerId, status: 'active' },
+				{ _id: accountId, status: 'active' },
 				{ status: 'inactive' }
 			);
 		}

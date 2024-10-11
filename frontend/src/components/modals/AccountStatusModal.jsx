@@ -57,7 +57,7 @@ const AddModal = ({ show, setShow, setLoading, loading, account }) => {
 						toast.success(' Account updated successfully');
 					}
 					setStatus('inactive');
-					navigate('/');
+					navigate('/companies');
 				})
 				.catch((error) => {
 					const message = getError(error);

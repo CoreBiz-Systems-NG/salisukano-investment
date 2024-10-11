@@ -59,7 +59,7 @@ const Transaction = () => {
 		navigate(`/add-supply/${id}`);
 	};
 	const handelPayment = () => {
-		navigate(`/payment/${id}`);
+		navigate(`/payment/new/${id}`);
 	};
 	const handelSuppliers = () => {
 		navigate(`/supplies/${id}`);
