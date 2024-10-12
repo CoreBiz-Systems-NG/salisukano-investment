@@ -122,7 +122,7 @@ const Receipt = ({
 														{item?.credit}
 													</td>
 													<td
-														className={`py-2 px-2 text-sm font-normal border whitespace-nowrap text-center`}
+														className={`py-2 px-2 text-sm font-normal text-[#637381] whitespace-nowrap border text-center`}
 													>
 														{' '}
 														{item?.debit}
