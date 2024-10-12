@@ -96,7 +96,10 @@ const Receipt = ({
 											Description
 										</th>
 										<th className="p-3 text-sm font-normal whitespace-nowrap">
-											₦ Amount
+											₦ Credit
+										</th>
+										<th className="p-3 text-sm font-normal whitespace-nowrap">
+											₦ Debit
 										</th>
 										<th className="p-3 text-sm font-normal whitespace-nowrap">
 											₦ Balance
@@ -111,15 +114,23 @@ const Receipt = ({
 														{new Date(item.date).toLocaleDateString()}
 													</td>
 													<td className="py-2 px-2 text-sm font-normal text-[#637381] whitespace-nowrap">
-														{item.description}
+														{item.vehicleNumber}
 													</td>
+
 													<td
-														className={`py-2 px-2 text-sm font-normal text-[#637381] whitespace-nowrap
+														className={`py-2 px-2 text-sm font-normal  whitespace-nowrap text-center
 														${item?.credit ? 'text-red-500' : 'text-[#4F80E1]'}{' '}
 														whitespace-nowrap`}
 													>
 														{' '}
-														₦{item?.credit || item?.debit}
+														{item?.credit || item?.debit}
+													</td>
+													<td
+														className={`py-2 px-2 text-sm font-normal  whitespace-nowrap text-center
+														${item?.debit ? 'text-red-500' : 'text-[#4F80E1]'}{' '}
+														whitespace-nowrap`}
+													>
+														{item?.debit}
 													</td>
 													<td className="whitespace-nowrap">{item.balance}</td>
 												</tr>
@@ -131,24 +142,8 @@ const Receipt = ({
 						<div>
 							<div className="flex  justify-end">
 								<div className="mt-6">
-									<p className="text-sm font-bold p-1">
-										Debit Total:
-										<span className="ml-6 text-black font-bold">
-											₦{totalCredit}
-										</span>
-									</p>
-									{totalDebit ? (
-										<p className="text-sm font-normal text-[#637381] p-1">
-											Credit Total:{' '}
-											<span className="ml-6 text-black font-bold">
-												₦{totalDebit}
-											</span>
-										</p>
-									) : (
-										''
-									)}
 									<p className="text-sm font-bold bg-[#cccfd1] text-black p-1 px-2">
-										Balance: ₦{infoData?.balance}
+										Credit Balance: ₦{infoData?.balance}
 									</p>
 								</div>
 							</div>

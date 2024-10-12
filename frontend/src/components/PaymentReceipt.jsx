@@ -35,7 +35,7 @@ const Receipt = ({
 										</div>
 										<div className="mt-3">
 											<h2 className="text-center text-sm font-bold uppercase">
-												Salisu Kano Investment Limited
+												Salisu Kano International Limited
 											</h2>
 											<p className="text-sm font-normal text-[#637381]">
 												Block P5, No.: 1-3 Dalar Gyada Market.
@@ -57,7 +57,7 @@ const Receipt = ({
 								<div className="sm:flex justify-between mt-4 w-full">
 									<div className="">
 										<p className="text-sm font-bold ">Bill To</p>
-										<p className="text-sm font-normal text-[#637381]">
+										<p className="text-sm uppercase font-normal text-[#637381]">
 											{infoData?.name}
 										</p>
 										<p className="text-sm font-normal text-[#637381]">

@@ -13,13 +13,16 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { cleanCreditorsData } from '../hooks/cleanData';
 import { SiMicrosoftexcel } from 'react-icons/si';
 import DepositeModal from '../components/modals/DepositeModal.jsx';
+import Receipt from '../components/CreditorReceipt.jsx';
 import { useDownloadExcel } from 'react-export-table-to-excel';
 import { MdSaveAlt } from 'react-icons/md';
 import moment from 'moment';
+import { FiPrinter } from 'react-icons/fi';
 const Creditor = () => {
 	const [loading, setIsLoading] = useState(false);
 	// const [isAddModal, setIsAddModal] = useState(false);
 	const [isDepositModal, setIsDepositModal] = useState(false);
+	const [isPrintModal, setIsPrintModal] = useState(false);
 	const [tableData, setTableDate] = useState([]);
 	const { user } = useContext(AuthContext);
 	const tableRef = useRef(null);
@@ -52,6 +55,12 @@ const Creditor = () => {
 		).format('MMM YYYY')} transactions`,
 		sheet: 'Users',
 	});
+	const handelPrint = () => {
+		if (!data) {
+			return;
+		}
+		setIsPrintModal(true);
+	};
 
 	return (
 		<>
@@ -102,7 +111,7 @@ const Creditor = () => {
 									onClick={() => setIsDepositModal(true)}
 								>
 									<MdSaveAlt className="text-green-500" />
-									Deposite
+									Deposit
 								</MenuItem>
 								<MenuItem
 									as="button"
@@ -111,6 +120,14 @@ const Creditor = () => {
 								>
 									<SiMicrosoftexcel className="text-green-500" />
 									Export
+								</MenuItem>
+								<MenuItem
+									as="button"
+									className="pl-3 py-2 px-2 flex w-full justify-start items-center gap-1 rounded text-sm  text-gray-700 hover:bg-orange-100 font-normal"
+									onClick={handelPrint}
+								>
+									<FiPrinter className="text-orange-500" />
+									Print Reciept
 								</MenuItem>
 							</MenuItems>
 						</Menu>
@@ -148,6 +165,13 @@ const Creditor = () => {
 				setLoading={setIsLoading}
 				loading={isLoading}
 				account={data?.creditor}
+			/>
+			<Receipt
+				show={isPrintModal}
+				setShow={setIsPrintModal}
+				title="Payment Voucher"
+				infoData={data?.creditor}
+				tableData={tableData || []}
 			/>
 
 			{isLoading || (loading && <Loader />)}
