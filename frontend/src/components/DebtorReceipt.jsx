@@ -12,11 +12,11 @@ const Receipt = ({
 	InvoiceDate,
 }) => {
 	const invoiceNumber = generateRandomNumber();
-	const totalCredit = tableData?.reduce(
-		(total, item) => total + item.credit,
-		0
-	);
-	const totalDebit = tableData?.reduce((total, item) => total + item.debit, 0);
+	// const totalCredit = tableData?.reduce(
+	// 	(total, item) => total + item.credit,
+	// 	0
+	// );
+	// const totalDebit = tableData?.reduce((total, item) => total + item.debit, 0);
 	// console.log('totalDebit', totalDebit);
 	// console.log('totalCredit', totalCredit);
 	const handelPrint = async () => {
@@ -96,7 +96,10 @@ const Receipt = ({
 											Description
 										</th>
 										<th className="p-3 text-sm font-normal whitespace-nowrap">
-											₦ Amount
+											₦ Credit
+										</th>
+										<th className="p-3 text-sm font-normal whitespace-nowrap">
+											₦ Debit
 										</th>
 										<th className="p-3 text-sm font-normal whitespace-nowrap">
 											₦ Balance
@@ -106,22 +109,27 @@ const Receipt = ({
 								<tbody>
 									{tableData && tableData.length > 0
 										? tableData.map((item, index) => (
-												<tr key={index}>
-													<td className="py-2 px-2 text-sm font-normal text-[#637381] whitespace-nowrap">
+												<tr key={index} className="">
+													<td className="py-2 px-2 text-sm font-normal text-[#637381] whitespace-nowrap border">
 														{new Date(item.date).toLocaleDateString()}
 													</td>
-													<td className="py-2 px-2 text-sm font-normal text-[#637381] whitespace-nowrap">
+													<td className="py-2 px-2 text-sm font-normal text-[#637381] whitespace-nowrap border">
 														{item.description}
 													</td>
 													<td
-														className={`py-2 px-2 text-sm font-normal text-[#637381] whitespace-nowrap
-														${item?.credit ? 'text-red-500' : 'text-[#4F80E1]'}{' '}
-														whitespace-nowrap`}
+														className={`py-2 px-2 text-sm font-normal text-[#637381] whitespace-nowrap border`}
+													>
+														{item?.credit}
+													</td>
+													<td
+														className={`py-2 px-2 text-sm font-normal border whitespace-nowrap text-center`}
 													>
 														{' '}
-														₦{item?.credit || item?.debit}
+														{item?.debit}
 													</td>
-													<td className="whitespace-nowrap">{item.balance}</td>
+													<td className="whitespace-nowrap border p-3">
+														{item.balance}
+													</td>
 												</tr>
 										  ))
 										: ''}
@@ -131,24 +139,8 @@ const Receipt = ({
 						<div>
 							<div className="flex  justify-end">
 								<div className="mt-6">
-									<p className="text-sm font-bold p-1">
-										Debit Total:
-										<span className="ml-6 text-black font-bold">
-											₦{totalCredit}
-										</span>
-									</p>
-									{totalDebit ? (
-										<p className="text-sm font-normal text-[#637381] p-1">
-											Credit Total:{' '}
-											<span className="ml-6 text-black font-bold">
-												₦{totalDebit}
-											</span>
-										</p>
-									) : (
-										''
-									)}
 									<p className="text-sm font-bold bg-[#cccfd1] text-black p-1 px-2">
-										Balance: ₦{infoData?.balance}
+										Debit Balance: ₦{infoData?.balance}
 									</p>
 								</div>
 							</div>

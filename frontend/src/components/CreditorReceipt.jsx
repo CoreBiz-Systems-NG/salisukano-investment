@@ -83,7 +83,7 @@ const Receipt = ({
 							</div>
 						</div>
 						<div className="w-full mt-6 md:mt-10">
-							<table className="table-auto overflow-scroll md:overflow-auto w-full text-left font-inter border-separate border-spacing-y-1">
+							<table className="table-auto overflow-scroll md:overflow-auto w-full text-left font-inter border-collapse border-spacing-y-1">
 								<thead className="p-3 ">
 									<tr className="bg-[#222E3A]/[15%] text-[#212B36] rounded-none ">
 										<th
@@ -106,33 +106,31 @@ const Receipt = ({
 										</th>
 									</tr>
 								</thead>
-								<tbody>
+								<tbody className="">
 									{tableData && tableData.length > 0
 										? tableData.map((item, index) => (
-												<tr key={index}>
-													<td className="py-2 px-2 text-sm font-normal text-[#637381] whitespace-nowrap">
+												<tr key={index} className="">
+													<td className="py-2 px-2 text-sm font-normal text-[#637381] whitespace-nowrap border">
 														{new Date(item.date).toLocaleDateString()}
 													</td>
-													<td className="py-2 px-2 text-sm font-normal text-[#637381] whitespace-nowrap">
+													<td className="py-2 px-2 text-sm font-normal text-[#637381] whitespace-nowrap border">
 														{item.vehicleNumber}
 													</td>
 
 													<td
-														className={`py-2 px-2 text-sm font-normal  whitespace-nowrap text-center
-														${item?.credit ? 'text-red-500' : 'text-[#4F80E1]'}{' '}
-														whitespace-nowrap`}
+														className={`py-2 px-2 text-sm font-normal  whitespace-nowrap text-center border`}
 													>
 														{' '}
 														{item?.credit || item?.debit}
 													</td>
 													<td
-														className={`py-2 px-2 text-sm font-normal  whitespace-nowrap text-center
-														${item?.debit ? 'text-red-500' : 'text-[#4F80E1]'}{' '}
-														whitespace-nowrap`}
+														className={`py-2 px-2 text-sm font-normal  whitespace-nowrap text-center border`}
 													>
 														{item?.debit}
 													</td>
-													<td className="whitespace-nowrap">{item.balance}</td>
+													<td className="whitespace-nowrap p-3 border">
+														{item.balance}
+													</td>
 												</tr>
 										  ))
 										: ''}
