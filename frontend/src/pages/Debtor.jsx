@@ -170,7 +170,7 @@ const Debtors = () => {
 			<Receipt
 				show={isPrintModal}
 				setShow={setIsPrintModal}
-				title="Debtors Receipt"
+				title="Debtor's Receipt"
 				infoData={data?.debtor}
 				tableData={data?.debtor?.transactions || []}
 			/>
