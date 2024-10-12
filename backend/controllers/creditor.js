@@ -43,7 +43,7 @@ export const createCreditor = async (req, res) => {
 export const editCreditor = async (req, res) => {
 	try {
 		const { id } = req.params;
-		const { name, phone } = req;
+		const { name, phone } = req.body;
 		if (!id) {
 			return res.status(404).json({ error: 'Invalid Creditor id' });
 		}

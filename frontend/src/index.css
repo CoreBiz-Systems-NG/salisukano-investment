@@ -12,12 +12,12 @@
 	font-family: 'nourd' !important;
 }
 
-table {
+/* table {
 	@apply border-collapse !important;
 }
 td {
 	@apply border-b !important;
-}
+} */
 
 /* table {
 	border-collapse: separate;
