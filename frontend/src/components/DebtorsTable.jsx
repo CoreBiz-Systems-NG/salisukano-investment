@@ -164,7 +164,7 @@ const Table = ({
 								</td>
 								<td
 									onClick={() => handelClick(data?._id)}
-									className="py-4 px-1 text-sm font-normal text-[#637381] whitespace-nowrap bg-gray-50 cursor-pointer"
+									className="py-4 px-1 text-sm font-normal text-[#637381] whitespace-nowrap cursor-pointer"
 								>
 									{data?.phone}
 								</td>
@@ -172,11 +172,11 @@ const Table = ({
 									onClick={() => handelClick(data?._id)}
 									className={`${
 										data?.balance > 0 ? 'text-[#FB4949]' : 'text-[#4F80E1]'
-									} w-auto py-2 px-1 text-sm font-normal  whitespace-nowrap bg-gray-50 cursor-pointer`}
+									} w-auto py-2 px-1 text-sm font-normal  whitespace-nowrap cursor-pointer`}
 								>
 									{data?.balance}
 								</td>
-								<td className="py-2 px-1 text-sm font-normal whitespace-nowrap bg-gray-50 flex gap-2 justify-center">
+								<td className="py-2 px-1 text-sm font-normal whitespace-nowrap flex gap-2 justify-center">
 									<span
 										onClick={() => handelEdit(data)}
 										className="cursor-pointer"

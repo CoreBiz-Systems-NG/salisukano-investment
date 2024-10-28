@@ -245,7 +245,7 @@ const AddSupply = () => {
 											<select
 												className="input w-full h-[44px] rounded-md border border-gray px-1 text-base"
 												value={item.product}
-												defaultValue={'Cast'}
+												defaultValue='Cast'
 												onChange={(e) =>
 													handleMaterialChange(index, 'product', e.target.value)
 												}

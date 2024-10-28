@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import ProtectedRoutes from './hooks/ProtectedRoutes';
 import NotFound from './NotFound';
 import Login from './pages/Login';
+import Index from './pages/Index';
 import ForgotPassword from './pages/ForgotPassword';
 import DashboardLayout from './layouts/DashboardLayout';
 import Transactions from './pages/Transactions';
@@ -44,12 +45,13 @@ function App() {
 		<>
 			<Routes>
 				<Route path="/">
+					<Route path="/" element={<Index />} />
 					<Route path="/login" element={<Login />} />
 					<Route path="/forgot-password" element={<ForgotPassword />} />
 					<Route path="/reset-password/:token" element={<ChangePassword />} />
 					<Route element={<ProtectedRoutes />}>
 						<Route exact path="/" element={<DashboardLayout />}>
-							<Route path="/" element={<Dashboard />} />
+							<Route path="/dashboard" element={<Dashboard />} />
 							<Route path="/companies" element={<Customers />} />
 							<Route
 								path="/companies/payment/:customerId"

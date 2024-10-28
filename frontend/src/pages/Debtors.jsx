@@ -54,7 +54,7 @@ const Debtors = () => {
 	};
 	const { onDownload } = useDownloadExcel({
 		currentTableRef: tableRef.current,
-		filename: `${data?.debtor?.name} transactions`,
+		filename: `all debtors transactions`,
 		sheet: 'Users',
 	});
 

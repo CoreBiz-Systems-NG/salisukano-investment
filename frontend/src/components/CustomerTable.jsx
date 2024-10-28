@@ -148,13 +148,13 @@ const TransactionTable = ({ tableData, handelAddModal, handelEdit }) => {
 
 								<td
 									onClick={() => handelClick(data._id)}
-									className="py-2 px-2 text-sm font-normal text-[#DD6107] whitespace-nowrap"
+									className="py-2 px-2 text-sm font-normal text-[#637381] whitespace-nowrap"
 								>
 									{data?.name}
 								</td>
 								<td
 									onClick={() => handelClick(data._id)}
-									className="py-4 px-1 text-sm font-normal text-[#4F80E1] whitespace-nowrap bg-gray-50"
+									className="py-4 px-1 text-sm font-normal text-[#637381] whitespace-nowrap bg-gray-50"
 								>
 									{data?.phone}
 								</td>

@@ -8,7 +8,7 @@ import AuthContext from '../context/authContext';
 const navigationList = [
 	{
 		name: 'Dashboard',
-		link: '/',
+		link: '/dashboard',
 		svg: (
 			<svg
 				width="18"
