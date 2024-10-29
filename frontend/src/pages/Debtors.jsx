@@ -60,7 +60,7 @@ const Debtors = () => {
 
 	return (
 		<>
-			<main className=" w-full  py-3 pl-7 pr-5 gap-5 flex flex-col space-y-3">
+			<main className=" w-full lg:max-w-6xl mx-auto  py-3 pl-7 pr-5 gap-5 flex flex-col space-y-3">
 				<div className="flex justify-between">
 					<h4 className="font-semibold text-lg text-primary">Debtors</h4>
 				</div>

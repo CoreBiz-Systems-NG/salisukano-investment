@@ -26,6 +26,7 @@ import Loader from './components/Loader';
 import { useState, useEffect } from 'react';
 import Debtors from './pages/Debtors';
 import Debtor from './pages/Debtor';
+import DebtorReceipt from './pages/DebtorReceipt';
 import Creditors from './pages/Creditors';
 import MonthlyCredits from './pages/MonthlyCredits';
 import Creditor from './pages/Creditor';
@@ -78,6 +79,7 @@ function App() {
 							<Route path="/pricing/:id" element={<Pricing />} />
 							<Route path="/debtors" element={<Debtors />} />
 							<Route path="/debtors/:id" element={<Debtor />} />
+							<Route path="/debtors/:id/print" element={<DebtorReceipt />} />
 							<Route path="/creditors" element={<Creditors />} />
 							<Route path="/creditors/:id" element={<Creditor />} />
 							<Route

@@ -13,19 +13,20 @@ import toast from 'react-hot-toast';
 import { FaMinus, FaPlus } from 'react-icons/fa6';
 import { IoMdOptions } from 'react-icons/io';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useDownloadExcel } from 'react-export-table-to-excel';
 import { SiMicrosoftexcel } from 'react-icons/si';
-import Receipt from '../components/DebtorReceipt.jsx';
+// import Receipt from '../components/DebtorReceipt.jsx';
 import { FiPrinter } from 'react-icons/fi';
 const Debtors = () => {
 	const [loading, setIsLoading] = useState(false);
 	const [isAddModal, setIsAddModal] = useState(false);
 	const [isDebitModal, setIsDebitModal] = useState(false);
-	const [isPrintModal, setIsPrintModal] = useState(false);
+	// const [isPrintModal, setIsPrintModal] = useState(false);
 	const [account, setAccount] = useState();
 	const [isEditDebitModal, setIsEditDebitModal] = useState(false);
 	const [isDeleteDebitModal, setIsDeleteDebitModal] = useState(false);
+	const navigate = useNavigate();
 	const { user } = useContext(AuthContext);
 	const { id } = useParams();
 	const tableRef = useRef(null);
@@ -59,7 +60,8 @@ const Debtors = () => {
 		if (!data) {
 			return;
 		}
-		setIsPrintModal(true);
+		navigate(`/debtors/${id}/print`);
+		// setIsPrintModal(true);
 	};
 	const { onDownload } = useDownloadExcel({
 		currentTableRef: tableRef.current,
@@ -71,7 +73,7 @@ const Debtors = () => {
 			{isLoading || loading ? (
 				<Loader />
 			) : (
-				<main className=" w-full py-3 pl-7 pr-5 gap-5 flex flex-col space-y-3">
+				<main className=" w-full xl:max-w-6xl mx-auto py-3 pl-7 pr-5 gap-5 flex flex-col space-y-3">
 					<div className="flex justify-between">
 						<ul className="text-tiny font-medium flex items-center space-x-2 text-text3">
 							<li className="breadcrumb-item text-muted">
@@ -174,13 +176,6 @@ const Debtors = () => {
 					</div>
 				</main>
 			)}
-			<Receipt
-				show={isPrintModal}
-				setShow={setIsPrintModal}
-				title="Debtor's Receipt"
-				infoData={data?.debtor}
-				tableData={data?.debtor?.transactions || []}
-			/>
 			<CreditModal
 				show={isAddModal}
 				setShow={setIsAddModal}
