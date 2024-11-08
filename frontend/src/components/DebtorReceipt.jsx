@@ -143,7 +143,7 @@ const Receipt = ({
 						<div>
 							<div className="flex  justify-end">
 								<div className="mt-6">
-									<p className="text-sm font-bold bg-[#cccfd1] text-black p-1 px-2">
+									<p className="text-sm font-bold bg-[#cccfd1] text-black p-1  pb-2 px-2">
 										Debit Balance: ₦{infoData?.balance}
 									</p>
 								</div>

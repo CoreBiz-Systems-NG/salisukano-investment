@@ -166,6 +166,7 @@ export const fetchAccount = async (props) => {
 				Authorization: `Bearer ${props.user?.token}`,
 			},
 		};
+		console.log(props)
 		const { data } = await axios.get(`${apiUrl}/accounts/${props.id}`, config);
 		return data;
 	} catch (error) {
@@ -524,9 +525,27 @@ export const fetchCurrentAccount = async (prop) => {
 				Authorization: `Bearer ${prop?.token}`,
 			},
 		};
-
+		console.log(props);
 		const { data } = await axios.get(
 			`${apiUrl}/accounts/active/${prop.id}`,
+			config
+		);
+		return data;
+	} catch (error) {
+		console.log(error.message);
+		return error;
+	}
+};
+export const fetchAccountCommmission = async (prop) => {
+	try {
+		const config = {
+			headers: {
+				Authorization: `Bearer ${prop?.token}`,
+			},
+		};
+
+		const { data } = await axios.get(
+			`${apiUrl}/accounts/commission/${prop.id}`,
 			config
 		);
 		return data;

@@ -79,7 +79,6 @@ const TransactionSchema = new mongoose.Schema(
 // Pre-save hook to calculate total and normalize fields
 TransactionSchema.pre('save', function (next) {
 	this.name = this.name.toLowerCase();
-
 	// Calculate total based on the materials' costs
 	this.total = this.materials.reduce((sum, material) => sum + material.cost, 0);
 

@@ -143,7 +143,7 @@ export const getCustomer = async (req, res) => {
 // };
 export const createCustomer = async (req, res) => {
 	try {
-		const { name, phone, balance } = req.body;
+		const { name, phone, balance = 0 } = req.body;
 		if (!name) {
 			return res.status(401).json({ message: 'Customer name is required!' });
 		}
@@ -157,7 +157,7 @@ export const createCustomer = async (req, res) => {
 export const editCustomer = async (req, res) => {
 	try {
 		const { id } = req.params;
-		const { body } = req;
+		const { name, phone } = req.body;
 		if (!id) {
 			return res.status(404).json({ error: 'Invalid Customer id' });
 		}
@@ -168,15 +168,12 @@ export const editCustomer = async (req, res) => {
 			return res.status(404).json({ error: 'Customer not found' });
 		}
 
-		const updatedCustomer = await Customer.findByIdAndUpdate(
-			id,
-			{ ...body }, // Use the new image path or keep the old one
-			{ new: true } // Return the updated document
-		);
-
+		customer.name = name || customer.name;
+		customer.phone = phone || customer.phone;
+		await customer.save();
 		res
 			.status(200)
-			.json({ updatedCustomer, message: 'Customer updated successfully' });
+			.json({ customer, message: 'Customer updated successfully' });
 	} catch (error) {
 		res.status(404).json({ message: error.message });
 	}

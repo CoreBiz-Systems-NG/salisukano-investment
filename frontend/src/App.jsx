@@ -32,6 +32,7 @@ import MonthlyCredits from './pages/MonthlyCredits';
 import Creditor from './pages/Creditor';
 import NewCredit from './pages/NewCredit';
 import CreditDetails from './pages/CreditDetails';
+import Commission from './pages/Commission';
 // import Report from './pages/Report';
 function App() {
 	const [loading, setLoading] = useState(true);
@@ -65,8 +66,9 @@ function App() {
 							<Route path="/companies/:id" element={<Accounts />} />
 							{/* <Route path="/accounts" element={< />} /> */}
 							<Route path="/accounts/:id" element={<AccountDetail />} />
-							<Route path="/add-supply/:id" element={<AddSupply />} />
 							<Route path="/transactions" element={<Transactions />} />
+							<Route path="/add-supply/:id" element={<AddSupply />} />
+							<Route path="/commission/:id" element={<Commission />} />
 							<Route path="/payment/new/:id" element={<Payment />} />
 							<Route path="/payment/edit/:id" element={<EditPayment />} />
 							<Route

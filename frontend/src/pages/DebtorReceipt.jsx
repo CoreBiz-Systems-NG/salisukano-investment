@@ -51,9 +51,9 @@ const Receipt = () => {
 				<>
 					<div
 						id="receipt"
-						className="w-full  md:max-w-3xl bg-white mx-auto rounded-md mt-4 p-2 md:p-6 lg:p-10 xl:p-14"
+						className="w-full md:max-w-3xl bg-white mx-auto rounded-md mt-4 p-2 md:p-6 lg:p-10 xl:p-14"
 					>
-						<div className="w-full  bg-white mx-auto rounded-md text-xs">
+						<div className="w-full p-2 sm:p-0 bg-white mx-auto rounded-md text-xs">
 							<div className="w-full text-black">
 								<div className="w-full sm:flex justify-between">
 									<div>
@@ -99,7 +99,7 @@ const Receipt = () => {
 										</p>
 										{InvoiceDate && (
 											<p className="text-sm font-normal text-[#637381]">
-												From:{InvoiceDate?.toLocaleDateString()}{' '}
+												From:{InvoiceDate}{' '}
 											</p>
 										)}
 										<p className="text-sm font-normal text-[#637381]">

@@ -9,8 +9,6 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchAccount } from '../hooks/axiosApis.js';
 import getError from '../hooks/getError.js';
 import toast from 'react-hot-toast';
-// import { exportToExcel } from '../components/ExportToExcel';
-// import { formatDataForExcel } from '../hooks/cleanData.js';
 import { FaMinus, FaPlus } from 'react-icons/fa6';
 import moment from 'moment';
 import OpeningBalanceModal from '../components/modals/OpeningBalance.jsx';
@@ -20,7 +18,7 @@ import { TfiTruck } from 'react-icons/tfi';
 import { GiReceiveMoney } from 'react-icons/gi';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { useDownloadExcel } from 'react-export-table-to-excel';
-// import axios from 'axios';
+import { FiPercent } from 'react-icons/fi';
 
 const Transaction = () => {
 	const [loading, setIsLoading] = useState(false);
@@ -33,11 +31,11 @@ const Transaction = () => {
 	// const queryClient = useQueryClient();
 	const tableRef = useRef(null);
 
-	const { id } = useParams();
-	// const [business, setBusiness] = useState([]);
+	const { id } = useParams();	
+	// console.log('user accounts', user);
 	const { data, isLoading, error } = useQuery({
 		queryKey: ['transactions', id],
-		queryFn: async () => fetchAccount({ user, id }),
+		queryFn: async () => fetchAccount({ token: user?.token, id }),
 	});
 	useEffect(() => {
 		// if (data && data.length > 0) {
@@ -127,6 +125,13 @@ const Transaction = () => {
 								New Payment
 							</MenuItem>
 
+							<MenuItem
+								as="button"
+								className="pl-3 py-2 px-2 flex w-full justify-start items-center gap-1 rounded text-sm  text-gray-700 hover:bg-yellow-100 font-normal"
+								onClick={() => navigate(`/commission/${id}`)}
+							>
+								<FiPercent /> Commission
+							</MenuItem>
 							<MenuItem
 								as="button"
 								className="pl-3 py-2 px-2 flex w-full justify-start items-center gap-1 rounded text-sm  text-gray-700 hover:bg-green-100 font-normal"

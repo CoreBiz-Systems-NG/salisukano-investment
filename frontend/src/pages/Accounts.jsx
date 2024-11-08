@@ -25,7 +25,6 @@ const Transaction = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
 	const tableRef = useRef(null);
-
 	const { data, isLoading, error } = useQuery({
 		queryKey: ['customers', 'accounts', id],
 		queryFn: async () => fetchCustomer({ token: user.token, id }),

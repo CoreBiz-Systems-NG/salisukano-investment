@@ -2,6 +2,7 @@ import CustomerTable from '../components/CustomerTable.jsx';
 import Loader from '../components/Loader.jsx';
 import { useContext, useEffect, useState } from 'react';
 import AddCustomerModal from '../components/modals/AddCustomerModal.jsx';
+import EditModal from '../components/modals/EditCustomer.jsx';
 // import OpeningBalance from '../components/modals/CompanyOpeningBalance.jsx';
 // import { useNavigate } from 'react-router-dom';
 import AuthContext from '../context/authContext.jsx';
@@ -12,9 +13,8 @@ import toast from 'react-hot-toast';
 const Company = () => {
 	const [loading, setIsLoading] = useState(false);
 	const [isAddModal, setIsAddModal] = useState(false);
-	// const [isStatusModal, setIsStatusModal] = useState(false);
-	// const [isBalanceModal, setIsBalanceModal] = useState(false);
-	// const [selectedAccount, setSelectedAccount] = useState(null);
+	const [isEditModal, setIsEditModal] = useState(false);
+	const [customer, setCustomer] = useState(null);
 	const { user } = useContext(AuthContext);
 	const { data, isLoading, error } = useQuery({
 		queryKey: ['customers'],
@@ -37,18 +37,12 @@ const Company = () => {
 		setIsAddModal(true);
 	};
 
-	// const handelChangeBalance = async (data) => {
-	// 	setSelectedAccount(data);
-	// 	setIsBalanceModal(true);
-	// };
-	
-	const handelEdit = async () => {
+	const handelEdit = async (data) => {
 		console.log('Edit data', data);
-		// 	setSelectedAccount(data);
-		// 	setIsBalanceModal(true);
+		setCustomer(data);
+		setIsEditModal(true);
 	};
 
-	
 	return (
 		<>
 			<main className="  w-full py-3 pl-7 pr-5 gap-5 flex flex-col space-y-3">
@@ -66,6 +60,13 @@ const Company = () => {
 				setShow={setIsAddModal}
 				setLoading={setIsLoading}
 				loading={isLoading}
+			/>
+			<EditModal
+				show={isEditModal}
+				setShow={setIsEditModal}
+				setLoading={setIsLoading}
+				loading={isLoading}
+				customer={customer}
 			/>
 			{isLoading || (loading && <Loader />)}
 		</>

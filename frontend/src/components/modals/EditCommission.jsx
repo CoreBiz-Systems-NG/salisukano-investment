@@ -4,20 +4,36 @@ import AuthContext from '../../context/authContext';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import getError from '../../hooks/getError';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import Modal from './Modal';
 import { HiXMark } from 'react-icons/hi2';
 
-const EditModal = ({ show, setShow, setLoading, loading, debtor }) => {
+const statusData = [
+	{ name: 'Debit', value: 'debit' },
+	{ name: 'Credit', value: 'credit' },
+];
+
+
+const EditModal = ({
+	show,
+	setShow,
+	setLoading,
+	loading,
+	debtor,
+	commissionId,
+}) => {
 	const { user } = useContext(AuthContext);
 	const [name, setName] = useState(debtor?.name);
-	const [phone, setPhone] = useState(debtor?.phone);
+	const [amount, setAmount] = useState(debtor?.phone);
+	const [type, setType] = useState('debit');
+	const { id } = useParams();
 	const apiUrl = import.meta.env.VITE_API_URL;
-
+	console.log('debtor', commissionId);
 	useEffect(() => {
 		setName(debtor?.name);
-		setPhone(debtor?.phone);
+		setAmount(debtor?.amount);
+		setType(debtor?.type);
 	}, [debtor]);
 	const config = {
 		headers: {
@@ -31,19 +47,26 @@ const EditModal = ({ show, setShow, setLoading, loading, debtor }) => {
 		if (!name) {
 			return toast.error('Name is required');
 		}
+		if (!amount || amount <= 0) {
+			return toast.error('Enter a valid  amount');
+		}
 		setLoading(true);
 		setShow(false);
 		try {
 			axios
-				.patch(`${apiUrl}/debtors/${debtor?._id}`, { name, phone }, config)
+				.patch(
+					`${apiUrl}/accounts/commission/${commissionId}`,
+					{ name, amount, transactionType: type, transactionId: debtor?._id },
+					config
+				)
 				.then((res) => {
 					if (res.data) {
 						queryClient.invalidateQueries({
 							queryKey: ['dashboard', 'accounts', 'customers', 'debtors'],
 						});
-						toast.success('Account updated successfully');
+						toast.success('Commission updated successfully');
 					}
-					navigate(`/debtors/${debtor?._id}`);
+					navigate(`/accounts/${id}`);
 				})
 				.catch((error) => {
 					const message = getError(error);
@@ -51,7 +74,7 @@ const EditModal = ({ show, setShow, setLoading, loading, debtor }) => {
 				})
 				.finally(() => {
 					setName('');
-					setPhone('');
+					setAmount('');
 					setLoading(false);
 				});
 		} catch (error) {
@@ -62,11 +85,13 @@ const EditModal = ({ show, setShow, setLoading, loading, debtor }) => {
 
 	return (
 		<Modal show={show}>
-			<div className="transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all font-josefin max-w-2xl  md:min-w-[450px]">
+			<div className="transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all font-josefin max-w-xl md:min-w-[450px]">
 				<div className="space-y-5 p-4">
 					<div className="flex justify-between">
 						<div>
-							<p className="font-semibold text-lg text-primary">Edit Debtor</p>
+							<p className="font-semibold text-lg text-primary">
+								Edit Commission
+							</p>
 						</div>
 						<button
 							onClick={() => setShow(false)}
@@ -85,25 +110,40 @@ const EditModal = ({ show, setShow, setLoading, loading, debtor }) => {
 							value={name}
 							onChange={(e) => setName(e.target.value)}
 						/>
-						<span className="text-tiny leading-4">Enter name.</span>
 					</div>
 					<div className="mb-5">
 						<label className="mb-0 text-base text-black">
-							Phone <span className="text-red-500">*</span>
+							Amount <span className="text-red-500">*</span>
 						</label>
 						<input
 							className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
-							type="tel"
-							value={phone}
-							onChange={(e) => setPhone(e.target.value)}
+							type="text"
+							value={amount}
+							onChange={(e) => setAmount(e.target.value)}
 						/>
+					</div>
+					<div className="mb-5">
+						<p className="mb-0 text-base text-black">Type</p>
+						<select
+							className={`${
+								type === 'debit' ? 'text-[#FB4949]' : 'text-[#4F80E1]'
+							} 'input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"`}
+							value={type}
+							onChange={(e) => setType(e.target.value)}
+						>
+							{statusData?.map((data, idx) => (
+								<option key={idx} value={data.value} className="text-black">
+									{data.name}
+								</option>
+							))}
+						</select>
 					</div>
 					<button
 						disabled={loading}
 						className="bg-blue-500 hover:bg-blue-700 text-white font-semibold h-10 py-1 w-full flex items-center justify-center rounded-md transition-all duration-500 ease-in-out"
 						onClick={handleSubmit}
 					>
-						<span>Update Debtor</span>
+						<span>Update Commission</span>
 					</button>
 				</div>
 			</div>

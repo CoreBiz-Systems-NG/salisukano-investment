@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import Transaction from '../models/Transaction.js';
 import Customer from '../models/Customer.js';
 import Account from '../models/Account.js';
+import Commission from '../models/Commission.js';
 import fs from 'fs';
 import { uploader } from '../utils/cloudinary.js';
 import dotenv from 'dotenv';
@@ -81,7 +82,7 @@ export const createAccount = async (req, res) => {
 			message: 'Account created successfully',
 		});
 	} catch (error) {
-		console.log('error', error)
+		console.log('error', error);
 		await session.abortTransaction();
 		console.error('Error creating account:', error.message);
 		res.status(500).json({ message: 'Internal server error' });
@@ -174,7 +175,7 @@ export const getAccount = async (req, res) => {
 		const customer = await Customer.findById({ _id: account.customerId });
 		const transactions = await Transaction.find({
 			accountId: account._id,
-		}).sort({ date: 1 }); 
+		}).sort({ date: 1 });
 		res.status(200).json({ account, customer, transactions });
 	} catch (error) {
 		console.error(error);
@@ -295,6 +296,174 @@ export const updateOpeningBalance = async (req, res) => {
 		await session.abortTransaction();
 		session.endSession();
 		console.error(error);
+		res.status(500).json({ error: 'Internal Server Error' });
+	}
+};
+export const getAccountCommission = async (req, res) => {
+	try {
+		// Find the account by the provided id
+		const account = await Account.findById({ _id: req.params.id });
+		if (!account) {
+			return res.status(404).json({ message: 'Account not found' });
+		}
+		const commission = await Commission.findOne({ accountId: req.params.id });
+		// Respond with the updated account data
+		res.status(200).json({
+			account,
+			commission,
+			message: 'Commision fetched successfully',
+		});
+	} catch (error) {
+		console.error('get commission Error', error);
+		res.status(500).json({ error: 'Internal Server Error' });
+	}
+};
+export const addAccountCommission = async (req, res) => {
+	try {
+		const { accountId, name, amount, description, transactionType } = req.body;
+
+		// Find the account by the provided ID
+		const account = await Account.findById({ _id: accountId });
+		if (!account) {
+			return res.status(404).json({ message: 'Account not found' });
+		}
+
+		let commission = await Commission.findOne({ accountId });
+		let newBalance = 0;
+
+		// Calculate new balance based on transaction type
+		if (transactionType === 'debit') {
+			newBalance = Number(commission?.balance || 0) - Number(amount);
+		} else {
+			newBalance = Number(commission?.balance || 0) + Number(amount);
+		}
+
+		// Prepare transaction
+		const transaction = {
+			name,
+			amount,
+			description,
+			type: transactionType,
+		};
+
+		if (commission) {
+			console.log('commission', commission);
+			// Update existing commission record
+			commission.accountBalance = account.balance;
+			commission.balance = newBalance;
+			commission.transactions.push(transaction);
+			await commission.save();
+			return res.status(200).json({
+				account,
+				message: 'Account commission updated successfully',
+			});
+		} else {
+			// Create new commission record
+			commission = await Commission.create({
+				accountId,
+				accountBalance: account.balance,
+				balance: newBalance,
+				transactions: [transaction],
+			});
+			return res.status(201).json({
+				account,
+				message: 'Account commission added successfully',
+			});
+		}
+	} catch (error) {
+		console.error('Error adding commission:', error);
+		res.status(500).json({ error: 'Internal Server Error' });
+	}
+};
+
+export const updateCommissionTransaction = async (req, res) => {
+	try {
+		const { name, amount, description, transactionType, transactionId } =
+			req.body;
+
+		// Find the commission by the provided ID
+		const commission = await Commission.findById(req.params.id);
+		if (!commission) {
+			return res.status(404).json({ message: 'Commission not found' });
+		}
+
+		// Find the transaction to update
+		const transaction = commission.transactions.find(
+			(t) => t._id.toString() === transactionId
+		);
+		if (!transaction) {
+			return res.status(404).json({ error: 'Transaction not found' });
+		}
+
+		// Calculate the balance adjustment based on the updated transaction
+		const previousAmount = transaction.amount;
+		let balanceAdjustment = 0;
+
+		if (transactionType === 'debit') {
+			balanceAdjustment = Number(previousAmount) - Number(amount);
+		} else {
+			balanceAdjustment = Number(amount) - Number(previousAmount);
+		}
+
+		// Update transaction fields
+		transaction.name = name || transaction.name;
+		transaction.amount = amount || transaction.amount;
+		transaction.description = description || transaction.description;
+		transaction.type = transactionType || transaction.type;
+
+		// Update the commission balance
+		commission.balance += balanceAdjustment;
+		await commission.save();
+
+		res.status(200).json({
+			commission,
+			message: 'Transaction updated successfully',
+		});
+	} catch (error) {
+		console.error('Error updating commission', error);
+		res.status(500).json({ error: 'Internal Server Error' });
+	}
+};
+
+export const deleteCommissionTransaction = async (req, res) => {
+	try {
+		// Find the commission by the provided id
+		const commission = await Commission.findById(req.params.commissionId);
+		if (!commission) {
+			return res.status(404).json({ message: 'Commission not found' });
+		}
+
+		// Find the transaction to delete
+		const transactionIndex = commission.transactions.findIndex(
+			(t) => t._id.toString() === req.params.id
+		);
+		if (transactionIndex === -1) {
+			return res.status(404).json({ error: 'Transaction not found' });
+		}
+
+		// Get the transaction details
+		const transaction = commission.transactions[transactionIndex];
+
+		// Adjust the balance based on the transaction type and amount
+		const transactionAmount = Number(transaction.amount);
+		if (transaction.type === 'debit') {
+			commission.balance += transactionAmount;
+		} else {
+			commission.balance -= transactionAmount;
+		}
+
+		// Remove the transaction from the transactions array
+		commission.transactions.splice(transactionIndex, 1);
+
+		// Save the updated commission document
+		await commission.save();
+
+		res.status(200).json({
+			commission,
+			message: 'Transaction deleted successfully and balance updated',
+		});
+	} catch (error) {
+		console.error('Error deleting transaction', error);
 		res.status(500).json({ error: 'Internal Server Error' });
 	}
 };

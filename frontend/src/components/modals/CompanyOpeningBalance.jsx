@@ -91,7 +91,7 @@ const AddModal = ({ show, setShow, setLoading, loading, account }) => {
 						</h2>
 						<div className="mb-5">
 							<label className="mb-0 text-base text-black">
-								Openinig Bal.<span className="text-red">*</span>
+								Openinig Bal. <span className="text-red-500">*</span>
 							</label>
 							<input
 								className="input w-full h-[44px] rounded-md border border-gray6 px-6 text-base"
@@ -109,7 +109,7 @@ const AddModal = ({ show, setShow, setLoading, loading, account }) => {
 						className="bg-blue-500 hover:bg-blue-700 text-white font-semibold h-10 py-1 w-full flex items-center justify-center rounded-md transition-all duration-500 ease-in-out"
 						onClick={handleSubmit}
 					>
-						<span>Update Account</span>
+						<span>Update Accountt</span>
 					</button>
 				</div>
 			</div>

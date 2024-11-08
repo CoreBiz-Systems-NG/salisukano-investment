@@ -4,6 +4,7 @@ import {
 	getTransaction,
 	cleanAndBalanceTransactionsAndAccount,
 } from '../controllers/transaction.js';
+import { protect } from '../middleware/requireAuth.js';
 // import { uploadMiddleware } from '../utils/uploadMiddleware.js';
 
 const router = express.Router();

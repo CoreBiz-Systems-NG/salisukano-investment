@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import AuthContext from '../../context/authContext';
 import toast from 'react-hot-toast';
 import axios from 'axios';
@@ -9,57 +9,49 @@ import { useQueryClient } from '@tanstack/react-query';
 import Modal from './Modal';
 import { HiXMark } from 'react-icons/hi2';
 
-const AddModal = ({ show, setShow, setLoading, loading, account }) => {
+const EditModal = ({ show, setShow, setLoading, loading, customer }) => {
 	const { user } = useContext(AuthContext);
-	const [balance, setBalance] = useState(0);
+	const [name, setName] = useState(customer?.name);
+	const [phone, setPhone] = useState(customer?.phone);
 	const apiUrl = import.meta.env.VITE_API_URL;
+
+	useEffect(() => {
+		setName(customer?.name);
+		setPhone(customer?.phone);
+	}, [customer]);
 	const config = {
 		headers: {
 			Authorization: `Bearer ${user?.token}`,
 		},
 	};
-	// console.log('account', account);
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
-	const normalizedMonth = new Date(
-		new Date(account?.month).getFullYear(),
-		new Date(account?.month).getMonth(),
-		1
-	);
-	const month = normalizedMonth.toLocaleDateString('en-GB', {
-		month: 'long',
-		year: 'numeric',
-	});
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		// AMOUNT MUST BE A VALID DEGIT
-		if (!balance || isNaN(balance) || balance <= 0) {
-			return toast.error('Amount must be a valid positive number');
+		if (!name) {
+			return toast.error('Name is required');
 		}
 		setLoading(true);
 		setShow(false);
 		try {
 			axios
-				.patch(
-					`${apiUrl}/accounts/opening-balance`,
-					{ accountId: account._id, openingBalance: balance },
-					config
-				)
+				.patch(`${apiUrl}/customers/${customer?._id}`, { name, phone }, config)
 				.then((res) => {
 					if (res.data) {
 						queryClient.invalidateQueries({
-							queryKey: ['dashboard', 'accounts'],
+							queryKey: ['dashboard', 'accounts', 'customers', 'debtors'],
 						});
-						toast.success(' Account updated successfully');
+						toast.success('Company updated successfully');
 					}
-					setBalance(0);
-					navigate(`/companies/${account?.customerId}`);
+					navigate(`/dashboard`);
 				})
 				.catch((error) => {
 					const message = getError(error);
 					toast.error(message);
 				})
 				.finally(() => {
+					setName('');
+					setPhone('');
 					setLoading(false);
 				});
 		} catch (error) {
@@ -70,11 +62,11 @@ const AddModal = ({ show, setShow, setLoading, loading, account }) => {
 
 	return (
 		<Modal show={show}>
-			<div className="transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all font-josefin min-w-[450px] max-w-2xl">
-				<div className="space-y-2 p-4">
+			<div className="transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all font-josefin max-w-2xl md:min-w-[450px]">
+				<div className="space-y-5 p-4">
 					<div className="flex justify-between">
 						<div>
-							<h2 className="font-semibold text-lg text-primary">{month}</h2>
+							<p className="font-semibold text-lg text-primary">Edit Company</p>
 						</div>
 						<button
 							onClick={() => setShow(false)}
@@ -83,29 +75,34 @@ const AddModal = ({ show, setShow, setLoading, loading, account }) => {
 							<HiXMark className="fa-solid fa-xmark text-xl text-red-600 hover:text-red-800" />
 						</button>
 					</div>
-
-					<div className="">
-						<div className="mb-5">
-							<label className="mb-0 text-base text-black">
-								Update Balance
-							</label>
-							<input
-								className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
-								type="number"
-								value={balance}
-								onChange={(e) => setBalance(e.target.value)}
-							/>
-							<span className="text-tiny leading-4">
-								Balance brought forward.
-							</span>
-						</div>
+					<div className="mb-5">
+						<label className="mb-0 text-base text-black">
+							Name <span className="text-red-500">*</span>
+						</label>
+						<input
+							className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
+							type="text"
+							value={name}
+							onChange={(e) => setName(e.target.value)}
+						/>
+					</div>
+					<div className="mb-5">
+						<label className="mb-0 text-base text-black">
+							Phone <span className="text-red-500">*</span>
+						</label>
+						<input
+							className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
+							type="tel"
+							value={phone}
+							onChange={(e) => setPhone(e.target.value)}
+						/>
 					</div>
 					<button
 						disabled={loading}
 						className="bg-blue-500 hover:bg-blue-700 text-white font-semibold h-10 py-1 w-full flex items-center justify-center rounded-md transition-all duration-500 ease-in-out"
 						onClick={handleSubmit}
 					>
-						<span>Update Account</span>
+						<span>Update Company</span>
 					</button>
 				</div>
 			</div>
@@ -113,4 +110,4 @@ const AddModal = ({ show, setShow, setLoading, loading, account }) => {
 	);
 };
 
-export default AddModal;
+export default EditModal;

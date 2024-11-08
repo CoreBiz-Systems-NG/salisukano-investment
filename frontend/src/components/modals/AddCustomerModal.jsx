@@ -59,7 +59,7 @@ const AddModal = ({ show, setShow, setLoading, loading }) => {
 
 	return (
 		<Modal show={show}>
-			<div className="transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all font-josefin max-w-2xl">
+			<div className="transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all font-josefin max-w-2xl  md:min-w-[450px]">
 				<div className="space-y-5 p-4">
 					<div className="flex justify-between">
 						<div>
@@ -73,10 +73,10 @@ const AddModal = ({ show, setShow, setLoading, loading }) => {
 						</button>
 					</div>
 
-					<div className="flex gap-2 p-2 ">
+					<div className="flex flex-col gap-2 p-2 ">
 						<div className="mb-5">
 							<label className="mb-0 text-base text-black">
-								Name<span className="text-red">*</span>
+								Name <span className="text-red-500">*</span>
 							</label>
 							<input
 								className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
@@ -88,7 +88,7 @@ const AddModal = ({ show, setShow, setLoading, loading }) => {
 						</div>
 						<div className="mb-5">
 							<label className="mb-0 text-base text-black">
-								Phone<span className="text-red">*</span>
+								Phone <span className="text-red-500">*</span>
 							</label>
 							<input
 								className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
@@ -98,7 +98,7 @@ const AddModal = ({ show, setShow, setLoading, loading }) => {
 							/>
 						</div>
 					</div>
-					<div className=" p-2 ">
+					<div className=" p-2 hidden">
 						<div className="mb-5">
 							<label className="mb-0 text-base text-black">
 								Openinig Bal.<span className="text-red">*</span>
