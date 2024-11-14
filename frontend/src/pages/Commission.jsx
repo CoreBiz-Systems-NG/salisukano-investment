@@ -75,16 +75,28 @@ const Commissions = () => {
 				.then((res) => {
 					if (res.data) {
 						queryClient.invalidateQueries({
-							queryKey: ['dashboard', 'accounts', 'customers', 'debtors'],
+							queryKey: [
+								'dashboard',
+								'accounts',
+								'customers',
+								'debtors',
+								'commission',
+							],
 						});
 						toast.success('Commission deleted successfully');
 					}
 					// refetch all active queries partially matching a query key:
 					queryClient.refetchQueries({
-						queryKey: ['dashboard', 'accounts', 'customers', 'debtors'],
+						queryKey: [
+							'dashboard',
+							'accounts',
+							'customers',
+							'debtors',
+							'commission',
+						],
 					});
 					// navigate(`/accounts/`);
-					navigate(`/accounts/${id}`);
+					// navigate(`/accounts/${id}`);
 				})
 				.catch((error) => {
 					const message = getError(error);
