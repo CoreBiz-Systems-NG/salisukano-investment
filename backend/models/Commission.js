@@ -38,10 +38,27 @@ const CommissionSchema = new mongoose.Schema(
 			type: Number,
 			default: 0,
 		},
+		totalBalance: {
+			type: Number,
+			default: 0,
+		},
+		totalCredit: {
+			type: Number,
+			default: 0,
+		},
+		totalDebit: {
+			type: Number,
+			default: 0,
+		},
 		transactions: [TransactionSchema],
 	},
 	{ timestamps: true }
 );
+
+CommissionSchema.pre('save', function (next) {
+	this.totalBalance = this.accountBalance + this.balance;
+	next();
+});
 
 const Commission = mongoose.model('Commission', CommissionSchema);
 

@@ -50,7 +50,7 @@ const AddModal = ({ show, setShow, setLoading, loading, accountId }) => {
 						queryClient.invalidateQueries({
 							queryKey: ['dashboard', 'accounts', 'customers', 'debtors'],
 						});
-						toast.success('Account created successfully');
+						toast.success('Commission added successfully');
 					}
 					// refetch all active queries partially matching a query key:
 					queryClient.refetchQueries({

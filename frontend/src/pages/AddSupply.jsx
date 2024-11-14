@@ -58,7 +58,7 @@ const AddSupply = () => {
 				normalizedMonth.getMonth(),
 				1
 			);
-			setMinDate(min.toISOString().split('T')[0]);
+			setMinDate(min?.toISOString().split('T')[0]);
 
 			// Set maximum date to the last day of the month
 			const max = new Date(

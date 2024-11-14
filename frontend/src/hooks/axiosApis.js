@@ -166,7 +166,7 @@ export const fetchAccount = async (props) => {
 				Authorization: `Bearer ${props.user?.token}`,
 			},
 		};
-		console.log(props)
+		console.log(props);
 		const { data } = await axios.get(`${apiUrl}/accounts/${props.id}`, config);
 		return data;
 	} catch (error) {
@@ -525,7 +525,7 @@ export const fetchCurrentAccount = async (prop) => {
 				Authorization: `Bearer ${prop?.token}`,
 			},
 		};
-		console.log(props);
+		console.log(prop);
 		const { data } = await axios.get(
 			`${apiUrl}/accounts/active/${prop.id}`,
 			config

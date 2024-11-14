@@ -9,7 +9,9 @@ import { fetchAccountCommmission } from '../hooks/axiosApis.js';
 import getError from '../hooks/getError.js';
 import toast from 'react-hot-toast';
 import { useDownloadExcel } from 'react-export-table-to-excel';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useQueryClient } from '@tanstack/react-query';
 const Commissions = () => {
 	const [loading, setIsLoading] = useState(false);
 	const [isAddModal, setIsAddModal] = useState(false);
@@ -17,6 +19,8 @@ const Commissions = () => {
 	const [debtor, setDebtor] = useState(false);
 	const { user } = useContext(AuthContext);
 	const tableRef = useRef(null);
+	const navigate = useNavigate();
+	const apiUrl = import.meta.env.VITE_API_URL;
 	const { id } = useParams();
 	const { data, isLoading, error } = useQuery({
 		queryKey: ['commission', id],
@@ -52,6 +56,46 @@ const Commissions = () => {
 		console.log(data);
 		setDebtor(data);
 		setIsEditModal(true);
+	};
+
+	const queryClient = useQueryClient();
+	const config = {
+		headers: {
+			Authorization: `Bearer ${user?.token}`,
+		},
+	};
+	const handelDelete = async (cId) => {
+		setIsLoading(true);
+		try {
+			axios
+				.delete(
+					`${apiUrl}/accounts/commission/${cId}/${data?.commission?._id}`,
+					config
+				)
+				.then((res) => {
+					if (res.data) {
+						queryClient.invalidateQueries({
+							queryKey: ['dashboard', 'accounts', 'customers', 'debtors'],
+						});
+						toast.success('Commission deleted successfully');
+					}
+					// refetch all active queries partially matching a query key:
+					queryClient.refetchQueries({
+						queryKey: ['dashboard', 'accounts', 'customers', 'debtors'],
+					});
+					// navigate(`/accounts/`);
+					navigate(`/accounts/${id}`);
+				})
+				.catch((error) => {
+					const message = getError(error);
+					toast.error(message);
+				})
+				.finally(() => {
+					setIsLoading(false);
+				});
+		} catch (error) {
+			console.log(error);
+		}
 	};
 	const { onDownload } = useDownloadExcel({
 		currentTableRef: tableRef.current,
@@ -105,7 +149,7 @@ const Commissions = () => {
 					<div className="p-5 mb-4  bg-white flex flex-col md:max-w-md w-full rounded-xl gap-2 border border-[#E7E7E7] hover:shadow-xl cursor-pointer">
 						<div className={`flex justify-between `}>
 							<span className="text-[#637381] text-sm font-medium">
-								Total Commission
+								Total Credit
 							</span>
 							<div className="flex gap-1 items-center">
 								<span className="">100%</span>
@@ -115,8 +159,31 @@ const Commissions = () => {
 						<div
 							className={`flex gap-4 justify-between flex-nowrap items-center`}
 						>
-							<span className="text-xl font-bold whitespace-nowrap">
-								₦ {data?.commission?.balance || 0}
+							<span className="text-xl font-bold whitespace-nowrap text-[#4F80E1]">
+								₦ {data?.commission?.totalCredit || 0}
+							</span>
+							<img
+								src="/assets/admin/dashboard/graph1.svg"
+								className="w-10 h-10"
+								alt="graph"
+							/>
+						</div>
+					</div>
+					<div className="p-5 mb-4  bg-white flex flex-col md:max-w-md w-full rounded-xl gap-2 border border-[#E7E7E7] hover:shadow-xl cursor-pointer">
+						<div className={`flex justify-between `}>
+							<span className="text-[#637381] text-sm font-medium">
+								Total Debit
+							</span>
+							<div className="flex gap-1 items-center">
+								<span className="">100%</span>
+								<img src="/assets/admin/dashboard/uparrow.svg" alt="graph" />
+							</div>
+						</div>
+						<div
+							className={`flex gap-4 justify-between flex-nowrap items-center`}
+						>
+							<span className="text-xl font-bold whitespace-nowrap text-[#FB4949]">
+								₦ {data?.commission?.totalDebit || 0}
 							</span>
 							<img
 								src="/assets/admin/dashboard/graph1.svg"
@@ -139,9 +206,7 @@ const Commissions = () => {
 							className={`flex gap-4 justify-between flex-nowrap items-center`}
 						>
 							<span className="text-xl font-bold whitespace-nowrap">
-								₦{' '}
-								{Number(data?.account?.balance) -
-									Number(data?.commission?.balance) || 0}
+								₦ {Number(data?.commission?.totalBalance) || 0}
 							</span>
 							<img
 								src="/assets/admin/dashboard/graph1.svg"
@@ -155,6 +220,7 @@ const Commissions = () => {
 					tableData={data?.commission?.transactions || []}
 					handelAddModal={handelAddModal}
 					handelEdit={handelEdit}
+					handelDelete={handelDelete}
 					handelExportToExcel={onDownload}
 				/>
 			</main>

@@ -322,66 +322,87 @@ export const addAccountCommission = async (req, res) => {
 	try {
 		const { accountId, name, amount, description, transactionType } = req.body;
 
+		// Validate required fields
+		if (!accountId || !amount || !transactionType) {
+			return res.status(400).json({ message: 'Required fields are missing' });
+		}
+
 		// Find the account by the provided ID
-		const account = await Account.findById({ _id: accountId });
+		const account = await Account.findById(accountId);
 		if (!account) {
 			return res.status(404).json({ message: 'Account not found' });
 		}
 
+		// Check for existing commission record or initialize one
 		let commission = await Commission.findOne({ accountId });
-		let newBalance = 0;
-
-		// Calculate new balance based on transaction type
-		if (transactionType === 'debit') {
-			newBalance = Number(commission?.balance || 0) - Number(amount);
-		} else {
-			newBalance = Number(commission?.balance || 0) + Number(amount);
-		}
-
-		// Prepare transaction
-		const transaction = {
-			name,
-			amount,
-			description,
-			type: transactionType,
-		};
-
-		if (commission) {
-			console.log('commission', commission);
-			// Update existing commission record
-			commission.accountBalance = account.balance;
-			commission.balance = newBalance;
-			commission.transactions.push(transaction);
-			await commission.save();
-			return res.status(200).json({
-				account,
-				message: 'Account commission updated successfully',
-			});
-		} else {
-			// Create new commission record
-			commission = await Commission.create({
+		if (!commission) {
+			commission = new Commission({
 				accountId,
 				accountBalance: account.balance,
-				balance: newBalance,
-				transactions: [transaction],
-			});
-			return res.status(201).json({
-				account,
-				message: 'Account commission added successfully',
+				balance: 0,
+				totalCredit: 0,
+				totalDebit: 0,
+				transactions: [],
 			});
 		}
+
+		// Convert amount and account balance to numbers
+		const numericAmount = parseFloat(amount);
+		const accountBalance = parseFloat(account.balance);
+
+		// Calculate new balance and transaction totals
+		const updateBalanceAndTotals =
+			transactionType === 'debit'
+				? {
+						balance: commission.balance - numericAmount,
+						totalDebit: commission.totalDebit + numericAmount,
+						totalCredit: commission.totalCredit,
+				  }
+				: {
+						balance: commission.balance + numericAmount,
+						totalCredit: commission.totalCredit + numericAmount,
+						totalDebit: commission.totalDebit,
+				  };
+
+		// Update commission record with new data
+		Object.assign(commission, {
+			accountBalance,
+			balance: updateBalanceAndTotals.balance,
+			totalCredit: updateBalanceAndTotals.totalCredit,
+			totalDebit: updateBalanceAndTotals.totalDebit,
+			transactions: [
+				...commission.transactions,
+				{ name, amount, description, type: transactionType },
+			],
+		});
+
+		// Save the updated or new commission record
+		await commission.save();
+
+		res.status(commission.isNew ? 201 : 200).json({
+			account,
+			message: commission.isNew
+				? 'Account commission added successfully'
+				: 'Account commission updated successfully',
+		});
 	} catch (error) {
 		console.error('Error adding commission:', error);
 		res.status(500).json({ error: 'Internal Server Error' });
 	}
 };
 
+
 export const updateCommissionTransaction = async (req, res) => {
 	try {
 		const { name, amount, description, transactionType, transactionId } =
 			req.body;
 
-		// Find the commission by the provided ID
+		// Validate required fields
+		if (!transactionId || !amount || !transactionType) {
+			return res.status(400).json({ message: 'Required fields are missing' });
+		}
+
+		// Find the commission by ID
 		const commission = await Commission.findById(req.params.id);
 		if (!commission) {
 			return res.status(404).json({ message: 'Commission not found' });
@@ -392,27 +413,48 @@ export const updateCommissionTransaction = async (req, res) => {
 			(t) => t._id.toString() === transactionId
 		);
 		if (!transaction) {
-			return res.status(404).json({ error: 'Transaction not found' });
+			return res.status(404).json({ message: 'Transaction not found' });
 		}
 
-		// Calculate the balance adjustment based on the updated transaction
-		const previousAmount = transaction.amount;
+		// Calculate adjustments based on changes
+		const previousAmount = parseFloat(transaction.amount);
+		const newAmount = parseFloat(amount);
 		let balanceAdjustment = 0;
+		let totalCreditAdjustment = 0;
+		let totalDebitAdjustment = 0;
 
-		if (transactionType === 'debit') {
-			balanceAdjustment = Number(previousAmount) - Number(amount);
+		if (transaction.type === 'debit' && transactionType === 'credit') {
+			// Changing from debit to credit
+			balanceAdjustment = previousAmount + newAmount;
+			totalDebitAdjustment = -previousAmount;
+			totalCreditAdjustment = newAmount;
+		} else if (transaction.type === 'credit' && transactionType === 'debit') {
+			// Changing from credit to debit
+			balanceAdjustment = -previousAmount - newAmount;
+			totalCreditAdjustment = -previousAmount;
+			totalDebitAdjustment = newAmount;
+		} else if (transactionType === 'debit') {
+			// Updating debit transaction
+			balanceAdjustment = previousAmount - newAmount;
+			totalDebitAdjustment = newAmount - previousAmount;
 		} else {
-			balanceAdjustment = Number(amount) - Number(previousAmount);
+			// Updating credit transaction
+			balanceAdjustment = newAmount - previousAmount;
+			totalCreditAdjustment = newAmount - previousAmount;
 		}
 
-		// Update transaction fields
+		// Update transaction details
 		transaction.name = name || transaction.name;
-		transaction.amount = amount || transaction.amount;
+		transaction.amount = amount;
 		transaction.description = description || transaction.description;
-		transaction.type = transactionType || transaction.type;
+		transaction.type = transactionType;
 
-		// Update the commission balance
+		// Update commission balance and totals
 		commission.balance += balanceAdjustment;
+		commission.totalCredit += totalCreditAdjustment;
+		commission.totalDebit += totalDebitAdjustment;
+
+		// Save updated commission
 		await commission.save();
 
 		res.status(200).json({
@@ -420,10 +462,11 @@ export const updateCommissionTransaction = async (req, res) => {
 			message: 'Transaction updated successfully',
 		});
 	} catch (error) {
-		console.error('Error updating commission', error);
+		console.error('Error updating commission transaction:', error);
 		res.status(500).json({ error: 'Internal Server Error' });
 	}
 };
+
 
 export const deleteCommissionTransaction = async (req, res) => {
 	try {
@@ -448,8 +491,10 @@ export const deleteCommissionTransaction = async (req, res) => {
 		const transactionAmount = Number(transaction.amount);
 		if (transaction.type === 'debit') {
 			commission.balance += transactionAmount;
+			commission.totalDebit -= transactionAmount;
 		} else {
 			commission.balance -= transactionAmount;
+			commission.totalCredit -= transactionAmount;
 		}
 
 		// Remove the transaction from the transactions array

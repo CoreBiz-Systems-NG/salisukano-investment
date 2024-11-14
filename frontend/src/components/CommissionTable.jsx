@@ -2,7 +2,7 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaPlus } from 'react-icons/fa6';
-import { AiFillEdit } from 'react-icons/ai';
+import { AiFillDelete, AiFillEdit } from 'react-icons/ai';
 import moment from 'moment';
 import { SiMicrosoftexcel } from 'react-icons/si';
 
@@ -10,13 +10,14 @@ const Table = ({
 	tableData,
 	handelAddModal,
 	handelEdit,
+	handelDelete,
 	tableRef,
 	handelExportToExcel,
 }) => {
 	const navigate = useNavigate();
 	const [query, setQuery] = useState('');
 	const handelClick = (item) => {
-		console.log('item', item)
+		console.log('item', item);
 		// navigate(`/debtors/${item}`);
 	};
 	const handleChange = (e) => {
@@ -29,8 +30,9 @@ const Table = ({
 			const matchesQuery =
 				data?._id?.toLowerCase().includes(query.toLowerCase()) ||
 				data?.name?.toLowerCase().includes(query.toLowerCase()) ||
-				data?.phone?.toLowerCase().includes(query.toLowerCase()) ||
-				data?.balance?.toString().includes(query) ||
+				data?.amount?.toLowerCase().includes(query.toLowerCase()) ||
+				data?.description?.toLowerCase().includes(query.toLowerCase()) ||
+				data?.type?.toString().includes(query) ||
 				moment(data?.createdAt).format('DD-MM-YYYY').includes(query);
 
 			return matchesQuery;
@@ -134,10 +136,10 @@ const Table = ({
 								Name
 							</th>
 							<th className="py-3 text-[#212B36] text-sm font-normal whitespace-nowrap md:w-[100px]">
-								Amount
+								Credit
 							</th>
 							<th className="py-3 text-[#212B36] text-sm font-normal whitespace-nowrap md:w-[100px]">
-								Type
+								Dedit
 							</th>
 							<th className="py-3 text-[#212B36] text-sm font-normal whitespace-nowrap ">
 								Description
@@ -168,9 +170,11 @@ const Table = ({
 								</td>
 								<td
 									onClick={() => handelClick(data?._id)}
-									className="py-4 px-1 text-sm font-normal text-[#637381] whitespace-nowrap cursor-pointer"
+									className={`${
+										data?.type === 'debit' ? 'text-[#FB4949]' : 'text-[#4F80E1]'
+									} w-auto py-2 px-1 text-sm font-normal  whitespace-nowrap cursor-pointer capitalize`}
 								>
-									{data?.amount}
+									{data?.type === 'debit' ? '' : data?.amount}
 								</td>
 								<td
 									onClick={() => handelClick(data?._id)}
@@ -178,7 +182,7 @@ const Table = ({
 										data?.type === 'debit' ? 'text-[#FB4949]' : 'text-[#4F80E1]'
 									} w-auto py-2 px-1 text-sm font-normal  whitespace-nowrap cursor-pointer capitalize`}
 								>
-									{data?.type}
+									{data?.type === 'debit' ? data?.amount : ''}
 								</td>
 								<td
 									onClick={() => handelClick(data?._id)}
@@ -193,12 +197,12 @@ const Table = ({
 									>
 										<AiFillEdit className="text-blue-500" />
 									</span>
-									{/* <span
+									<span
 										onClick={() => handelDelete(data?._id)}
 										className="cursor-pointer"
 									>
 										<AiFillDelete className="text-red-500" />{' '}
-									</span> */}
+									</span>
 								</td>
 							</tr>
 						))}
