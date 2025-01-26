@@ -159,7 +159,6 @@ export const getAccounts = async (req, res) => {
 			(sum, account) => sum + (account.balance || 0),
 			0
 		);
-		const totalTransactions = totalCredit + totalDebit;
 
 		// Return the response with the fetched accounts and computed totals
 		res.status(200).json({
@@ -167,7 +166,6 @@ export const getAccounts = async (req, res) => {
 			totalCredit,
 			totalDebit,
 			totalBalance,
-			totalTransactions,
 		});
 	} catch (error) {
 		console.error('Error fetching accounts:', error);
@@ -181,11 +179,23 @@ export const getAccount = async (req, res) => {
 		if (!account) {
 			return res.status(404).json({ message: 'Account not found' });
 		}
+
 		const customer = await Customer.findById({ _id: account.customerId });
 		const transactions = await Transaction.find({
 			accountId: account._id,
 		}).sort({ date: 1 });
-		res.status(200).json({ account, customer, transactions });
+
+		const totalTransactions = transactions.reduce(
+			(sum, account) => sum + (account.total || 0),
+			0
+		);
+		res
+			.status(200)
+			.json({
+				account: { ...account._doc, totalTransactions },
+				customer,
+				transactions,
+			});
 	} catch (error) {
 		console.error(error);
 		res.status(500).json({ error: 'Internal Server Error' });
