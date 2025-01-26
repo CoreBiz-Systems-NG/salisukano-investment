@@ -33,9 +33,9 @@ const AddModal = ({ show, setShow, setLoading, loading, account }) => {
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		// AMOUNT MUST BE A VALID DEGIT
-		if (!balance || isNaN(balance) || balance <= 0) {
-			return toast.error('Amount must be a valid positive number');
-		}
+		// if (!balance || isNaN(balance) || balance <= 0) {
+		// 	return toast.error('Amount must be a valid positive number');
+		// }
 		setLoading(true);
 		setShow(false);
 		try {

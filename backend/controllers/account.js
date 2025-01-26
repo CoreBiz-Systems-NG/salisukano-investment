@@ -143,7 +143,9 @@ export const getAccounts = async (req, res) => {
 		const accounts = await Account.find({ customerId: req.params.id }).sort(
 			'month'
 		);
+		// const totalTransactions = await Transaction.countDocuments({
 
+		// })
 		// Calculate totalCredit, totalDebit, and totalBalance
 		const totalCredit = accounts.reduce(
 			(sum, account) => sum + (account.credit || 0),
@@ -157,9 +159,16 @@ export const getAccounts = async (req, res) => {
 			(sum, account) => sum + (account.balance || 0),
 			0
 		);
+		const totalTransactions = totalCredit + totalDebit;
 
 		// Return the response with the fetched accounts and computed totals
-		res.status(200).json({ accounts, totalCredit, totalDebit, totalBalance });
+		res.status(200).json({
+			accounts,
+			totalCredit,
+			totalDebit,
+			totalBalance,
+			totalTransactions,
+		});
 	} catch (error) {
 		console.error('Error fetching accounts:', error);
 		res.status(500).json({ error: 'Internal Server Error' });
@@ -391,7 +400,6 @@ export const addAccountCommission = async (req, res) => {
 	}
 };
 
-
 export const updateCommissionTransaction = async (req, res) => {
 	try {
 		const { name, amount, description, transactionType, transactionId } =
@@ -466,7 +474,6 @@ export const updateCommissionTransaction = async (req, res) => {
 		res.status(500).json({ error: 'Internal Server Error' });
 	}
 };
-
 
 export const deleteCommissionTransaction = async (req, res) => {
 	try {

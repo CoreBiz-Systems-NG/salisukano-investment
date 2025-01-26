@@ -12,6 +12,8 @@ import { useDownloadExcel } from 'react-export-table-to-excel';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useQueryClient } from '@tanstack/react-query';
+import { FiDownload } from 'react-icons/fi';
+import { downloadPDF } from '../hooks/downLoadPdf';
 const Commissions = () => {
 	const [loading, setIsLoading] = useState(false);
 	const [isAddModal, setIsAddModal] = useState(false);
@@ -114,10 +116,16 @@ const Commissions = () => {
 		filename: `Account commissions transactions`,
 		sheet: 'Users',
 	});
-
+	const handelDownloadInvocice = () => {
+		downloadPDF('commission');
+	};
 	return (
 		<>
-			<main className=" w-full lg:max-w-6xl mx-auto  py-3 pl-7 pr-5 gap-5 flex flex-col space-y-3">
+			{/* <main className=" w-full lg:max-w-6xl mx-auto  py-3 pl-7 pr-5 gap-5 flex flex-col space-y-3"> */}
+			<main
+				id="commission"
+				className="w-full py-3 pl-7 pr-5 gap-5 flex flex-col space-y-3"
+			>
 				<div>
 					<h4 className="font-semibold text-lg text-primary">Commissions</h4>
 					<ul className="text-tiny font-medium flex items-center space-x-2 text-text3">
@@ -235,6 +243,16 @@ const Commissions = () => {
 					handelDelete={handelDelete}
 					handelExportToExcel={onDownload}
 				/>
+				<div>
+					<button
+						className="py-2.5 px-2 border border-[#E7E7E7] flex
+										justify-center items-center gap-1 rounded text-sm text-white bg-green-500 hover:bg-green-700
+										font-normal"
+						onClick={handelDownloadInvocice}
+					>
+						<FiDownload className="text-white" /> Invoice
+					</button>
+				</div>
 			</main>
 			<AddCommission
 				show={isAddModal}
