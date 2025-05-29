@@ -200,12 +200,99 @@ export const createPayment = async (req, res) => {
 	}
 };
 
+// export const updatePayment = async (req, res) => {
+// 	const session = await mongoose.startSession();
+// 	session.startTransaction();
+// 	try {
+// 		const { id } = req.params;
+// 		const { name, total, date, description } = req.body;
+
+// 		const roundedTotal = Math.ceil(total);
+
+// 		// Find the existing transaction
+// 		const existingTransaction = await Transaction.findById(id).session(session);
+
+// 		if (!existingTransaction) {
+// 			await session.abortTransaction();
+// 			return res.status(404).json({ message: 'Transaction not found' });
+// 		}
+
+// 		// Calculate the difference in total to update the account balance and credit
+// 		const totalDifference = roundedTotal - existingTransaction.total;
+// 		console.log('totalDifference', totalDifference);
+
+// 		const duplicateExists = await Transaction.findOne({
+// 			_id: { $ne: id },
+// 			accountId: existingTransaction.accountId,
+// 			name,
+// 			date,
+// 			debit: total,
+// 		}).session(session);
+
+// 		if (duplicateExists) {
+// 			throw new Error('Duplicate transaction detected');
+// 		}
+
+// 		// Update the account's balance and credit
+// 		const account = await Account.findByIdAndUpdate(
+// 			existingTransaction.accountId,
+// 			{
+// 				$inc: { balance: totalDifference, debit: totalDifference },
+// 			},
+// 			{ new: true, session }
+// 		);
+
+// 		if (!account) {
+// 			await session.abortTransaction();
+// 			return res.status(400).json({ message: 'Account not found' });
+// 		}
+
+// 		// Update the transaction with new data
+// 		const updatedTransaction = await Transaction.findByIdAndUpdate(
+// 			id,
+// 			{
+// 				accountId: account._id,
+// 				name,
+// 				date,
+// 				description,
+// 				total: total,
+// 				debit: total,
+// 				balance: account.balance,
+// 			},
+// 			{ new: true, session }
+// 		);
+
+// 		await session.commitTransaction();
+// 		session.endSession();
+// 		await updateTransactionsBalance(account._id);
+
+// 		return res.status(201).json({
+// 			transaction: updatedTransaction,
+// 			account,
+// 			message: 'Transaction created successfully',
+// 		});
+// 	} catch (error) {
+// 		await session.abortTransaction();
+// 		session.endSession();
+// 		console.error(error);
+// 		res.status(500).json({ message: 'Internal server error' });
+// 	}
+// };
 export const updatePayment = async (req, res) => {
 	const session = await mongoose.startSession();
 	session.startTransaction();
+
 	try {
 		const { id } = req.params;
 		const { name, total, date, description } = req.body;
+
+		// Validate input
+		if (!name || total === undefined || !date) {
+			await session.abortTransaction();
+			return res
+				.status(400)
+				.json({ message: 'Missing required fields: name, total, or date' });
+		}
 
 		const roundedTotal = Math.ceil(total);
 
@@ -217,18 +304,45 @@ export const updatePayment = async (req, res) => {
 			return res.status(404).json({ message: 'Transaction not found' });
 		}
 
-		// Calculate the difference in total to update the account balance and credit
+		// Check for duplicates (excluding the current transaction)
+		const duplicateExists = await Transaction.findOne({
+			_id: { $ne: id },
+			accountId: existingTransaction.accountId,
+			name,
+			date,
+			total: roundedTotal, // Use consistent rounded value
+		}).session(session);
+
+		if (duplicateExists) {
+			await session.abortTransaction();
+			return res
+				.status(409)
+				.json({ message: 'Duplicate transaction detected' });
+		}
+
+		// Calculate the difference to update the account balance
 		const totalDifference = roundedTotal - existingTransaction.total;
 		console.log('totalDifference', totalDifference);
 
-		// Update the account's balance and credit
-		const account = await Account.findByIdAndUpdate(
-			existingTransaction.accountId,
-			{
-				$inc: { balance: totalDifference, debit: totalDifference },
-			},
-			{ new: true, session }
-		);
+		// Update the account's balance and debit only if there's a difference
+		let account;
+		if (totalDifference !== 0) {
+			account = await Account.findByIdAndUpdate(
+				existingTransaction.accountId,
+				{
+					$inc: {
+						balance: totalDifference,
+						debit: totalDifference,
+					},
+				},
+				{ new: true, session }
+			);
+		} else {
+			// If no balance change, just fetch the account
+			account = await Account.findById(existingTransaction.accountId).session(
+				session
+			);
+		}
 
 		if (!account) {
 			await session.abortTransaction();
@@ -239,34 +353,43 @@ export const updatePayment = async (req, res) => {
 		const updatedTransaction = await Transaction.findByIdAndUpdate(
 			id,
 			{
-				accountId: account._id,
 				name,
 				date,
 				description,
-				total: total,
-				debit: total,
+				total: roundedTotal, // Use consistent rounded value
+				debit: roundedTotal, // Use consistent rounded value
 				balance: account.balance,
 			},
 			{ new: true, session }
 		);
 
 		await session.commitTransaction();
-		session.endSession();
-		await updateTransactionsBalance(account._id);
 
-		return res.status(201).json({
+		// Only call updateTransactionsBalance if there was a balance change
+		// and after the transaction is committed
+		// if (totalDifference !== 0) {
+		await updateTransactionsBalance(account._id);
+		// }
+
+		return res.status(200).json({
 			transaction: updatedTransaction,
 			account,
-			message: 'Transaction created successfully',
+			message: 'Transaction updated successfully',
 		});
 	} catch (error) {
 		await session.abortTransaction();
+		console.error('Error updating payment:', error);
+
+		// Handle specific error types
+		if (error.message === 'Duplicate transaction detected') {
+			return res.status(409).json({ message: error.message });
+		}
+
+		return res.status(500).json({ message: 'Internal server error' });
+	} finally {
 		session.endSession();
-		console.error(error);
-		res.status(500).json({ message: 'Internal server error' });
 	}
 };
-
 export const createCustomerPayment = async (req, res) => {
 	const session = await mongoose.startSession();
 	session.startTransaction();

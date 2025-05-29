@@ -34,8 +34,9 @@ export const updateTransactionsBalance = async (accountId) => {
 			}
 
 			// Update account's opening balance
-			// account.openingBalance = parsedOpeningBalance;
 			let currentBalance = account.openingBalance || 0;
+			let currentCredit = 0;
+			let currentDebit =  0;
 
 			// Prepare bulk operations for transactions
 			const bulkOps = [];
@@ -55,8 +56,10 @@ export const updateTransactionsBalance = async (accountId) => {
 				// Update current balance
 				if (transactionCredit > 0) {
 					currentBalance += transactionCredit;
+					currentCredit += transactionCredit;
 				} else if (transaction.debit > 0) {
 					currentBalance -= Number(transaction.debit);
+					currentDebit += Number(transaction.debit);
 				}
 
 				// Add to bulk operations if values changed
@@ -80,6 +83,8 @@ export const updateTransactionsBalance = async (accountId) => {
 
 			// Update account balance
 			account.balance = currentBalance;
+			account.credit = currentCredit;
+			account.debit = currentDebit;
 
 			// Execute all updates
 			const promises = [account.save({ session })];

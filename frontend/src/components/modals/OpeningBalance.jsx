@@ -45,6 +45,9 @@ const AddModal = ({ show, setShow, setLoading, loading, account, openbal}) => {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({
+				queryKey: ['transactions', account._id],
+			});
+			queryClient.invalidateQueries({
 				queryKey: ['dashboard', 'accounts', 'transactions'],
 			});
 			queryClient.invalidateQueries({
