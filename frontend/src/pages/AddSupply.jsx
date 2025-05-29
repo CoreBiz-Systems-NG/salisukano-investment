@@ -251,7 +251,7 @@ const AddSupply = () => {
 										item.error ? 'border border-b border-red-300 ' : ''
 									}`}
 								>
-									<div className="grid sm:grid-cols-2 lg:grid-cols-3 w-full gap-3">
+									<div className="grid sm:grid-cols-2 lg:grid-cols-4 w-full gap-3">
 										<div className="mb-2">
 											<p className="mb-0 text-base text-black">Materials</p>
 											<select
@@ -298,7 +298,7 @@ const AddSupply = () => {
 												}
 											/>
 										</div>
-										<div className="mb-2 hidden">
+										<div className="mb-2">
 											<p className="mb-0 text-base text-black">Cost</p>
 											<div className="flex justify-center items-center">
 												<input
@@ -356,14 +356,12 @@ const AddSupply = () => {
 										min={minDate}
 										max={maxDate}
 									/>
-									<div className=" hidden">
-										<button
-											onClick={addMaterials}
-											className=" hover:bg-green-500 hover:text-white bg-gray-100 text-green-500 rounded-sm w-6 h-6 flex items-center justify-center"
-										>
-											<FaPlus className="text-xl" />
-										</button>
-									</div>
+									<button
+										onClick={addMaterials}
+										className=" hover:bg-green-500 hover:text-white bg-gray-100 text-green-500 rounded-sm w-6 h-6 flex items-center justify-center"
+									>
+										<FaPlus className="text-xl" />
+									</button>
 								</div>
 							</div>
 						</div>
