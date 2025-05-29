@@ -33,6 +33,18 @@ const AddSupply = () => {
 			rate: '',
 			cost: 0,
 		},
+		{
+			product: 'Mix',
+			qty: '',
+			rate: '',
+			cost: 0,
+		},
+		{
+			product: 'Special',
+			qty: '',
+			rate: '',
+			cost: 0,
+		},
 	]);
 	const [date, setDate] = useState('');
 	const [minDate, setMinDate] = useState('');

@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import axios from 'axios';
 import getError from '../hooks/getError';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import Loader from '../components/Loader.jsx';
 import CustomersInput from '../components/CustomersInput.jsx';
 import { fetchTransaction } from '../hooks/axiosApis.js';
@@ -36,16 +36,45 @@ const EditPayment = () => {
 	useEffect(() => {
 		if (data) {
 			setName(data?.name);
-			setAmount(data?.total);
+			setAmount(data?.total || data?.debit);
 			setDescription(data?.description);
-			setDate(data?.date);
+			console.log('data?.date', data?.date);
+			setDate(new Date(data?.date).toISOString().split('T')[0] || data?.date);
 		}
 		if (error) {
 			toast.error(error?.message);
 		}
 	}, [data, error]);
 
-	const handleSubmit = (e) => {
+	const mutation = useMutation({
+		mutationFn: async (data) => {
+			return axios.patch(`${apiUrl}/payments/${id}`, data, config);
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: ['dashboard', 'accounts', 'customers', id],
+			});
+			queryClient.invalidateQueries({
+				queryKey: [
+					'supplies',
+					'transactions',
+					'accounts',
+					'dashboard',
+					'tcustomers',
+				],
+			});
+
+			toast.success(' Payment created successfully');
+			setIsLoading(false);
+			navigate(`/transactions/${id}`);
+		},
+		onError: (error) => {
+			const message = getError(error);
+			toast.error(message);
+		},
+	});
+
+	const handleSubmit = async (e) => {
 		e.preventDefault();
 		if (!amount) {
 			return toast.error('Amount error. Please valid amount.');
@@ -59,32 +88,15 @@ const EditPayment = () => {
 		setIsLoading(true);
 		// Make API call
 		const data = { name, date, total: amount, description };
-		// console.log('data', data);
-		axios
-			.patch(`${apiUrl}/payments/${id}`, data, config)
-			.then((res) => {
-				if (res.data) {
-					console.log(res.data);
-					toast.success('Payment updated successfully');
-				}
-				queryClient.invalidateQueries({
-					queryKey: [
-						'supplies',
-						'transactions',
-						'accounts',
-						'dashboard',
-						'tcustomers',
-					],
-				});
-				navigate(`/transactions/${id}`);
-			})
-			.catch((error) => {
-				const message = getError(error);
-				toast.error(message);
-			})
-			.finally(() => {
-				setIsLoading(false);
-			});
+
+		try {
+			await mutation.mutateAsync(data);
+		} catch (error) {
+			const message = getError(error);
+			toast.error(message);
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
 	return (

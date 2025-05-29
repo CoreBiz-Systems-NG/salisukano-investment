@@ -61,7 +61,9 @@ const TransactionDetail = ({ openSideBar }) => {
 			<main className="w-full py-3 pl-7 pr-5 gap-5 flex flex-col space-y-3 justify-start">
 				<div className="flex justify-between">
 					<div>
-						<h4 className="font-semibold text-lg text-primary">Transactions info</h4>
+						<h4 className="font-semibold text-lg text-primary">
+							Transactions info
+						</h4>
 						<ul className="text-tiny font-medium flex items-center space-x-2 text-text3">
 							<li className="breadcrumb-item text-muted">
 								<Link
@@ -151,7 +153,7 @@ const TransactionDetail = ({ openSideBar }) => {
 									data?.credit ? 'text-[#4F80E1]' : 'text-red-500'
 								} text-2xl font-bold whitespace-nowrap`}
 							>
-								₦ {data?.total}
+								₦ {data?.total || data?.debit}
 							</span>
 							<img
 								src={`${

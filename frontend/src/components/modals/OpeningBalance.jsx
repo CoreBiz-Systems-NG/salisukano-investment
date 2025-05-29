@@ -1,15 +1,16 @@
 /* eslint-disable react/prop-types */
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import AuthContext from '../../context/authContext';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import getError from '../../hooks/getError';
 import { useNavigate } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
 import Modal from './Modal';
 import { HiXMark } from 'react-icons/hi2';
+import { use } from 'react';
 
-const AddModal = ({ show, setShow, setLoading, loading, account }) => {
+const AddModal = ({ show, setShow, setLoading, loading, account, openbal}) => {
 	const { user } = useContext(AuthContext);
 	const [balance, setBalance] = useState(0);
 	const apiUrl = import.meta.env.VITE_API_URL;
@@ -26,45 +27,65 @@ const AddModal = ({ show, setShow, setLoading, loading, account }) => {
 		new Date(account?.month).getMonth(),
 		1
 	);
+	useEffect(() => {
+		setBalance(openbal || 0);
+	}, [openbal]);
 	const month = normalizedMonth.toLocaleDateString('en-GB', {
 		month: 'long',
 		year: 'numeric',
 	});
-	const handleSubmit = (e) => {
+
+	const mutation = useMutation({
+		mutationFn: async (data) => {
+			return axios.patch(
+				`${apiUrl}/accounts/opening-balance`,
+				data,
+				config
+			);
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: ['dashboard', 'accounts', 'transactions'],
+			});
+			queryClient.invalidateQueries({
+				queryKey: [
+					'dashboard',
+					'accounts',
+					'transactions',
+					'customers',
+					account._id,
+				],
+			});
+			setBalance(0);
+			setBalance(0);
+			toast.success(' Account updated successfully');
+			setShow(false);
+			setLoading(false);
+		},
+		onError: (error) => {
+			const message = getError(error);
+			toast.error(message);
+		},
+	});
+
+	const handleSubmit = async (e) => {
 		e.preventDefault();
-		// AMOUNT MUST BE A VALID DEGIT
-		// if (!balance || isNaN(balance) || balance <= 0) {
-		// 	return toast.error('Amount must be a valid positive number');
-		// }
+		if (!month) {
+			return toast.error('Month is required');
+		}
+
 		setLoading(true);
 		setShow(false);
 		try {
-			axios
-				.patch(
-					`${apiUrl}/accounts/opening-balance`,
-					{ accountId: account._id, openingBalance: balance },
-					config
-				)
-				.then((res) => {
-					if (res.data) {
-						queryClient.invalidateQueries({
-							queryKey: ['dashboard', 'accounts'],
-						});
-						toast.success(' Account updated successfully');
-					}
-					setBalance(0);
-					navigate(`/companies/${account?.customerId}`);
-				})
-				.catch((error) => {
-					const message = getError(error);
-					toast.error(message);
-				})
-				.finally(() => {
-					setLoading(false);
-				});
+			await mutation.mutateAsync({
+				accountId: account._id,
+				openingBalance: balance,
+			});
 		} catch (error) {
-			console.log(error);
-			setShow(true);
+			const message = getError(error);
+			toast.error(message);
+		} finally {
+			setLoading(false);
 		}
 	};
 

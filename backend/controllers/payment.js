@@ -7,6 +7,7 @@ import fs from 'fs';
 import { uploader } from '../utils/cloudinary.js';
 import dotenv from 'dotenv';
 import { v2 as cloudinary } from 'cloudinary';
+import { updateTransactionsBalance } from '../services/updateTransactions.js';
 dotenv.config();
 cloudinary.config({
 	cloud_name: process.env.CLOUDINARY_API_NAME,
@@ -126,52 +127,79 @@ export const getPayments = async (req, res) => {
 };
 export const createPayment = async (req, res) => {
 	const session = await mongoose.startSession();
-	session.startTransaction();
+
 	try {
+		session.startTransaction();
+
 		const { name, total, description, date, accountId } = req.body;
 
-		const account = await Account.findOneAndUpdate(
-			{ _id: accountId },
-			{ $inc: { balance: -total, debit: total } },
-			{ new: true, session }
-		);
+		// Validate total
+		// if (typeof total !== 'number' || total <= 0) {
+		// 	throw new Error('Total amount must be a positive number');
+		// }
 
+		// Validate account
+		const account = await Account.findById(accountId).session(session);
 		if (!account) {
-			await session.abortTransaction();
-			session.endSession();
-			return res.status(400).json({ message: 'Account not found' });
+			throw new Error('Account not found');
 		}
-		console.log(total);
-		const transaction = await Transaction.create(
+
+		// Optimized duplicate check with indexed fields first
+		const duplicateExists = await Transaction.exists({
+			accountId,
+			name,
+			date,
+			debit: total,
+		}).session(session);
+
+		if (duplicateExists) {
+			return res.status(409).json({
+				message: 'Duplicate transaction detected',
+			});
+		}
+
+		// Create transaction
+		const [newTransaction] = await Transaction.create(
 			[
 				{
 					accountId: account._id,
 					name,
 					description,
-					total: total,
+					total,
 					debit: total,
 					date,
-					balance: account.balance,
+					balance: account.balance, // old balance before deduction
 				},
 			],
 			{ session }
 		);
 
+		// Update account balance
+		account.balance -= Number(total);
+		account.debit += Number(total);
+		await account.save({ session });
+
+		// Update transaction with new balance after deduction
+		newTransaction.balance = account.balance;
+		await newTransaction.save({ session });
+
 		await session.commitTransaction();
 		session.endSession();
+		await updateTransactionsBalance(account._id);
 
-		return res.status(201).json({
-			transaction: transaction[0],
+		res.status(201).json({
+			transaction: newTransaction,
 			account,
 			message: 'Transaction created successfully',
 		});
 	} catch (error) {
 		await session.abortTransaction();
 		session.endSession();
-		console.error(error);
-		res.status(500).json({ message: 'Internal server error' });
+		console.error('Payment creation error:', error.message);
+		res.status(500).json({ message: error.message || 'Internal server error' });
 	}
 };
+
 export const updatePayment = async (req, res) => {
 	const session = await mongoose.startSession();
 	session.startTransaction();
@@ -191,7 +219,7 @@ export const updatePayment = async (req, res) => {
 
 		// Calculate the difference in total to update the account balance and credit
 		const totalDifference = roundedTotal - existingTransaction.total;
-		console.log(totalDifference);
+		console.log('totalDifference', totalDifference);
 
 		// Update the account's balance and credit
 		const account = await Account.findByIdAndUpdate(
@@ -224,6 +252,7 @@ export const updatePayment = async (req, res) => {
 
 		await session.commitTransaction();
 		session.endSession();
+		await updateTransactionsBalance(account._id);
 
 		return res.status(201).json({
 			transaction: updatedTransaction,
@@ -302,20 +331,11 @@ export const updateCustomerPayment = async (req, res) => {
 			await session.abortTransaction();
 			return res.status(404).json({ message: 'Transaction not found' });
 		}
+		const accountExist = await Customer.findById(
+			existingTransaction.customerId
+		).session(session);
 
-		// Calculate the difference in total to update the account balance and credit
-		const totalDifference = roundedTotal - existingTransaction.total;
-
-		// Update the account's balance and credit
-		const account = await Customer.findByIdAndUpdate(
-			existingTransaction.customerId,
-			{
-				$inc: { balance: totalDifference, debit: totalDifference },
-			},
-			{ new: true, session }
-		);
-
-		if (!account) {
+		if (!accountExist) {
 			await session.abortTransaction();
 			return res.status(400).json({ message: 'Customer not found' });
 		}
@@ -331,6 +351,17 @@ export const updateCustomerPayment = async (req, res) => {
 				total: total,
 				debit: total,
 				balance: account.balance,
+			},
+			{ new: true, session }
+		);
+
+		// Calculate the difference in total to update the account balance and credit
+		const totalDifference = roundedTotal - existingTransaction.total;
+		// Update the account's balance and credit
+		const account = await Customer.findByIdAndUpdate(
+			existingTransaction.customerId,
+			{
+				$inc: { balance: totalDifference, debit: totalDifference },
 			},
 			{ new: true, session }
 		);
@@ -412,10 +443,13 @@ export const deletePaymentAndUpdateBalance = async (req, res) => {
 		const deletedTransaction = await Transaction.findByIdAndDelete(id).session(
 			session
 		);
-
 		// Commit the transaction
 		await session.commitTransaction();
 		session.endSession();
+
+		if (existingTransaction.accountId) {
+			await updateTransactionsBalance(existingTransaction.accountId);
+		}
 
 		return res.status(200).json({
 			transaction: deletedTransaction,

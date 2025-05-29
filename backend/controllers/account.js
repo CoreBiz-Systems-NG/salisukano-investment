@@ -189,13 +189,11 @@ export const getAccount = async (req, res) => {
 			(sum, account) => sum + (account.total || 0),
 			0
 		);
-		res
-			.status(200)
-			.json({
-				account: { ...account._doc, totalTransactions },
-				customer,
-				transactions,
-			});
+		res.status(200).json({
+			account: { ...account._doc, totalTransactions },
+			customer,
+			transactions,
+		});
 	} catch (error) {
 		console.error(error);
 		res.status(500).json({ error: 'Internal Server Error' });
@@ -237,87 +235,202 @@ export const changeAccountStatus = async (req, res) => {
 		res.status(500).json({ error: 'Internal Server Error' });
 	}
 };
-
 export const updateOpeningBalance = async (req, res) => {
 	const session = await mongoose.startSession();
-	session.startTransaction();
+
 	try {
-		const { accountId, openingBalance } = req.body;
+		await session.withTransaction(async () => {
+			const { accountId, openingBalance } = req.body;
 
-		// Find the account by the provided accountId
-		const account = await Account.findById(accountId).session(session);
-		if (!account) {
-			await session.abortTransaction();
-			return res.status(404).json({ message: 'Account not found' });
-		}
-
-		// Fetch transactions related to the account, sorted by date (ascending)
-		const transactions = await Transaction.find({ accountId: account._id })
-			.sort({ date: 1 }) // Sort by date (ascending)
-			.session(session);
-
-		// Set the initial balance
-		let currentBalance = Number(openingBalance);
-
-		// Update the account's opening balance and set its current balance
-		account.openingBalance = openingBalance;
-		account.balance = Number(currentBalance);
-		// console.log('currentBalance 1', currentBalance);
-
-		// Iterate through each transaction, calculate credit using materials, update account balance
-		for (const transaction of transactions) {
-			// Calculate the total and quantity using materials
-			if (transaction.materials && transaction.materials.length > 0) {
-				const { total, quantity } = transaction.materials.reduce(
-					(acc, material) => {
-						acc.total += material.qty * material.rate;
-						acc.quantity += Number(material.qty);
-						return acc;
-					},
-					{ total: 0, quantity: 0 }
-				);
-
-				// Round up the total to get the transaction credit
-				const roundedTotal = Math.ceil(total);
-				// console.log("roundedTotal 1", roundedTotal);
-				transaction.credit = Number(roundedTotal); // Assign the rounded total as credit
+			// Validate input
+			if (
+				!accountId ||
+				openingBalance === undefined ||
+				openingBalance === null
+			) {
+				throw new Error('AccountId and openingBalance are required');
 			}
 
-			// Update the current balance based on credit or debit
-			if (transaction.credit) {
-				currentBalance += Number(transaction.credit);
-			} else if (transaction.debit) {
-				currentBalance -= transaction.debit;
-				// console.log("currentBalance 3", currentBalance);
+			const parsedOpeningBalance = Number(openingBalance);
+			if (isNaN(parsedOpeningBalance)) {
+				throw new Error('Opening balance must be a valid number');
 			}
 
-			// console.log("currentBalance 3", currentBalance);
-			// Update the transaction balance and save
-			transaction.balance = Number(currentBalance);
-			await transaction.save({ session });
-		}
+			// Find account and transactions in parallel
+			const [account, transactions] = await Promise.all([
+				Account.findById(accountId).session(session),
+				Transaction.find({ accountId })
+					.sort({ date: 1 })
+					.lean() // Use lean() for better performance since we're updating separately
+					.session(session),
+			]);
 
-		// Save the updated account balance
-		account.balance = Number(currentBalance);
-		await account.save({ session });
+			if (!account) {
+				throw new Error('Account not found');
+			}
 
-		// Commit the transaction
-		await session.commitTransaction();
-		session.endSession();
+			// Update account's opening balance
+			account.openingBalance = parsedOpeningBalance;
+			let currentBalance = parsedOpeningBalance;
 
-		// Respond with the updated account data
+			// Prepare bulk operations for transactions
+			const bulkOps = [];
+
+			for (const transaction of transactions) {
+				let transactionCredit = transaction.credit || 0;
+
+				// Calculate credit from materials if they exist
+				if (transaction.materials?.length > 0) {
+					const total = transaction.materials.reduce((sum, material) => {
+						return sum + Number(material.qty) * Number(material.rate);
+					}, 0);
+
+					transactionCredit = Math.ceil(total);
+				}
+
+				// Update current balance
+				if (transactionCredit > 0) {
+					currentBalance += transactionCredit;
+				} else if (transaction.debit > 0) {
+					currentBalance -= Number(transaction.debit);
+				}
+
+				// Add to bulk operations if values changed
+				if (
+					transaction.credit !== transactionCredit ||
+					transaction.balance !== currentBalance
+				) {
+					bulkOps.push({
+						updateOne: {
+							filter: { _id: transaction._id },
+							update: {
+								$set: {
+									credit: transactionCredit,
+									balance: currentBalance,
+								},
+							},
+						},
+					});
+				}
+			}
+
+			// Update account balance
+			account.balance = currentBalance;
+
+			// Execute all updates
+			const promises = [account.save({ session })];
+
+			if (bulkOps.length > 0) {
+				promises.push(Transaction.bulkWrite(bulkOps, { session }));
+			}
+
+			await Promise.all(promises);
+
+			return { account, updatedTransactions: bulkOps.length };
+		});
+
 		res.status(200).json({
-			account,
+			account: await Account.findById(req.body.accountId),
 			message: 'Account balance updated successfully',
 		});
 	} catch (error) {
-		// Handle errors and rollback the transaction
-		await session.abortTransaction();
-		session.endSession();
-		console.error(error);
-		res.status(500).json({ error: 'Internal Server Error' });
+		console.error('Error updating opening balance:', error);
+
+		// Send appropriate error response based on error type
+		if (error.message === 'Account not found') {
+			res.status(404).json({ message: error.message });
+		} else if (
+			error.message.includes('required') ||
+			error.message.includes('valid number')
+		) {
+			res.status(400).json({ message: error.message });
+		} else {
+			res.status(500).json({ message: 'Internal Server Error' });
+		}
+	} finally {
+		await session.endSession();
 	}
 };
+// export const updateOpeningBalance = async (req, res) => {
+// 	const session = await mongoose.startSession();
+// 	session.startTransaction();
+// 	try {
+// 		const { accountId, openingBalance } = req.body;
+
+// 		// Find the account by the provided accountId
+// 		const account = await Account.findById(accountId).session(session);
+// 		if (!account) {
+// 			await session.abortTransaction();
+// 			return res.status(404).json({ message: 'Account not found' });
+// 		}
+
+// 		// Fetch transactions related to the account, sorted by date (ascending)
+// 		const transactions = await Transaction.find({ accountId: account._id })
+// 			.sort({ date: 1 }) // Sort by date (ascending)
+// 			.session(session);
+
+// 		// Set the initial balance
+// 		let currentBalance = Number(openingBalance);
+
+// 		// Update the account's opening balance and set its current balance
+// 		account.openingBalance = openingBalance;
+// 		account.balance = Number(currentBalance);
+// 		// console.log('currentBalance 1', currentBalance);
+
+// 		// Iterate through each transaction, calculate credit using materials, update account balance
+// 		for (const transaction of transactions) {
+// 			// Calculate the total and quantity using materials
+// 			if (transaction.materials && transaction.materials.length > 0) {
+// 				const { total, quantity } = transaction.materials.reduce(
+// 					(acc, material) => {
+// 						acc.total += material.qty * material.rate;
+// 						acc.quantity += Number(material.qty);
+// 						return acc;
+// 					},
+// 					{ total: 0, quantity: 0 }
+// 				);
+
+// 				// Round up the total to get the transaction credit
+// 				const roundedTotal = Math.ceil(total);
+// 				// console.log("roundedTotal 1", roundedTotal);
+// 				transaction.credit = Number(roundedTotal); // Assign the rounded total as credit
+// 			}
+
+// 			// Update the current balance based on credit or debit
+// 			if (transaction.credit) {
+// 				currentBalance += Number(transaction.credit);
+// 			} else if (transaction.debit) {
+// 				currentBalance -= transaction.debit;
+// 				// console.log("currentBalance 3", currentBalance);
+// 			}
+
+// 			// console.log("currentBalance 3", currentBalance);
+// 			// Update the transaction balance and save
+// 			transaction.balance = Number(currentBalance);
+// 			await transaction.save({ session });
+// 		}
+
+// 		// Save the updated account balance
+// 		account.balance = Number(currentBalance);
+// 		await account.save({ session });
+
+// 		// Commit the transaction
+// 		await session.commitTransaction();
+// 		session.endSession();
+
+// 		// Respond with the updated account data
+// 		res.status(200).json({
+// 			account,
+// 			message: 'Account balance updated successfully',
+// 		});
+// 	} catch (error) {
+// 		// Handle errors and rollback the transaction
+// 		await session.abortTransaction();
+// 		session.endSession();
+// 		console.error(error);
+// 		res.status(500).json({ error: 'Internal Server Error' });
+// 	}
+// };
 export const getAccountCommission = async (req, res) => {
 	try {
 		// Find the account by the provided id

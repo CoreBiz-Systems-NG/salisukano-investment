@@ -9,7 +9,7 @@ import { SiMicrosoftexcel } from 'react-icons/si';
 // import { useNavigate } from 'react-router-dom';
 // const pageList = [{ name: 'Pages' },{ name: 'All' }, { name: '10' }, { name: '20' }];
 // import { formatPrice } from '../hooks/formatPrice';
-import moment from 'moment';
+import formatDate from '../hooks/formatDate';
 
 const Tablle = ({
 	handelExportToExcel,
@@ -27,7 +27,7 @@ const Tablle = ({
 		{
 			Header: 'Date',
 			accessor: 'date',
-			Cell: ({ value }) => moment(value).format('ll'),
+			Cell: ({ value }) => formatDate(value),
 		},
 		{
 			Header: 'Customer/Desc',

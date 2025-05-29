@@ -6,6 +6,7 @@ import fs from 'fs';
 import { uploader } from '../utils/cloudinary.js';
 import dotenv from 'dotenv';
 import { v2 as cloudinary } from 'cloudinary';
+import { updateTransactionsBalance } from '../services/updateTransactions.js';
 dotenv.config();
 cloudinary.config({
 	cloud_name: process.env.CLOUDINARY_API_NAME,
@@ -15,70 +16,130 @@ cloudinary.config({
 
 export const createSupply = async (req, res) => {
 	const session = await mongoose.startSession();
-	session.startTransaction();
 
 	try {
 		const { name, date, materials, vehicleNumber, description, accountId } =
 			req.body;
+		await session.withTransaction(async () => {
+			// Input validation
+			if (!accountId || !name || !date || !materials?.length) {
+				throw new Error('Missing required fields');
+			}
 
-		// Calculate the total and quantity in one reduce function for efficiency
-		const { total, quantity } = materials.reduce(
-			(acc, material) => {
-				acc.total += material.qty * material.rate;
-				acc.quantity += Number(material.qty);
-				return acc;
-			},
-			{ total: 0, quantity: 0 }
-		);
+			// Calculate totals efficiently
+			const { total, quantity } = materials.reduce(
+				(acc, material) => ({
+					total: acc.total + material.qty * material.rate,
+					quantity: acc.quantity + Number(material.qty),
+				}),
+				{ total: 0, quantity: 0 }
+			);
 
-		const roundedTotal = Math.ceil(total);
-		const roundedQuantity = Math.ceil(quantity);
+			const roundedTotal = Math.ceil(total);
+			const roundedQuantity = Math.ceil(quantity);
 
-		// Update the account's balance and credit
-		const account = await Account.findOneAndUpdate(
-			{ _id: accountId },
-			{ $inc: { balance: roundedTotal, credit: roundedTotal } },
-			{ new: true, session }
-		);
+			// Check if account exists first (lightweight operation)
+			const accountExists = await Account.exists({ _id: accountId }).session(
+				session
+			);
+			if (!accountExists) {
+				throw new Error('Account not found');
+			}
 
-		if (!account) {
-			await session.abortTransaction();
-			return res.status(400).json({ message: 'Account not found' });
-		}
+			// Optimized duplicate check with indexed fields first
+			const duplicateExists = await Transaction.exists({
+				accountId,
+				name,
+				date,
+				vehicleNumber,
+				// Only check materials if basic fields match (more efficient)
+				$or: [
+					{ materials: { $eq: materials } },
+					{
+						$and: [
+							{ 'materials.product': { $in: materials.map((m) => m.product) } },
+							{ 'materials.qty': { $in: materials.map((m) => m.qty) } },
+							{ 'materials.rate': { $in: materials.map((m) => m.rate) } },
+						],
+					},
+				],
+			}).session(session);
 
-		const transaction = await Transaction.create(
-			[
+			if (duplicateExists) {
+				throw new Error('Duplicate transaction detected');
+			}
+
+			// Get current account balance for transaction record
+			const currentAccount = await Account.findById(accountId)
+				.select('balance')
+				.session(session);
+
+			const newBalance = currentAccount.balance + roundedTotal;
+
+			// Create transaction first (data integrity - create records before updating balances)
+			const [transaction] = await Transaction.create(
+				[
+					{
+						accountId,
+						name,
+						date,
+						description,
+						materials,
+						total: roundedTotal,
+						quantity: roundedQuantity,
+						vehicleNumber,
+						credit: roundedTotal,
+						balance: newBalance,
+					},
+				],
+				{ session }
+			);
+
+			// Update account balance after successful transaction creation
+			const updatedAccount = await Account.findByIdAndUpdate(
+				accountId,
 				{
-					accountId: account._id,
-					name,
-					date,
-					description,
-					materials,
-					total: roundedTotal,
-					quantity: roundedQuantity,
-					vehicleNumber,
-					credit: roundedTotal,
-					balance: account.balance,
+					$inc: {
+						balance: roundedTotal,
+						credit: roundedTotal,
+					},
 				},
-			],
-			{ session }
-		);
+				{ new: true, session }
+			);
 
-		await session.commitTransaction();
-
-		res.status(201).json({
-			transaction: transaction[0],
-			account,
-			message: 'Transaction created successfully',
+			// Return success response
+			return {
+				transaction,
+				account: updatedAccount,
+				message: 'Transaction created successfully',
+			};
 		});
+
+		// If we reach here, transaction was successful
+		await updateTransactionsBalance(accountId);
+		const result = await session.commitTransaction();
+		res.status(201).json(result);
 	} catch (error) {
-		await session.abortTransaction();
-		console.error('Error creating transaction:', error.message);
-		res.status(500).json({ message: 'Internal server error' });
+		// Transaction automatically rolled back by withTransaction
+		console.error('Error creating supply transaction:', error);
+
+		// Send appropriate error response
+		const statusCode = error.message.includes('not found')
+			? 404
+			: error.message.includes('Duplicate')
+			? 409
+			: error.message.includes('required fields')
+			? 400
+			: 500;
+
+		res.status(statusCode).json({
+			message: error.message || 'Internal server error',
+		});
 	} finally {
-		session.endSession();
+		await session.endSession();
 	}
 };
+
 export const updateSupply = async (req, res) => {
 	const session = await mongoose.startSession();
 	session.startTransaction();
@@ -87,11 +148,19 @@ export const updateSupply = async (req, res) => {
 		const { id } = req.params;
 		const { name, materials, vehicleNumber, date, description } = req.body;
 
-		// Calculate the new total and quantity based on updated materials
+		// ✅ Validate materials
+		if (!Array.isArray(materials) || materials.length === 0) {
+			throw new Error('Materials must be a non-empty array');
+		}
+
+		// ✅ Calculate new totals
 		const { total, quantity } = materials.reduce(
-			(acc, material) => {
-				acc.total += material.qty * material.rate;
-				acc.quantity += Number(material.qty);
+			(acc, m) => {
+				if (typeof m.qty !== 'number' || typeof m.rate !== 'number') {
+					throw new Error('Material qty and rate must be numbers');
+				}
+				acc.total += m.qty * m.rate;
+				acc.quantity += Number(m.qty);
 				return acc;
 			},
 			{ total: 0, quantity: 0 }
@@ -100,32 +169,40 @@ export const updateSupply = async (req, res) => {
 		const roundedTotal = Math.ceil(total);
 		const roundedQuantity = Math.ceil(quantity);
 
-		// Find the existing transaction
+		// ✅ Find existing transaction
 		const existingTransaction = await Transaction.findById(id).session(session);
-
 		if (!existingTransaction) {
-			await session.abortTransaction();
-			return res.status(404).json({ message: 'Transaction not found' });
+			throw new Error('Transaction not found');
 		}
 
-		// Calculate the difference in total to update the account balance and credit
+		// ✅ Duplicate check (ignore current record)
+		const duplicateExists = await Transaction.findOne({
+			_id: { $ne: id },
+			accountId: existingTransaction.accountId,
+			name,
+			date,
+			vehicleNumber,
+			materials,
+		}).session(session);
+
+		if (duplicateExists) {
+			throw new Error('Duplicate transaction detected');
+		}
+
+		// ✅ Calculate total difference for account adjustment
 		const totalDifference = roundedTotal - existingTransaction.total;
 
-		// Update the account's balance and credit
+		// ✅ Update account
 		const account = await Account.findByIdAndUpdate(
 			existingTransaction.accountId,
-			{
-				$inc: { balance: totalDifference, credit: totalDifference },
-			},
+			{ $inc: { balance: totalDifference, credit: totalDifference } },
 			{ new: true, session }
 		);
-
 		if (!account) {
-			await session.abortTransaction();
-			return res.status(400).json({ message: 'Account not found' });
+			throw new Error('Account not found');
 		}
 
-		// Update the transaction with new data
+		// ✅ Update transaction
 		const updatedTransaction = await Transaction.findByIdAndUpdate(
 			id,
 			{
@@ -142,9 +219,10 @@ export const updateSupply = async (req, res) => {
 			{ new: true, session }
 		);
 
+		await updateTransactionsBalance(existingTransaction.accountId);
 		await session.commitTransaction();
 
-		res.status(200).json({
+		return res.status(200).json({
 			transaction: updatedTransaction,
 			account,
 			message: 'Transaction updated successfully',
@@ -152,11 +230,14 @@ export const updateSupply = async (req, res) => {
 	} catch (error) {
 		await session.abortTransaction();
 		console.error('Error updating transaction:', error.message);
-		res.status(500).json({ message: 'Internal server error' });
+		return res
+			.status(400)
+			.json({ message: error.message || 'Internal server error' });
 	} finally {
 		session.endSession();
 	}
 };
+
 export const createCustomerSupply = async (req, res) => {
 	const session = await mongoose.startSession();
 	session.startTransaction();
@@ -544,11 +625,13 @@ export const deleteSupplyTransaction = async (req, res) => {
 		const deletedTransaction = await Transaction.findByIdAndDelete(id).session(
 			session
 		);
-
 		// Commit the transaction
 		await session.commitTransaction();
 		session.endSession();
 
+		if (existingTransaction.accountId) {
+			await updateTransactionsBalance(existingTransaction.accountId);
+		}
 		return res.status(200).json({
 			transaction: deletedTransaction,
 			message: 'Transaction deleted and balances updated successfully',

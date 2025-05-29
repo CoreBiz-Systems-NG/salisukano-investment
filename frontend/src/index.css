@@ -61,7 +61,12 @@
 	/* filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#7aa52e, endColorstr=#007d6e, GradientType=1);
 			color: #fff; */
 }
-
+td {
+	border-top-left-radius: 0 !important;
+	border-bottom-left-radius: 0 !important;
+	border-top-right-radius: 0 !important;
+	border-bottom-right-radius: 0 !important;
+}
 /* table {
 	@apply border-collapse !important;
 }

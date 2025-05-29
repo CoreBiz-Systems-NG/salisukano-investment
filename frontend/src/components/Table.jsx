@@ -43,7 +43,7 @@ const Table = ({
 		useSortBy,
 		usePagination
 	);
-	console.log('page ze', page);
+	// console.log('page ze', page);
 	useEffect(() => {
 		setPageSize(pageSize);
 	}, [pageSize]);
@@ -100,7 +100,9 @@ const Table = ({
 										onClick={() =>
 											navigate(`/transactions/${row.original._id}`)
 										}
-										className="drop-shadow-[0_0_10px_rgba(34,46,58,0.02)] bg-[#f6f8fa] hover:shadow-2xl cursor-pointer"
+										className={`${
+											index % 2 !== 0 ? 'bg-[#f6f8fa]' : ''
+										} drop-shadow-[0_0_10px_rgba(34,46,58,0.02)] hover:bg-[#f6f8fa] cursor-pointer`}
 									>
 										{row.cells.map((cell, index) => (
 											<td

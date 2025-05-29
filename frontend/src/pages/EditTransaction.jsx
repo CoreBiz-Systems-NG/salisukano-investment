@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import axios from 'axios';
 import getError from '../hooks/getError.js';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useQueryClient, useQuery } from '@tanstack/react-query';
+import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
 // import { HiXMark } from 'react-icons/hi2';
 import { MdDelete } from 'react-icons/md';
 import { FaPlus } from 'react-icons/fa6';
@@ -44,7 +44,7 @@ const UpdateSupply = () => {
 			setMaterials(data.materials);
 			setVehicleNumber(data.vehicleNumber);
 			setDescription(data.description);
-			setDate(new Date(data.date));
+			setDate(new Date(data?.date).toISOString().split('T')[0] || data?.date);
 		}
 		if (error) {
 			toast.error(error?.message);
@@ -85,6 +85,35 @@ const UpdateSupply = () => {
 			);
 		}
 	};
+
+	const mutation = useMutation({
+		mutationFn: async (data) => {
+			return axios.patch(`${apiUrl}/supplies/${id}`, data, config);
+		},
+		onSuccess: () => {
+			
+			queryClient.invalidateQueries({
+				queryKey: ['dashboard', 'accounts', 'customers', id],
+			});
+			queryClient.invalidateQueries({
+				queryKey: [
+					'supplies',
+					'accounts',
+					'transactions',
+					'dashboard',
+					'tcustomers',
+					id,
+				],
+			});
+			toast.success('Supply updated successfully');
+			setIsLoading(false);
+			navigate(`/transactions/${id}`);
+		},
+		onError: (error) => {
+			const message = getError(error);
+			toast.error(message);
+		},
+	});
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
@@ -140,27 +169,10 @@ const UpdateSupply = () => {
 
 		try {
 			const data = { materials, name, date, description, total, vehicleNumber };
-			const response = await axios.patch(
-				`${apiUrl}/supplies/${id}`,
-				data,
-				config
-			);
-			if (response.data) {
-				toast.success('Supply updated successfully');
-				queryClient.invalidateQueries({
-					queryKey: [
-						'supplies',
-						'accounts',
-						'transactions',
-						'dashboard',
-						'tcustomers',
-						id,
-					],
-				});
-				navigate(`/transactions/${id}`);
-			}
+			await mutation.mutateAsync(data);
 		} catch (error) {
-			toast.error(getError(error));
+			const message = getError(error);
+			toast.error(message);
 		} finally {
 			setIsLoading(false);
 		}

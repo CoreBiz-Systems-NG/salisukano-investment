@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
 // Define Material schema
-const MaterialSchema = new mongoose.Schema({
+const materialSchema = new mongoose.Schema({
 	product: {
 		type: String,
 		required: true,
@@ -22,14 +22,14 @@ const MaterialSchema = new mongoose.Schema({
 });
 
 // Pre-save hook to calculate cost based on qty and rate
-MaterialSchema.pre('save', function (next) {
+materialSchema.pre('save', function (next) {
 	this.product = this.product.toLowerCase();
 	this.cost = this.qty * this.rate;
 	next();
 });
 
 // Define Transaction schema
-const TransactionSchema = new mongoose.Schema(
+const transactionSchema = new mongoose.Schema(
 	{
 		accountId: {
 			type: Schema.Types.ObjectId,
@@ -47,7 +47,7 @@ const TransactionSchema = new mongoose.Schema(
 			type: String,
 			default: '',
 		},
-		materials: [MaterialSchema],
+		materials: [materialSchema],
 		total: {
 			type: Number,
 			default: 0,
@@ -76,8 +76,10 @@ const TransactionSchema = new mongoose.Schema(
 	{ timestamps: true }
 );
 
+transactionSchema.index({ accountId: 1, date: 1 });
+transactionSchema.index({ accountId: 1, _id: 1 });
 // Pre-save hook to calculate total and normalize fields
-TransactionSchema.pre('save', function (next) {
+transactionSchema.pre('save', function (next) {
 	this.name = this.name.toLowerCase();
 	// Calculate total based on the materials' costs
 	this.total = this.materials.reduce((sum, material) => sum + material.cost, 0);
@@ -85,6 +87,6 @@ TransactionSchema.pre('save', function (next) {
 	next();
 });
 
-const Transaction = mongoose.model('Transaction', TransactionSchema);
+const Transaction = mongoose.model('Transaction', transactionSchema);
 
 export default Transaction;

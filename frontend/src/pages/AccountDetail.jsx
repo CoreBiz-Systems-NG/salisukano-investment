@@ -31,7 +31,7 @@ const Transaction = () => {
 	// const queryClient = useQueryClient();
 	const tableRef = useRef(null);
 
-	const { id } = useParams();	
+	const { id } = useParams();
 	// console.log('user accounts', user);
 	const { data, isLoading, error } = useQuery({
 		queryKey: ['transactions', id],
@@ -174,6 +174,7 @@ const Transaction = () => {
 				setLoading={setIsLoading}
 				loading={isLoading}
 				account={data?.account}
+				openbal={data?.account?.openingBalance || 0}
 			/>
 			{isLoading || (loading && <Loader />)}
 		</>

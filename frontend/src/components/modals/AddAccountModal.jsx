@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import axios from 'axios';
 import getError from '../../hooks/getError';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
 import Modal from './Modal';
 import { HiXMark } from 'react-icons/hi2';
 
@@ -32,7 +32,32 @@ const AddModal = ({ show, setShow, setLoading, loading }) => {
 	const { id } = useParams();
 	console.log('customerId', id);
 	const queryClient = useQueryClient();
-	const handleSubmit = (e) => {
+
+	const mutation = useMutation({
+		mutationFn: async (data) => {
+			return axios.post(`${apiUrl}/accounts`, data, config);
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: ['dashboard', 'accounts', id, month, status],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ['dashboard', 'accounts', 'customers', id],
+			});
+			setMonth('');
+			setStatus('inactive');
+			setBalance(0);
+			toast.success(' Account created successfully');
+			setShow(false);
+			setLoading(false);
+		},
+		onError: (error) => {
+			const message = getError(error);
+			toast.error(message);
+		},
+	});
+
+	const handleSubmit = async (e) => {
 		e.preventDefault();
 		if (!month) {
 			return toast.error('Month is required');
@@ -41,34 +66,17 @@ const AddModal = ({ show, setShow, setLoading, loading }) => {
 		setLoading(true);
 		setShow(false);
 		try {
-			axios
-				.post(
-					`${apiUrl}/accounts`,
-					{ month, openingBalance: balance, status, customerId: id },
-					config
-				)
-				.then((res) => {
-					if (res.data) {
-						setMonth('');
-						queryClient.invalidateQueries({
-							queryKey: ['dashboard', 'accounts', id, month, status],
-						});
-						toast.success(' Account created successfully');
-					}
-					setStatus('inactive');
-					setBalance(0);
-					navigate('/companies');
-				})
-				.catch((error) => {
-					const message = getError(error);
-					toast.error(message);
-				})
-				.finally(() => {
-					setLoading(false);
-				});
+			await mutation.mutateAsync({
+				month,
+				openingBalance: balance,
+				status,
+				customerId: id,
+			});
 		} catch (error) {
-			console.log(error);
-			setShow(true);
+			const message = getError(error);
+			toast.error(message);
+		} finally {
+			setLoading(false);
 		}
 	};
 
