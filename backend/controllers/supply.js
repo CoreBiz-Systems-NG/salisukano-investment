@@ -156,9 +156,9 @@ export const updateSupply = async (req, res) => {
 		// ✅ Calculate new totals
 		const { total, quantity } = materials.reduce(
 			(acc, m) => {
-				if (typeof m.qty !== 'number' || typeof m.rate !== 'number') {
-					throw new Error('Material qty and rate must be numbers');
-				}
+				// if (typeof m.qty !== 'number' || typeof m.rate !== 'number') {
+				// 	throw new Error('Material qty and rate must be numbers');
+				// }
 				acc.total += m.qty * m.rate;
 				acc.quantity += Number(m.qty);
 				return acc;
