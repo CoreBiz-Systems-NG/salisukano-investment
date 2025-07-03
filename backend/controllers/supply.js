@@ -23,7 +23,10 @@ export const createSupply = async (req, res) => {
 		await session.withTransaction(async () => {
 			// Input validation
 			if (!accountId || !name || !date || !materials?.length) {
-				throw new Error('Missing required fields');
+				await session.abortTransaction();
+				return res.status(400).json({
+					message: 'Missing required fields',
+				});
 			}
 
 			// Calculate totals efficiently
@@ -43,7 +46,8 @@ export const createSupply = async (req, res) => {
 				session
 			);
 			if (!accountExists) {
-				throw new Error('Account not found');
+				await session.abortTransaction();
+				return res.status(400).json({ message: 'Account not found' });
 			}
 
 			// Optimized duplicate check with indexed fields first
@@ -66,7 +70,10 @@ export const createSupply = async (req, res) => {
 			}).session(session);
 
 			if (duplicateExists) {
-				throw new Error('Duplicate transaction detected');
+				await session.abortTransaction();
+				return res
+					.status(400)
+					.json({ message: 'Duplicate transaction detected' });
 			}
 
 			// Get current account balance for transaction record
@@ -150,7 +157,10 @@ export const updateSupply = async (req, res) => {
 
 		// ✅ Validate materials
 		if (!Array.isArray(materials) || materials.length === 0) {
-			throw new Error('Materials must be a non-empty array');
+			await session.abortTransaction();
+			return res
+				.status(400)
+				.json({ message: 'Materials must be a non-empty array' });
 		}
 
 		// ✅ Calculate new totals
@@ -172,7 +182,8 @@ export const updateSupply = async (req, res) => {
 		// ✅ Find existing transaction
 		const existingTransaction = await Transaction.findById(id).session(session);
 		if (!existingTransaction) {
-			throw new Error('Transaction not found');
+			await session.abortTransaction();
+			return res.status(400).json({ message: 'Transaction not found' });
 		}
 
 		// ✅ Duplicate check (ignore current record)
@@ -186,7 +197,10 @@ export const updateSupply = async (req, res) => {
 		}).session(session);
 
 		if (duplicateExists) {
-			throw new Error('Duplicate transaction detected');
+			await session.abortTransaction();
+			return res
+				.status(400)
+				.json({ message: 'Duplicate transaction detected' });
 		}
 
 		// ✅ Calculate total difference for account adjustment
@@ -199,7 +213,8 @@ export const updateSupply = async (req, res) => {
 			{ new: true, session }
 		);
 		if (!account) {
-			throw new Error('Account not found');
+			await session.abortTransaction();
+			return res.status(400).json({ message: 'Account not found' });
 		}
 
 		// ✅ Update transaction
@@ -228,6 +243,7 @@ export const updateSupply = async (req, res) => {
 			message: 'Transaction updated successfully',
 		});
 	} catch (error) {
+		console.error('Error updating transaction:', error.message);
 		await session.abortTransaction();
 		console.error('Error updating transaction:', error.message);
 		return res
@@ -291,7 +307,7 @@ export const createCustomerSupply = async (req, res) => {
 
 		await session.commitTransaction();
 
-		res.status(201).json({
+		return res.status(201).json({
 			transaction: transaction[0],
 			account,
 			message: 'Transaction created successfully',
