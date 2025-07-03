@@ -181,7 +181,18 @@ export const getAccount = async (req, res) => {
 		}
 
 		const customer = await Customer.findById({ _id: account.customerId });
+		// Check for existing commission record or initialize one
 		let commission = await Commission.findOne({ accountId: req.params.id });
+		if (!commission) {
+			commission = new Commission({
+				accountId: req.params.id,
+				accountBalance: account.balance,
+				balance: 0,
+				totalCredit: 0,
+				totalDebit: 0,
+				transactions: [],
+			});
+		}
 
 		const transactions = await Transaction.find({
 			accountId: account._id,
