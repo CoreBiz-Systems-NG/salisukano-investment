@@ -181,6 +181,8 @@ export const getAccount = async (req, res) => {
 		}
 
 		const customer = await Customer.findById({ _id: account.customerId });
+		let commission = await Commission.findOne({ accountId: req.params.id });
+
 		const transactions = await Transaction.find({
 			accountId: account._id,
 		}).sort({ date: 1 });
@@ -193,6 +195,7 @@ export const getAccount = async (req, res) => {
 			account: { ...account._doc, totalTransactions },
 			customer,
 			transactions,
+			commission,
 		});
 	} catch (error) {
 		console.error(error);
