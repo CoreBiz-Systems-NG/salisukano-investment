@@ -7,7 +7,7 @@ const WAT_TIMEZONE = 'Africa/Lagos';
 
 const formatDate = (input) => {
 	let date;
-	console.log('date input', input);
+	// console.log('date input', input);
 	// Try ISO: 2025-04-15
 	if (typeof input === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(input)) {
 		date = new Date(input);

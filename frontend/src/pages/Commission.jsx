@@ -98,7 +98,7 @@ const Commissions = () => {
 						],
 					});
 					// navigate(`/accounts/`);
-					// navigate(`/accounts/${id}`);
+					navigate(`/accounts/${id}`);
 				})
 				.catch((error) => {
 					const message = getError(error);
@@ -121,7 +121,6 @@ const Commissions = () => {
 	};
 	return (
 		<>
-			{/* <main className=" w-full lg:max-w-6xl mx-auto  py-3 pl-7 pr-5 gap-5 flex flex-col space-y-3"> */}
 			<main
 				id="commission"
 				className="w-full py-3 pl-7 pr-5 gap-5 flex flex-col space-y-3"

@@ -40,9 +40,11 @@ const Transaction = () => {
 	useEffect(() => {
 		// if (data && data.length > 0) {
 		if (data) {
-			// setBusiness(data);
-			console.log('transaction data', data);
-
+			console.log(data?.commission);
+			console.log(
+				'transaction data',
+				Number(data?.account?.balance || 0) + Number(data?.commission?.balance)
+			);
 			setTableData(() => cleanTableData(data?.transactions));
 			console.log(data?.transactions?.length || 20);
 			setPageSize(data?.transactions?.length || 20);
@@ -72,7 +74,6 @@ const Transaction = () => {
 		)} transactions`,
 		sheet: 'Users',
 	});
-
 	return (
 		<>
 			<main className="w-full py-3 pl-7 pr-5 gap-5 flex flex-col space-y-3">
@@ -150,7 +151,14 @@ const Transaction = () => {
 					</Menu>
 				</div>
 				<Cards
-					data={data?.account}
+					balance={
+						data?.commission?.balance != 0
+							? (data?.account?.balance || 0) + data?.commission?.balance
+							: data?.account?.balance || 0
+					}
+					credit={data?.account?.credit || 0}
+					debit={data?.account?.debit || 0}
+					openingBalance={data?.account?.openingBalance || 0}
 					handleOpeningBalance={handleOpeningBalance}
 				/>
 				<TransactionTable

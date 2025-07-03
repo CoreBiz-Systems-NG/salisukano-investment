@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 // import { formatPrice } from '../hooks/formatPrice';
 import { AiFillEdit } from 'react-icons/ai';
-const Card = ({ openSideBar, data, handleOpeningBalance }) => {
+const Card = ({ openSideBar, balance, debit, credit, openingBalance, handleOpeningBalance }) => {
 	return (
 		<div className="w-full grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5 col-span-12">
 			<div className="p-5  bg-white flex flex-col md:max-w-xs 2xl:max-w-none w-full rounded-xl gap-2 border border-[#E7E7E7] hover:shadow-xl cursor-pointer">
@@ -28,7 +28,7 @@ const Card = ({ openSideBar, data, handleOpeningBalance }) => {
 					}`}
 				>
 					<span className="text-xl font-bold whitespace-nowrap">
-						₦ {data?.openingBalance || 0}
+						₦ {openingBalance || 0}
 					</span>
 					<img
 						src="/assets/admin/dashboard/graph1.svg"
@@ -60,7 +60,7 @@ const Card = ({ openSideBar, data, handleOpeningBalance }) => {
 					}`}
 				>
 					<span className="text-xl font-bold whitespace-nowrap">
-						₦ {data?.balance || 0}
+						₦ {balance || 0}
 					</span>
 					<img
 						src="/assets/admin/dashboard/graph1.svg"
@@ -75,7 +75,7 @@ const Card = ({ openSideBar, data, handleOpeningBalance }) => {
 						openSideBar ? ' sm:flex-col md:flex-row' : ' sm:flex-row'
 					}`}
 				>
-					<span className="text-[#637381] text-sm font-medium">Credits</span>
+					<span className="text-[#637381] text-sm font-medium">Supplies</span>
 					<div className="flex gap-1 items-center">
 						<span className="">30%</span>
 						<img src="/assets/admin/dashboard/uparrow.svg" alt="graph" />
@@ -89,7 +89,7 @@ const Card = ({ openSideBar, data, handleOpeningBalance }) => {
 					}`}
 				>
 					<span className="text-xl font-bold whitespace-nowrap">
-						₦ {data?.credit || 0}
+						₦ {credit || 0}
 					</span>
 					<img
 						src="/assets/admin/dashboard/graph1.svg"
@@ -104,7 +104,7 @@ const Card = ({ openSideBar, data, handleOpeningBalance }) => {
 						openSideBar ? ' sm:flex-col md:flex-row' : ' sm:flex-row'
 					}`}
 				>
-					<span className="text-[#637381] text-sm font-medium">Debit</span>
+					<span className="text-[#637381] text-sm font-medium">Payments</span>
 					<div className="flex gap-1 items-center">
 						<span className="">23%</span>
 						<img src="/assets/admin/dashboard/downarrow.svg" alt="graph" />
@@ -118,7 +118,7 @@ const Card = ({ openSideBar, data, handleOpeningBalance }) => {
 					}`}
 				>
 					<span className="text-xl font-bold whitespace-nowrap">
-						₦ {data?.debit || 0}
+						₦ {debit || 0}
 					</span>
 					<img
 						src="/assets/admin/dashboard/graph3.svg"

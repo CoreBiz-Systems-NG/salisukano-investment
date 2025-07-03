@@ -91,7 +91,6 @@ const UpdateSupply = () => {
 			return axios.patch(`${apiUrl}/supplies/${id}`, data, config);
 		},
 		onSuccess: () => {
-			
 			queryClient.invalidateQueries({
 				queryKey: ['dashboard', 'accounts', 'customers', id],
 			});
