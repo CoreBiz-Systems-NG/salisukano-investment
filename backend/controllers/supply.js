@@ -123,8 +123,8 @@ export const createSupply = async (req, res) => {
 		});
 
 		// If we reach here, transaction was successful
-		await updateTransactionsBalance(accountId);
 		const result = await session.commitTransaction();
+		await updateTransactionsBalance(accountId);
 		res.status(201).json(result);
 	} catch (error) {
 		// Transaction automatically rolled back by withTransaction
@@ -235,9 +235,9 @@ export const updateSupply = async (req, res) => {
 			{ new: true, session }
 		);
 
-		await updateTransactionsBalance(existingTransaction.accountId);
 		await session.commitTransaction();
 		isCommitted = true;
+		await updateTransactionsBalance(existingTransaction.accountId);
 
 		return res.status(200).json({
 			transaction: updatedTransaction,
