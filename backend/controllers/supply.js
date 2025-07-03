@@ -150,6 +150,7 @@ export const createSupply = async (req, res) => {
 export const updateSupply = async (req, res) => {
 	const session = await mongoose.startSession();
 	session.startTransaction();
+	let isCommitted = false;
 
 	try {
 		const { id } = req.params;
@@ -236,6 +237,7 @@ export const updateSupply = async (req, res) => {
 
 		await updateTransactionsBalance(existingTransaction.accountId);
 		await session.commitTransaction();
+		isCommitted = true;
 
 		return res.status(200).json({
 			transaction: updatedTransaction,
@@ -244,7 +246,9 @@ export const updateSupply = async (req, res) => {
 		});
 	} catch (error) {
 		console.error('Error updating transaction:', error.message);
-		await session.abortTransaction();
+		if (!isCommitted) {
+			await session.abortTransaction();
+		}
 		console.error('Error updating transaction:', error.message);
 		return res
 			.status(400)
