@@ -41,6 +41,11 @@ const CreditSchema = new mongoose.Schema(
 			ref: 'CreditMonth',
 			required: true,
 		},
+		invoiceId: {
+			type: Schema.Types.ObjectId,
+			ref: 'CreditInvoice',
+			required: true,
+		},
 		vehicleNumber: {
 			type: String,
 		},
@@ -83,11 +88,25 @@ const CreditSchema = new mongoose.Schema(
 
 // Pre-save hook to calculate total and normalize fields
 CreditSchema.pre('save', function (next) {
-	// Calculate total based on the materials' costs
-	this.total = this.materials.reduce((sum, material) => sum + material.cost, 0);
+	if (!this.isModified('materials') && !this.isModified('debit')) {
+		return next(); // Skip if not modified
+	}
+
+	// If there are no materials, use debit as total
+	if (!this.materials || this.materials.length === 0) {
+		this.total = this.debit || 0;
+		return next();
+	}
+
+	// Ensure each material has cost before calculating
+	this.total = this.materials.reduce((sum, material) => {
+		const cost = Number(material.cost) || 0;
+		return sum + cost;
+	}, 0);
 
 	next();
 });
+
 
 const Credit = mongoose.model('Credit', CreditSchema);
 

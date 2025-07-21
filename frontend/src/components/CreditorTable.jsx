@@ -2,7 +2,8 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 // import { AiFillEdit } from 'react-icons/ai';
-import moment from 'moment';
+
+import formatDate from '../hooks/formatDate';
 
 const Table = ({ tableData, tableRef }) => {
 	const navigate = useNavigate();
@@ -23,7 +24,7 @@ const Table = ({ tableData, tableRef }) => {
 				data?.vehicleNumber?.toLowerCase().includes(query.toLowerCase()) ||
 				data?.description?.toLowerCase().includes(query.toLowerCase()) ||
 				data?.balance?.toString().includes(query) ||
-				moment(data?.createdAt).format('DD-MM-YYYY').includes(query);
+				formatDate(data?.createdAt);
 
 			return matchesQuery;
 		});
@@ -159,7 +160,7 @@ const Table = ({ tableData, tableRef }) => {
 								className="drop-shadow-[0_0_10px_rgba(34,46,58,0.02)] bg-[#f6f8fa] hover:shadow-2xl p-2 cursor-pointer"
 							>
 								<td className="py-2 pl-3 text-sm font-normal text-[#637381] whitespace-nowrap">
-									{moment(data?.date || data?.createdAt).format('ll')}
+									{formatDate(data?.date || data?.createdAt)}
 								</td>
 								<td className="py-2 px-2 text-sm font-normal text-[#637381] whitespace-nowrap uppercase">
 									{data?.vehicleNumber?.substr(0, 30) || '-'}

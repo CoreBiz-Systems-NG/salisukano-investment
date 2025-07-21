@@ -24,9 +24,27 @@ const NewCredit = () => {
 	});
 	const [loading, setIsLoading] = useState(false);
 	const [vehicleNumber, setVehicleNumber] = useState('');
+	const [deposits, setDeposits] = useState([
+		{
+			description: '',
+			amount: 0,
+		},
+	]);
 	const [materials, setMaterials] = useState([
 		{
+			product: 'Mix',
+			qty: '',
+			rate: '',
+			cost: 0,
+		},
+		{
 			product: 'Cast',
+			qty: '',
+			rate: '',
+			cost: 0,
+		},
+		{
+			product: 'Special',
 			qty: '',
 			rate: '',
 			cost: 0,
@@ -50,6 +68,15 @@ const NewCredit = () => {
 		);
 	}, [materials]);
 
+	const amount = useMemo(() => {
+		return Math.ceil(
+			deposits.reduce((acc, deposit) => acc + Math.ceil(deposit.amount), 0)
+		);
+	}, [deposits]);
+	const grandTotal = useMemo(() => {
+		return Math.ceil(total) - Math.ceil(amount);
+	}, [total, amount]);
+
 	const handleMaterialChange = (index, field, value) => {
 		setMaterials((prevMaterials) => {
 			const updatedMaterials = [...prevMaterials];
@@ -59,6 +86,16 @@ const NewCredit = () => {
 				material.cost = material.qty * material.rate || 0;
 			}
 			return updatedMaterials;
+		});
+	};
+	const handleDepositeChange = (index, field, value) => {
+		setDeposits((prevDeposits) => {
+			const updatedDeposits = [...prevDeposits];
+			updatedDeposits[index] = {
+				...updatedDeposits[index],
+				[field]: value,
+			};
+			return updatedDeposits;
 		});
 	};
 
@@ -73,6 +110,12 @@ const NewCredit = () => {
 	const removeMaterial = (indexToRemove) => {
 		if (materials.length <= 1) return;
 		setMaterials((prevMaterials) =>
+			prevMaterials.filter((_, index) => index !== indexToRemove)
+		);
+	};
+	const removeDeposit = (indexToRemove) => {
+		if (deposits.length <= 0) return;
+		setDeposits((prevMaterials) =>
 			prevMaterials.filter((_, index) => index !== indexToRemove)
 		);
 	};
@@ -114,8 +157,36 @@ const NewCredit = () => {
 			}
 			productNames.add(material.product);
 		});
-
 		setMaterials(updatedMaterials);
+		if (deposits?.length) {
+			const updatedDeposits = deposits.map((deposit) => ({
+				...deposit,
+				error: '',
+			}));
+
+			const depositNames = new Set();
+
+			const validatedDeposits = updatedDeposits.map((deposit) => {
+				let error = '';
+
+				if (Number(deposit.amount) <= 0) {
+					error = 'Amount must be greater than 0.';
+					isValid = false;
+				} else if (depositNames.has(deposit.description.trim())) {
+					error = 'Duplicate description.';
+					isValid = false;
+				} else if (!deposit.description.trim()) {
+					error = 'Description is required.';
+					isValid = false;
+				} else {
+					depositNames.add(deposit.description.trim());
+				}
+
+				return { ...deposit, error };
+			});
+
+			setDeposits(validatedDeposits);
+		}
 
 		if (isValid) {
 			if (!date) {
@@ -135,6 +206,8 @@ const NewCredit = () => {
 				total,
 				vehicleNumber,
 				accountId: id,
+				deposits,
+				creditorId: id,
 			};
 			// console.log('data', data);
 			axios
@@ -281,8 +354,8 @@ const NewCredit = () => {
 						</div>
 						<div className="mb-5 md:flex justify-between gap-2 items-center">
 							<div className="w-full md:w-1/2">
-								<label className="mb-0 text-base text-blue-500">
-									Total cost<span className="text-red">*</span>
+								<label className="mb-0 text-base ">
+									Total cost<span className="text-red"> *</span>
 								</label>
 								<div className="flex justify-between gap-2 items-center w-full">
 									<input
@@ -316,6 +389,97 @@ const NewCredit = () => {
 										<FaPlus className="text-xl" />
 									</button>
 								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				{/* Deposit */}
+
+				<div className="transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-lg transition-all font-josefin">
+					<div className="flex justify-between px-5 pt-4">
+						<h4 className="text-sm mb-0 font-semibold text-black">Deposit</h4>
+						<button
+							onClick={() =>
+								setDeposits([...deposits, { amount: 0, description: '' }])
+							}
+							className="hover:bg-green-500 hover:text-white bg-gray-100 text-green-500 rounded-sm w-6 h-6 flex items-center justify-center"
+						>
+							<FaPlus className="text-xl" />
+						</button>
+					</div>
+
+					{deposits?.map((item, index) => (
+						<div key={index} className="p-2 ">
+							<div className="md:flex gap-2 ">
+								<div className="w-full">
+									<label className="mb-0 text-base text-black">
+										Amount <span className="text-red-600">*</span>
+									</label>
+									<input
+										className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
+										type="number"
+										value={item.amount}
+										onChange={(e) =>
+											handleDepositeChange(index, 'amount', e.target.value)
+										}
+									/>
+								</div>
+								<div className="mb-2 w-full">
+									<label className="mb-0 text-base text-black">
+										Description <span className="text-red-600">*</span>
+									</label>
+									<div className="flex justify-center items-center">
+										<input
+											className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
+											type="text"
+											value={item.description}
+											onChange={(e) =>
+												handleDepositeChange(
+													index,
+													'description',
+													e.target.value
+												)
+											}
+										/>
+										<button
+											onClick={() => removeDeposit(index)}
+											className="text-center pl-3 py-2 h-10 w-10"
+										>
+											<MdDelete className="text-xl text-red-500 hover:text-red-200" />
+										</button>
+									</div>
+								</div>
+							</div>
+							{item.error && (
+								<p className="text-red-500 text-center mt-1">{item.error}</p>
+							)}
+						</div>
+					))}
+					<div className="p-2 ">
+						<div className="md:flex gap-2 ">
+							<div className="w-full">
+								<label className="mb-0 text-base text-black">
+									Total deposit
+								</label>
+								<input
+									className="input w-full h-[44px] rounded-md border border-gray6 lg:px-6 text-base"
+									type="number"
+									value={amount}
+									readOnly
+									disabled
+								/>
+							</div>
+							<div className="mb-2 w-full">
+								<label className="mb-0 text-base text-blue-500">
+									Grand Total
+								</label>
+								<input
+									className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
+									type="text"
+									value={grandTotal}
+									readOnly
+									disabled
+								/>
 							</div>
 						</div>
 					</div>

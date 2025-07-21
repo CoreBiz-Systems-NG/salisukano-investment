@@ -33,7 +33,7 @@ import Creditor from './pages/Creditor';
 import NewCredit from './pages/NewCredit';
 import CreditDetails from './pages/CreditDetails';
 import Commission from './pages/Commission';
-// import Report from './pages/Report';
+// import Receiptt from './pages/Receipt';
 function App() {
 	const [loading, setLoading] = useState(true);
 

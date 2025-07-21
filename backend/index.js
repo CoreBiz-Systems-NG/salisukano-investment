@@ -56,7 +56,7 @@ app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
 app.use(morgan('common'));
 app.use(bodyParser.json());
 app.use(express.static('public')); // configure static file to save images locally
-app.use(cookieParser());
+app.use(cookieParser())
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors('*'));
 app.use(

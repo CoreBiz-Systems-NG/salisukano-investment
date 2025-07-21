@@ -13,8 +13,8 @@ const DepositeModal = ({ show, setShow, setLoading, loading, account }) => {
 	const { user } = useContext(AuthContext);
 	const [amount, setAmount] = useState(0);
 	const [remark, setRemark] = useState('');
-	const [description, setDescription] = useState('');
 	const [date, setDate] = useState('');
+	const [description, setDescription] = useState('');
 	const apiUrl = import.meta.env.VITE_API_URL;
 	const config = {
 		headers: {

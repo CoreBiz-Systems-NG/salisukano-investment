@@ -15,6 +15,7 @@ const CreditMonthSchema = new mongoose.Schema(
 		month: {
 			type: Date,
 			default: () => getFirstDayOfMonth(new Date()),
+			unique: false,
 		},
 		balance: {
 			type: Number,
