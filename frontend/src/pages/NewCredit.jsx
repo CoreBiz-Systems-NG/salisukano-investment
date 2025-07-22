@@ -398,14 +398,6 @@ const NewCredit = () => {
 				<div className="transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-lg transition-all font-josefin">
 					<div className="flex justify-between px-5 pt-4">
 						<h4 className="text-sm mb-0 font-semibold text-black">Deposit</h4>
-						<button
-							onClick={() =>
-								setDeposits([...deposits, { amount: 0, description: '' }])
-							}
-							className="hover:bg-green-500 hover:text-white bg-gray-100 text-green-500 rounded-sm w-6 h-6 flex items-center justify-center"
-						>
-							<FaPlus className="text-xl" />
-						</button>
 					</div>
 
 					{deposits?.map((item, index) => (
@@ -456,30 +448,28 @@ const NewCredit = () => {
 						</div>
 					))}
 					<div className="p-2 ">
-						<div className="md:flex gap-2 ">
+						<div className="md:flex gap-2 items-center justify-between">
 							<div className="w-full">
 								<label className="mb-0 text-base text-black">
 									Total deposit
 								</label>
-								<input
-									className="input w-full h-[44px] rounded-md border border-gray6 lg:px-6 text-base"
-									type="number"
-									value={amount}
-									readOnly
-									disabled
-								/>
-							</div>
-							<div className="mb-2 w-full">
-								<label className="mb-0 text-base text-blue-500">
-									Grand Total
-								</label>
-								<input
-									className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
-									type="text"
-									value={grandTotal}
-									readOnly
-									disabled
-								/>
+								<div className="w-full flex gap-2 items-center justify-between">
+									<input
+										className="input w-full h-[44px] rounded-md border border-gray6 lg:px-6 text-base"
+										type="number"
+										value={amount}
+										readOnly
+										disabled
+									/>
+									<button
+										onClick={() =>
+											setDeposits([...deposits, { amount: 0, description: '' }])
+										}
+										className="py-2 px-4 w-fit hover:bg-green-500 hover:text-white bg-gray-100 text-green-500 rounded-sm  flex items-center justify-center"
+									>Add {' '}
+										<FaPlus className="text-lg w-6 h-6" />
+									</button>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -488,6 +478,18 @@ const NewCredit = () => {
 				<div className="transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-lg transition-all font-josefin p-4">
 					<h4 className="text-sm mb-0 font-semibold text-black">Information</h4>
 					<div className="md:flex justify-between gap-2 items-center w-full">
+						<div className="mb-2 w-full">
+							<label className="mb-0 text-base text-blue-500">
+								Grand Total
+							</label>
+							<input
+								className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
+								type="text"
+								value={grandTotal}
+								readOnly
+								disabled
+							/>
+						</div>
 						<div className="my-2 w-full md:w-1/2 md:mt-0">
 							<label htmlFor="vehicelNo" className="mb-0 text-base text-black">
 								Vehicel/Desc. <span className="text-red-500">*</span>

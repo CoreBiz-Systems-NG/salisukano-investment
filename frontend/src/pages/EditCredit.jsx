@@ -46,6 +46,7 @@ const EditCredit = () => {
 
 	useEffect(() => {
 		// If editing, pre-fill form fields
+		console.log('creditData:', creditData);
 		if (creditData?.credit) {
 			const { materials, deposits, date, description, vehicleNumber } =
 				creditData.credit;

@@ -33,6 +33,7 @@ import Creditor from './pages/Creditor';
 import NewCredit from './pages/NewCredit';
 import CreditDetails from './pages/CreditDetails';
 import Commission from './pages/Commission';
+import EditCredit from './pages/EditCredit';
 // import Receiptt from './pages/Receipt';
 function App() {
 	const [loading, setLoading] = useState(true);
@@ -92,6 +93,10 @@ function App() {
 							<Route
 								path="/creditors/:id/credit/:creditId"
 								element={<CreditDetails />}
+							/>
+							<Route
+								path="/creditors/:id/edit/:creditId"
+								element={<EditCredit />}
 							/>
 							<Route path="/settings" element={<Settings />} />
 						</Route>
