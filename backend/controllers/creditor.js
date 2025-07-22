@@ -295,6 +295,8 @@ export const newCredit = async (req, res) => {
 		const roundedTotal = Math.ceil(total);
 		const roundedQuantity = Math.ceil(quantity);
 
+		console.log('roundedTotal', roundedTotal);
+
 		// Fetch creditor
 		const creditor = await Creditor.findById(creditorId).session(session);
 		if (!creditor) {
@@ -316,14 +318,14 @@ export const newCredit = async (req, res) => {
 				creditorId,
 				month: firstDayOfMonth,
 			}).session(session);
-			console.log('transactionMonth', transactionMonth);
+			// console.log('transactionMonth', transactionMonth);
 			if (!transactionMonth) {
 				transactionMonth = await CreditMonth.create(
 					[
 						{
 							creditorId,
 							month: firstDayOfMonth,
-							balance: roundedTotal,
+							balance: 0,
 							quantity: roundedQuantity,
 						},
 					],
@@ -438,6 +440,166 @@ export const newCredit = async (req, res) => {
 		session.endSession();
 	}
 };
+
+export const updateCreditInvoice = async (req, res) => {
+	const session = await mongoose.startSession();
+	session.startTransaction();
+
+	try {
+		const invoiceId = req.params.id;
+
+		const {
+			name,
+			date,
+			credits = [],
+			deposits = [],
+			vehicleNumber,
+			description,
+		} = req.body;
+
+		// Find invoice
+		const invoice = await CreditInvoice.findById(invoiceId).session(session);
+		if (!invoice) {
+			await session.abortTransaction();
+			return res.status(404).json({ message: 'Invoice not found' });
+		}
+
+		// Clear existing credits linked to this invoice
+		const existingCredits = await Credit.find({
+			_id: { $in: invoice.credits },
+		}).session(session);
+
+		let totalCreditAmount = 0;
+		let totalDebitAmount = 0;
+
+		for (const trx of existingCredits) {
+			// Reverse balance effects
+			const creditor = await Creditor.findById(trx.creditorId).session(session);
+			const creditMonth = await CreditMonth.findById(trx.monthId).session(
+				session
+			);
+
+			if (trx.credit) {
+				creditor.balance -= trx.credit;
+				creditMonth.balance -= trx.credit;
+			} else if (trx.debit) {
+				creditor.balance += trx.debit;
+				creditMonth.balance += trx.debit;
+			}
+
+			await creditor.save({ session });
+			await creditMonth.save({ session });
+		}
+
+		// Delete previous credits
+		await Credit.deleteMany({ _id: { $in: invoice.credits } }).session(session);
+		invoice.credits = [];
+
+		// Create new credit transactions
+		for (const credit of credits) {
+			const total = Math.ceil(
+				credit.materials.reduce((sum, m) => sum + m.qty * m.rate, 0)
+			);
+			const quantity = Math.ceil(
+				credit.materials.reduce((sum, m) => sum + m.qty, 0)
+			);
+
+			const creditMonth = await CreditMonth.findById(credit.monthId).session(
+				session
+			);
+			const creditor = await Creditor.findById(credit.creditorId).session(
+				session
+			);
+
+			const created = await Credit.create(
+				[
+					{
+						...credit,
+						total,
+						credit: total,
+						quantity,
+						invoiceId: invoice._id,
+						balance: creditMonth.balance + total,
+						date,
+					},
+				],
+				{ session }
+			);
+
+			invoice.credits.push(created[0]._id);
+			creditor.balance += total;
+			creditMonth.balance += total;
+			totalCreditAmount += total;
+
+			await Promise.all([
+				creditor.save({ session }),
+				creditMonth.save({ session }),
+			]);
+		}
+
+		// Create deposit transactions
+		for (const deposit of deposits) {
+			const amount = Number(deposit.amount);
+			const creditor = await Creditor.findById(deposit.creditorId).session(
+				session
+			);
+			const creditMonth = await CreditMonth.findById(deposit.monthId).session(
+				session
+			);
+
+			const trx = await Credit.create(
+				[
+					{
+						creditorId: deposit.creditorId,
+						monthId: deposit.monthId,
+						date,
+						total: amount,
+						debit: amount,
+						invoiceId: invoice._id,
+						description: description || 'Deposit',
+						vehicleNumber,
+						balance: creditMonth.balance - amount,
+					},
+				],
+				{ session }
+			);
+
+			invoice.credits.push(trx[0]._id);
+			creditor.balance -= amount;
+			creditMonth.balance -= amount;
+			totalDebitAmount += amount;
+
+			await Promise.all([
+				creditor.save({ session }),
+				creditMonth.save({ session }),
+			]);
+		}
+
+		invoice.total = totalCreditAmount - totalDebitAmount;
+		await invoice.save({ session });
+
+		await session.commitTransaction();
+
+		res.status(200).json({
+			invoice,
+			totalCreditAmount,
+			totalDebitAmount,
+			message: 'Invoice updated successfully',
+		});
+	} catch (error) {
+		await session.abortTransaction();
+		console.error(
+			'Error updating credit invoice:',
+			error.stack || error.message
+		);
+		res
+			.status(500)
+			.json({ message: 'Internal server error', error: error.message });
+	} finally {
+		session.endSession();
+	}
+};
+
 
 export const createDeposit = async (req, res) => {
 	const session = await mongoose.startSession();
@@ -560,48 +722,123 @@ export const deleteCredit = async (req, res) => {
 		const { creditorId, creditId } = req.params;
 
 		if (!creditorId || !creditId) {
-			return res.status(404).json({ error: 'Invalid creditor or credit ID' });
+			return res.status(400).json({ error: 'Missing creditor or credit ID' });
 		}
 
-		// Find the creditor by ID
-		const creditor = await Creditor.findById({ _id: creditorId });
-		if (!creditor) {
-			return res.status(404).json({ error: 'creditor not found' });
-		}
-		const creditMonth = await CreditMonth.findOne({ creditorId });
+		// Fetch necessary data
+		const [creditor, transaction] = await Promise.all([
+			Creditor.findById(creditorId),
+			Credit.findById(creditId),
+		]);
 
-		// Find the transaction within the creditor's transactions
-		const transaction = await Credit.findById({ _id: creditId });
+		if (!creditor) return res.status(404).json({ error: 'Creditor not found' });
+		if (!transaction) return res.status(404).json({ error: 'Credit not found' });
 
-		if (!transaction) {
-			return res.status(404).json({ error: 'Transaction not found' });
-		}
+		const [creditMonth, creditInvoice] = await Promise.all([
+			CreditMonth.findById(transaction.monthId),
+			CreditInvoice.findById(transaction.invoiceId),
+		]);
 
-		// Adjust the creditor's balance based on whether the transaction is a credit or debit
+		if (!creditMonth)
+			return res.status(404).json({ error: 'Credit month not found' });
+		if (!creditInvoice)
+			return res.status(404).json({ error: 'Invoice not found' });
+
+		// Adjust balances
 		if (transaction.credit) {
-			creditor.balance -= transaction.credit; // Subtract the credit amount
-			creditMonth.balance -= transaction.credit; // Subtract the credit amount
+			creditor.balance -= transaction.credit;
+			creditMonth.balance -= transaction.credit;
+			creditInvoice.total -= transaction.credit;
 		} else if (transaction.debit) {
-			creditor.balance += transaction.debit; // Add back the debit amount
-			creditMonth.balance += transaction.debit; // Add back the debit amount
+			creditor.balance += transaction.debit;
+			creditMonth.balance += transaction.debit;
+			creditInvoice.total += transaction.debit;
 		}
 
-		// Remove the transaction
-		const updatedTransaction = await Credit.findByIdAndDelete({
-			_id: creditId,
-		});
+		// Remove creditId from invoice.credits[]
+		creditInvoice.credits = creditInvoice.credits.filter(
+			(id) => id.toString() !== creditId
+		);
 
-		// Save the updated creditor
-		creditor.save();
+		// Delete transaction
+		await transaction.deleteOne();
+
+		// Save updates
+		await Promise.all([
+			creditor.save(),
+			creditMonth.save(),
+			creditInvoice.save(),
+		]);
 
 		res.status(200).json({
-			message: 'Transaction deleted and Creditor updated successfully',
+			message: 'Transaction deleted and balances updated successfully',
 		});
 	} catch (error) {
-		console.log(error);
+		console.error('Error deleting credit:', error);
 		res.status(500).json({ message: error.message });
 	}
 };
+
+export const deleteCreditInvoice = async (req, res) => {
+	try {
+		const { invoiceId } = req.params;
+
+		if (!invoiceId) {
+			return res.status(400).json({ error: 'Invoice ID is required' });
+		}
+
+		const creditInvoice = await CreditInvoice.findById(invoiceId);
+		if (!creditInvoice) {
+			return res.status(404).json({ error: 'Credit Invoice not found' });
+		}
+
+		const [creditor, creditMonth] = await Promise.all([
+			Creditor.findById(creditInvoice.creditorId),
+			CreditMonth.findById(creditInvoice.monthId),
+		]);
+
+		if (!creditor) {
+			return res.status(404).json({ error: 'Creditor not found' });
+		}
+		if (!creditMonth) {
+			return res.status(404).json({ error: 'Credit Month not found' });
+		}
+
+		const transactions = creditInvoice.credits || [];
+
+		if (transactions.length === 0) {
+			return res
+				.status(404)
+				.json({ error: 'No transactions found for this invoice' });
+		}
+
+		// Loop over transactions to adjust balances and delete them
+		for (const creditId of transactions) {
+			const transaction = await Credit.findById(creditId);
+			if (transaction) {
+				if (transaction.credit) {
+					creditor.balance -= transaction.credit;
+					creditMonth.balance -= transaction.credit;
+				} else if (transaction.debit) {
+					creditor.balance += transaction.debit;
+					creditMonth.balance += transaction.debit;
+				}
+				await transaction.deleteOne();
+			}
+		}
+
+		await creditInvoice.deleteOne();
+		await Promise.all([creditor.save(), creditMonth.save()]);
+
+		res.status(200).json({
+			message: 'Invoice and associated transactions deleted successfully',
+		});
+	} catch (error) {
+		console.error('Error deleting credit invoice:', error);
+		res.status(500).json({ message: error.message });
+	}
+};
+
 
 export const addCreditFunction = async (req, res) => {
 	try {
