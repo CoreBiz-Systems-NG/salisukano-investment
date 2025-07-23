@@ -21,14 +21,13 @@ const CreditInvoiceSchema = new mongoose.Schema(
 				ref: 'Credit',
 			},
 		],
-
-		remark: {
-			type: String,
-			default: '',
-		},
 		date: {
 			type: Date,
 			default: Date.now, // Set to current date by default
+		},
+		remark: {
+			type: String,
+			default: '',
 		},
 	},
 	{ timestamps: true }

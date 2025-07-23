@@ -9,7 +9,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import Modal from './Modal';
 import { HiXMark } from 'react-icons/hi2';
 
-const DepositeModal = ({ show, setShow, setLoading, loading, account }) => {
+const DepositeModal = ({ show, setShow, setLoading, loading, invoiceId, account }) => {
 	const { user } = useContext(AuthContext);
 	const [amount, setAmount] = useState(0);
 	const [remark, setRemark] = useState('');
@@ -35,7 +35,7 @@ const DepositeModal = ({ show, setShow, setLoading, loading, account }) => {
 			axios
 				.post(
 					`${apiUrl}/creditors/deposit`,
-					{ creditorId: account, amount, date, description, remark },
+					{ invoiceId, amount, date, description, remark },
 					config
 				)
 				.then((res) => {
@@ -46,10 +46,10 @@ const DepositeModal = ({ show, setShow, setLoading, loading, account }) => {
 								'accounts',
 								'creditors',
 								'credits',
-								account._id,
+								invoiceId,
 							],
 						});
-						toast.success('Deposit created successfully!');
+						toast.success('Deposit added successfully!');
 					}
 					navigate(`/creditors`);
 				});
@@ -72,9 +72,7 @@ const DepositeModal = ({ show, setShow, setLoading, loading, account }) => {
 				<div className="space-y-2 p-4">
 					<div className="flex justify-between">
 						<div>
-							<h2 className="font-semibold text-lg text-blue-500">
-								Deposit {account?.name}
-							</h2>
+							<h2 className="font-semibold text-lg text-blue-500">Deposit</h2>
 						</div>
 						<button
 							onClick={() => setShow(false)}
@@ -91,7 +89,7 @@ const DepositeModal = ({ show, setShow, setLoading, loading, account }) => {
 									Amount <span className="text-red-600">*</span>
 								</label>
 								<input
-									className="input w-full h-[44px] rounded-md border border-gray6 px-6 text-base"
+									className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
 									type="number"
 									value={amount}
 									onChange={(e) => setAmount(e.target.value)}
@@ -102,7 +100,7 @@ const DepositeModal = ({ show, setShow, setLoading, loading, account }) => {
 									Date <span className="text-red-600">*</span>
 								</label>
 								<input
-									className="input w-full h-[44px] rounded-md border border-gray6 px-6 text-base"
+									className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
 									type="date"
 									value={date}
 									onChange={(e) => setDate(e.target.value)}

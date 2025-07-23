@@ -406,7 +406,7 @@ const Dashbord = () => {
 							onClick={showMenuItems}
 						>
 							<svg
-								className="group-hover:text-blue-600 text-[#637381] w-10 h-10"
+								className="group-hover:text-blue-600 text-[#637381] w-8 h-8"
 								xmlns="http://www.w3.org/2000/svg"
 								width="24"
 								height="24"
@@ -423,7 +423,7 @@ const Dashbord = () => {
 							</svg>
 						</div>
 						<div className="hidden sm:flex gap-4">
-							<div className="w-12 h-12 bg-[#F6F8FA] rounded-lg flex items-center justify-center border border-[#E7E7E7] cursor-pointer group">
+							<div className="w-10 h-10 bg-[#F6F8FA] rounded-lg flex items-center justify-center border border-[#E7E7E7] cursor-pointer group">
 								<svg
 									width="24"
 									height="26"

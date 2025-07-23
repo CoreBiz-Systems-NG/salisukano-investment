@@ -11,6 +11,7 @@ import {
 	addCreditFunction,
 	createDeposit,
 	deleteCredit,
+	updateCreditInvoice,
 } from '../controllers/creditor.js';
 // import { uploadMiddleware } from '../utils/uploadMiddleware.js';
 
@@ -24,7 +25,7 @@ router.get('/:id/credit', getCredit);
 router.post('/', createCreditor);
 router.post('/deposit', createDeposit);
 router.post('/:id', newCredit);
-router.patch('/credit', addCreditFunction);
+router.patch('/invoices', updateCreditInvoice);
 router.patch('/credit', addCreditFunction);
 router.patch('/:id', editCreditor);
 router.delete('/:creditorId/:creditId', deleteCredit);

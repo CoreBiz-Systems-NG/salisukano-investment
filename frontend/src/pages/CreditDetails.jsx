@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import OrderDetails from '../components/CreditDetails.jsx';
+// import OrderDetails from '../components/CreditDetails.jsx';
 import DeleteCreditModal from '../components/modals/DeleteCreditModal.jsx';
 import Loader from '../components/Loader.jsx';
 import { useContext, useEffect, useState } from 'react';
@@ -7,7 +7,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import AuthContext from '../context/authContext.jsx';
 import { useQuery } from '@tanstack/react-query';
 import { fetchCredit } from '../hooks/axiosApis.js';
-import DepositeModal from '../components/modals/DepositeModal.jsx';
+import DepositModal from '../components/modals/DepositModal.jsx';
 import getError from '../hooks/getError.js';
 import toast from 'react-hot-toast';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
@@ -23,6 +23,7 @@ import formatDate from '../hooks/formatDate';
 import loadImageAsBase64 from '../hooks/loadImageAsBase64.js';
 import image from '../assets/logo.jpg';
 import capitalizeText from '../hooks/CapitalizeText.js';
+import { FaMinus } from 'react-icons/fa6';
 
 const TransactionDetail = ({ openSideBar }) => {
 	const [loading, setIsLoading] = useState(false);
@@ -257,6 +258,14 @@ const TransactionDetail = ({ openSideBar }) => {
 							</MenuItem>
 							<MenuItem
 								as="button"
+								className="pl-3 py-2 px-2  flex w-full justify-start items-center gap-1 rounded text-sm  text-gray-700 hover:bg-red-100 font-normal"
+								onClick={() => setIsDepositModal(true)}
+							>
+								<FaMinus className="text-red-500" />
+								Deposit
+							</MenuItem>
+							<MenuItem
+								as="button"
 								className="pl-3 py-2 px-2 flex w-full justify-start items-center gap-1 rounded text-sm  text-gray-700 hover:bg-red-100 font-normal"
 								onClick={handelDelete}
 							>
@@ -423,7 +432,10 @@ const TransactionDetail = ({ openSideBar }) => {
 							<p>{receiptData.phone}</p>
 						</div>
 						<div className="text-right">
-							<p>Order number: {receiptData.orderNumber}</p>
+							<p>
+								Vehicle Number:{' '}
+								{data?.invoice?.credits[0]?.vehicleNumber || 'N/A'}
+							</p>
 							<p>
 								Date Created:{' '}
 								{formatDate(data?.invoice?.date || data?.credit?.date)}
@@ -443,7 +455,10 @@ const TransactionDetail = ({ openSideBar }) => {
 					</div>
 					{/* {data?.invoice */}
 					<div className="mb-6">
-						<h2 className="font-semibold mb-2">Credits</h2>
+						<div className=" flex justify-between w-full">
+							<h2 className="font-semibold mb-2">Credits</h2>
+							<buttton>Edit</buttton>
+						</div>
 						<table className="w-full text-sm border mb-6">
 							<thead>
 								<tr className="bg-gray-100 text-left">
@@ -462,7 +477,7 @@ const TransactionDetail = ({ openSideBar }) => {
 											<td className="p-2 border">
 												₦{item.rate.toLocaleString()}
 											</td>
-											<td className="p-2 border">
+											<td className="p-2 border row-span-2">
 												₦{calculateAmount(item).toLocaleString()}
 											</td>
 										</tr>
@@ -480,6 +495,7 @@ const TransactionDetail = ({ openSideBar }) => {
 										<th className="p-2 border">Name</th>
 										<th className="p-2 border">Amount</th>
 										<th className="p-2 border">Date</th>
+										<th className="p-2 border w-auto">Action</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -493,6 +509,21 @@ const TransactionDetail = ({ openSideBar }) => {
 												₦{payment.total.toLocaleString()}
 											</td>
 											<td className="p-2 border">{formatDate(payment.date)}</td>
+
+											<td className="p-1 border flex justify-center">
+												<button
+													type="button"
+													className="mr-3 text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline"
+												>
+													Edit
+												</button>
+												<button
+													type="button"
+													className="text-sm bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline"
+												>
+													Delete
+												</button>
+											</td>
 										</tr>
 									))}
 								</tbody>
@@ -525,12 +556,12 @@ const TransactionDetail = ({ openSideBar }) => {
 					</div>
 				</div>
 			</main>
-			<DepositeModal
+			<DepositModal
 				show={isDepositModal}
 				setShow={setIsDepositModal}
 				setLoading={setIsLoading}
 				loading={isLoading}
-				account={data?.credit}
+				invoiceId={data?.invoice?._id}
 			/>
 			<DeleteCreditModal
 				show={isDeleteModal}

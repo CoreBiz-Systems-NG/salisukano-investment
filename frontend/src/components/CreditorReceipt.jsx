@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import logo from '../assets/logo.jpg';
 import Modal from './modals/Modal';
+import formatDate from '../hooks/formatDate';
 import { downloadPDF, generateRandomNumber } from '../hooks/downLoadPdf';
 
 const Receipt = ({
@@ -111,7 +112,7 @@ const Receipt = ({
 										? tableData.map((item, index) => (
 												<tr key={index} className="">
 													<td className="py-2 px-2 text-xs md:text-sm font-normal text-[#637381] whitespace-nowrap border">
-														{new Date(item.date).toLocaleDateString()}
+														{formatDate(item?.date || item?.createdAt)}
 													</td>
 													<td className="py-2 px-2 text-xs md:text-sm font-normal text-[#637381] whitespace-nowrap border">
 														{item.vehicleNumber}
@@ -128,7 +129,7 @@ const Receipt = ({
 														{item?.debit}
 													</td>
 													<td className="whitespace-nowrap p-3 border">
-														{item.balance}
+														{item.balance.toLocaleString() || 0}
 													</td>
 												</tr>
 										  ))
@@ -140,7 +141,7 @@ const Receipt = ({
 							<div className="flex  justify-end">
 								<div className="mt-6">
 									<p className="text-xs md:text-sm font-bold bg-[#cccfd1] text-black p-1 pb-2 px-2">
-										Credit Balance: ₦{infoData?.balance}
+										Credit Balance: ₦{infoData?.balance.toLocaleString() || 0}
 									</p>
 								</div>
 							</div>

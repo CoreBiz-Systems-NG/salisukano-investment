@@ -6,22 +6,20 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchCreditorMonthlyCredits } from '../hooks/axiosApis.js';
 import getError from '../hooks/getError.js';
 import toast from 'react-hot-toast';
-import { FaMinus, FaPlus } from 'react-icons/fa6';
+import { FaPlus } from 'react-icons/fa6';
 import { IoMdOptions } from 'react-icons/io';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { cleanCreditorsData } from '../hooks/cleanData';
 import { SiMicrosoftexcel } from 'react-icons/si';
-import DepositeModal from '../components/modals/DepositeModal.jsx';
+// import DepositeModal from '../components/modals/DepositeModal.jsx';
 import Receipt from '../components/CreditorReceipt.jsx';
 import { useDownloadExcel } from 'react-export-table-to-excel';
 // import { MdSaveAlt } from 'react-icons/md';
 import moment from 'moment';
 import { FiPrinter } from 'react-icons/fi';
 const Creditor = () => {
-	const [loading, setIsLoading] = useState(false);
-	// const [isAddModal, setIsAddModal] = useState(false);
-	const [isDepositModal, setIsDepositModal] = useState(false);
+	// const [loading, setIsLoading] = useState(false);
 	const [isPrintModal, setIsPrintModal] = useState(false);
 	const [tableData, setTableDate] = useState([]);
 	const { user } = useContext(AuthContext);
@@ -107,14 +105,6 @@ const Creditor = () => {
 								</MenuItem>
 								<MenuItem
 									as="button"
-									className="pl-3 py-2 px-2  flex w-full justify-start items-center gap-1 rounded text-sm  text-gray-700 hover:bg-red-100 font-normal"
-									onClick={() => setIsDepositModal(true)}
-								>
-									<FaMinus className="text-red-500" />
-									Deposit
-								</MenuItem>
-								<MenuItem
-									as="button"
 									className="pl-3 py-2 px-2 flex w-full justify-start items-center gap-1 rounded text-sm  text-gray-700 hover:bg-green-100 font-normal"
 									onClick={onDownload}
 								>
@@ -159,13 +149,6 @@ const Creditor = () => {
 				</div>
 				<CreditorTable tableData={tableData || []} tableRef={tableRef} />
 			</main>
-			<DepositeModal
-				show={isDepositModal}
-				setShow={setIsDepositModal}
-				setLoading={setIsLoading}
-				loading={isLoading}
-				account={data?.creditor}
-			/>
 			<Receipt
 				show={isPrintModal}
 				setShow={setIsPrintModal}
@@ -174,7 +157,7 @@ const Creditor = () => {
 				tableData={tableData || []}
 			/>
 
-			{isLoading || (loading && <Loader />)}
+			{isLoading && <Loader />}
 		</>
 	);
 };

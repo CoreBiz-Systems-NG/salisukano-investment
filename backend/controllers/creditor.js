@@ -446,23 +446,31 @@ export const updateCreditInvoice = async (req, res) => {
 	session.startTransaction();
 
 	try {
-		const invoiceId = req.params.id;
-
+		const { invoiceId } = req.body;
+		if (!invoiceId) {
+			await session.abortTransaction();
+			return res.status(404).json({ message: 'Invoice id is reqired!' });
+		}
 		const {
-			name,
 			date,
 			credits = [],
 			deposits = [],
 			vehicleNumber,
 			description,
 		} = req.body;
-
+		console.log('invoiceId', invoiceId);
 		// Find invoice
 		const invoice = await CreditInvoice.findById(invoiceId).session(session);
 		if (!invoice) {
 			await session.abortTransaction();
 			return res.status(404).json({ message: 'Invoice not found' });
 		}
+		const creditor = await Creditor.findById(invoice.creditorId).session(
+			session
+		);
+		const creditMonth = await CreditMonth.findById(invoice.monthId).session(
+			session
+		);
 
 		// Clear existing credits linked to this invoice
 		const existingCredits = await Credit.find({
@@ -474,10 +482,6 @@ export const updateCreditInvoice = async (req, res) => {
 
 		for (const trx of existingCredits) {
 			// Reverse balance effects
-			const creditor = await Creditor.findById(trx.creditorId).session(session);
-			const creditMonth = await CreditMonth.findById(trx.monthId).session(
-				session
-			);
 
 			if (trx.credit) {
 				creditor.balance -= trx.credit;
@@ -550,8 +554,8 @@ export const updateCreditInvoice = async (req, res) => {
 			const trx = await Credit.create(
 				[
 					{
-						creditorId: deposit.creditorId,
-						monthId: deposit.monthId,
+						creditorId: invoice.creditorId,
+						monthId: invoice.monthId,
 						date,
 						total: amount,
 						debit: amount,
@@ -600,7 +604,6 @@ export const updateCreditInvoice = async (req, res) => {
 	}
 };
 
-
 export const createDeposit = async (req, res) => {
 	const session = await mongoose.startSession();
 	session.startTransaction();
@@ -608,103 +611,154 @@ export const createDeposit = async (req, res) => {
 	try {
 		const {
 			creditorId,
+			invoiceId,
 			amount,
 			description,
 			remark = '',
 			date,
 			monthId,
 		} = req.body;
-
-		// Find the creditor by ID
-		const creditor = await Creditor.findById(creditorId).session(session);
-		if (!creditor) {
-			await session.abortTransaction();
-			return res.status(400).json({ message: 'Creditor not found' });
-		}
-
-		// Find or create the credit month entry
-		let transactionMonth;
-		if (monthId) {
-			// Update or create a month by monthId
-			transactionMonth = await CreditMonth.findOneAndUpdate(
-				{ _id: monthId },
-				{ $inc: { balance: -amount } },
-				{ upsert: true, new: true, session }
-			);
-		} else {
-			// Check if a month exists for the provided date
-			const firstDayOfMonth = getFirstDayOfMonth(new Date(date));
-			transactionMonth = await CreditMonth.findOne({
-				creditorId,
-				month: firstDayOfMonth,
-			}).session(session);
-
-			if (!transactionMonth) {
-				// Create a new credit month if it doesn't exist
-				transactionMonth = await CreditMonth.create(
-					[
-						{
-							creditorId,
-							month: firstDayOfMonth,
-							balance: -amount, // Since it's a deposit, the balance decreases
-						},
-					],
-					{ session }
-				).then((docs) => docs[0]);
-			} else {
-				// Update the existing month's balance
-				transactionMonth.balance -= amount;
-				await transactionMonth.save({ session });
+		if (invoiceId) {
+			// Create Invoice
+			const invoice = await CreditInvoice.findById(invoiceId).session(session);
+			if (!invoice) {
+				await session.abortTransaction();
+				return res.status(404).json({ message: 'Invoice not found' });
 			}
+			const creditor = await Creditor.findById(invoice.creditorId).session(
+				session
+			);
+			const transactionMonth = await CreditMonth.findById(
+				invoice.monthId
+			).session(session);
+
+			// Create a new deposit transaction
+			const credit = await Credit.create(
+				[
+					{
+						creditorId: creditor._id,
+						invoiceId: invoice._id,
+						monthId: transactionMonth._id,
+						date,
+						total: amount,
+						debit: amount, // Represents the deposit as a debit
+						balance: transactionMonth.balance,
+						description,
+						vehicleNumber: description, // Assuming vehicleNumber is passed as description
+						remark,
+					},
+				],
+				{ session }
+			);
+
+			// Update creditor's total balance
+			creditor.balance -= amount;
+			transactionMonth.balance -= amount;
+			invoice.balance -= amount;
+			invoice.credits.push(credit[0]._id);
+			await invoice.save({ session });
+			await creditor.save({ session });
+
+			// Commit the transaction
+			await session.commitTransaction();
+			// Send success response
+			res.status(201).json({
+				credit,
+				creditor,
+				invoice,
+				message: 'Deposit created successfully',
+			});
+		} else {
+			// Find the creditor by ID
+			const creditor = await Creditor.findById(creditorId).session(session);
+			if (!creditor) {
+				await session.abortTransaction();
+				return res.status(400).json({ message: 'Creditor not found' });
+			}
+
+			// Find or create the credit month entry
+			let transactionMonth;
+			if (monthId) {
+				// Update or create a month by monthId
+				transactionMonth = await CreditMonth.findOneAndUpdate(
+					{ _id: monthId },
+					{ $inc: { balance: -amount } },
+					{ upsert: true, new: true, session }
+				);
+			} else {
+				// Check if a month exists for the provided date
+				const firstDayOfMonth = getFirstDayOfMonth(new Date(date));
+				transactionMonth = await CreditMonth.findOne({
+					creditorId,
+					month: firstDayOfMonth,
+				}).session(session);
+
+				if (!transactionMonth) {
+					// Create a new credit month if it doesn't exist
+					transactionMonth = await CreditMonth.create(
+						[
+							{
+								creditorId,
+								month: firstDayOfMonth,
+								balance: -amount, // Since it's a deposit, the balance decreases
+							},
+						],
+						{ session }
+					).then((docs) => docs[0]);
+				} else {
+					// Update the existing month's balance
+					transactionMonth.balance -= amount;
+					await transactionMonth.save({ session });
+				}
+			}
+			// Create Invoice
+			const invoice = await CreditInvoice.create(
+				[
+					{
+						creditorId,
+						monthId: transactionMonth._id,
+						total: amount,
+						date,
+					},
+				],
+				{ session }
+			).then((docs) => docs[0]);
+			// Update creditor's total balance
+			creditor.balance -= amount;
+			await creditor.save({ session });
+
+			// Create a new deposit transaction
+			const credit = await Credit.create(
+				[
+					{
+						creditorId,
+						invoiceId: invoice._id,
+						monthId: transactionMonth._id,
+						date,
+						total: amount,
+						debit: amount, // Represents the deposit as a debit
+						balance: transactionMonth.balance,
+						description,
+						vehicleNumber: description, // Assuming vehicleNumber is passed as description
+						remark,
+					},
+				],
+				{ session }
+			);
+
+			invoice.credits.push(credit[0]._id);
+			await invoice.save({ session });
+
+			// Commit the transaction
+			await session.commitTransaction();
+			// Send success response
+			res.status(201).json({
+				credit,
+				creditor,
+				invoice,
+				message: 'Deposit created successfully',
+			});
 		}
-		// Create Invoice
-		const invoice = await CreditInvoice.create(
-			[
-				{
-					creditorId,
-					monthId: transactionMonth._id,
-					total: amount,
-					date,
-				},
-			],
-			{ session }
-		).then((docs) => docs[0]);
-		// Update creditor's total balance
-		creditor.balance -= amount;
-		await creditor.save({ session });
-
-		// Create a new deposit transaction
-		const credit = await Credit.create(
-			[
-				{
-					creditorId,
-					invoiceId: invoice._id,
-					monthId: transactionMonth._id,
-					date,
-					total: amount,
-					debit: amount, // Represents the deposit as a debit
-					balance: transactionMonth.balance,
-					description,
-					vehicleNumber: description, // Assuming vehicleNumber is passed as description
-					remark,
-				},
-			],
-			{ session }
-		);
-
-		invoice.credits.push(credit[0]._id);
-		await invoice.save({ session });
-
-		// Commit the transaction
-		await session.commitTransaction();
-		console.log('Deposit created successfully', invoice);
-		// Send success response
-		res.status(201).json({
-			credit,
-			creditor,
-			invoice,
-			message: 'Deposit created successfully',
-		});
 	} catch (error) {
 		// Abort transaction in case of an error
 		await session.abortTransaction();
@@ -732,7 +786,8 @@ export const deleteCredit = async (req, res) => {
 		]);
 
 		if (!creditor) return res.status(404).json({ error: 'Creditor not found' });
-		if (!transaction) return res.status(404).json({ error: 'Credit not found' });
+		if (!transaction)
+			return res.status(404).json({ error: 'Credit not found' });
 
 		const [creditMonth, creditInvoice] = await Promise.all([
 			CreditMonth.findById(transaction.monthId),
@@ -838,7 +893,6 @@ export const deleteCreditInvoice = async (req, res) => {
 		res.status(500).json({ message: error.message });
 	}
 };
-
 
 export const addCreditFunction = async (req, res) => {
 	try {

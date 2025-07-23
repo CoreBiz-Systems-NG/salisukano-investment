@@ -11,7 +11,7 @@ import { IoMdOptions } from 'react-icons/io';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { SiMicrosoftexcel } from 'react-icons/si';
-import DepositeModal from '../components/modals/DepositeModal.jsx';
+import DepositeModal from '../components/modals/DepositModal.jsx';
 import { MdSaveAlt } from 'react-icons/md';
 const Creditor = () => {
 	const [loading, setIsLoading] = useState(false);
