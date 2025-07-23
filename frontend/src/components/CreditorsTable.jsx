@@ -152,7 +152,7 @@ const Table = ({ tableData, handelAddModal, handelEdit }) => {
 									onClick={() => handelClick(data?._id)}
 									className="w-auto py-2 px-1 text-sm font-normal text-[#10B860] whitespace-nowrap bg-gray-50 cursor-pointer"
 								>
-									{data?.balance}
+									{data?.balance?.toLocaleString() || 0}
 								</td>
 								<td className="py-2 px-1 text-sm font-normal whitespace-nowrap bg-gray-50  flex justify-center">
 									<span

@@ -20,6 +20,7 @@ export const AuthContextProvider = ({ children }) => {
 	const [isFirstMounted, setIsFirstMounted] = useState(true);
 	const [site, setSite] = useState('');
 	const [selectedProduct, setSelectedProduct] = useState('');
+	const [invoiceData, setInvoiceData] = useState(null);
 	const [notification, setNotification] = useState([]);
 	const [groupInfo, setGroupInfo] = useState('');
 
@@ -89,6 +90,8 @@ export const AuthContextProvider = ({ children }) => {
 				groupInfo,
 				setGroupInfo,
 				handleLogout,
+				invoiceData,
+				setInvoiceData,
 			}}
 		>
 			{children}

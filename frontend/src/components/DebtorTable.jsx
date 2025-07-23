@@ -149,13 +149,13 @@ const Table = ({
 									{data?.description}
 								</td>
 								<td className="py-4 px-1 text-sm font-normal text-[#FB4949]  whitespace-nowrap bg-gray-50">
-									{data?.credit}
+									{data?.credit?.toLocaleString() || 0}
 								</td>
 								<td className="py-4 px-1 text-sm font-normal text-[#4F80E1] whitespace-nowrap">
-									{data?.debit}
+									{data?.debit?.toLocaleString() || 0}
 								</td>
 								<td className="py-2 px-1 text-sm font-normal text-[#10B860] whitespace-nowrap bg-gray-50">
-									{data?.balance}
+									{data?.balance?.toLocaleString() || 0}
 								</td>
 								<td className="py-2 px-1 text-sm font-normal text-[#637381] whitespace-nowrap bg-gray-50">
 									{data?.remark}

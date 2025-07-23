@@ -71,7 +71,7 @@ const Creditors = () => {
 						className={`flex gap-4 justify-between flex-nowrap items-center`}
 					>
 						<span className="text-xl font-bold whitespace-nowrap">
-							₦ {total || 0}
+							₦ {total?.toLocaleString() || 0}
 						</span>
 						<img
 							src="/assets/admin/dashboard/graph1.svg"

@@ -193,13 +193,13 @@ const Table = ({ tableData, tableRef }) => {
 									{data?.specialTotal || '-'}
 								</td>
 								<td className="py-4 px-1 text-sm font-normal text-[#4F80E1] whitespace-nowrap">
-									{data?.credit || '-'}
+									{data?.credit?.toLocaleString() || '-'}
 								</td>
 								<td className="py-4 px-1 text-sm font-normal text-[#FB4949] whitespace-nowrap">
-									{data?.debit}
+									{data?.debit?.toLocaleString()}
 								</td>
 								<td className="py-2 px-2 text-sm font-normal text-[#10B860] whitespace-nowrap">
-									{data?.balance || '-'}
+									{data?.balance?.toLocaleString() || '-'}
 								</td>
 								<td className="py-2 px-2 text-sm font-normal text-[#637381] whitespace-nowrap bg-gray-50">
 									{data?.description || '-'}

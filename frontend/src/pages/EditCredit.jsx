@@ -8,13 +8,13 @@ import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { MdDelete } from 'react-icons/md';
 import { FaPlus } from 'react-icons/fa6';
 import Loader from '../components/Loader.jsx';
-import { fetchCreditor, fetchCredit } from '../hooks/axiosApis.js';
+import capitalizeText from '../hooks/CapitalizeText.js';
 
 const materialsData = [{ name: 'Cast' }, { name: 'Mix' }, { name: 'Special' }];
 
 // ----------- MAIN COMPONENT -----------
 const EditCredit = () => {
-	const { user } = useContext(AuthContext);
+	const { user, invoiceData } = useContext(AuthContext);
 	const { id, creditId } = useParams(); // creditId param for editing
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
@@ -32,37 +32,35 @@ const EditCredit = () => {
 	const [dateError, setDateError] = useState('');
 	const [loading, setLoading] = useState(false);
 
-	// Fetch credit record if editing
-	const { data: creditorData } = useQuery({
-		queryKey: ['creditor', id],
-		queryFn: () => fetchCreditor({ user, id }),
-		enabled: !!id && !creditId,
-	});
-	const { data: creditData, isLoading } = useQuery({
-		queryKey: creditId ? ['credit', id, creditId] : [],
-		enabled: !!creditId,
-		queryFn: () => fetchCredit({ user, id, creditId }),
-	});
-
 	useEffect(() => {
 		// If editing, pre-fill form fields
-		console.log('creditData:', creditData);
-		if (creditData?.credit) {
-			const { materials, deposits, date, description, vehicleNumber } =
-				creditData.credit;
+		if (invoiceData?.invoice?.credits) {
+			const { materials, date, description, vehicleNumber } =
+				invoiceData.invoice.credits[0];
+			const materialData = materials.map((m) => ({
+				...m,
+				product: capitalizeText(m.product),
+			}));
+			// console.log('materialData:', materialData);
 			setMaterials(
-				materials?.length
-					? materials
+				materialData?.length
+					? materialData
 					: [{ product: 'Mix', qty: '', rate: '', cost: 0 }]
-			);
-			setDeposits(
-				deposits?.length ? deposits : [{ description: '', amount: 0 }]
 			);
 			setDate(date?.substring(0, 10) || '');
 			setDescription(description || '');
 			setVehicleNumber(vehicleNumber || '');
 		}
-	}, [creditData]);
+		if (invoiceData?.invoice?.debits) {
+			// console.log('invoiceData?.debits:', invoiceData?.invoice?.debits);
+			const debits = invoiceData?.invoice?.debits.map((d) => ({
+				description: d.description || '',
+				amount: d.total || 0,
+				...d,
+			}));
+			setDeposits(debits?.length ? debits : [{ description: '', amount: 0 }]);
+		}
+	}, [invoiceData]);
 
 	// Cost calculations
 	const total = useMemo(
@@ -105,17 +103,22 @@ const EditCredit = () => {
 	};
 
 	// Add/Remove
-	const addMaterial = () =>
+	const addMaterial = () => {
+		if (materials.length >= 3) {
+			return;
+		}
 		setMaterials((prev) => [
 			...prev,
 			{ product: '', qty: '', rate: '', cost: 0 },
 		]);
+	};
 	const removeMaterial = (index) =>
 		setMaterials((prev) =>
 			prev.length > 1 ? prev.filter((_, i) => i !== index) : prev
 		);
-	const addDeposit = () =>
+	const addDeposit = () => {
 		setDeposits((prev) => [...prev, { description: '', amount: 0 }]);
+	};
 	const removeDeposit = (idx) =>
 		setDeposits((prev) =>
 			prev.length > 1 ? prev.filter((_, i) => i !== idx) : prev
@@ -217,19 +220,19 @@ const EditCredit = () => {
 			creditorId: id,
 			total,
 		};
-
+		console.log('formPayload:', formPayload);
+		setLoading(false);
 		try {
-			// Create or Update logic
-			const editMode = !!creditId;
-			const url = editMode
-				? `${apiUrl}/creditors/${id}/credits/${creditId}`
-				: `${apiUrl}/creditors/${id}`;
-			const method = editMode ? 'put' : 'post';
-			await axios[method](url, formPayload, config);
-
-			toast.success(`Credit ${editMode ? 'updated' : 'added'} successfully`);
-			queryClient.invalidateQueries({ queryKey: ['creditors', id] });
-			navigate(`/creditors/${id}`);
+			axios
+				.patch(`${apiUrl}/creditors/${id}`, formPayload, config)
+				.then((res) => {
+					if (res.data) {
+						console.log('Credit updated successfully:', res.data);
+						toast.success(`Credit updated successfully`);
+						queryClient.invalidateQueries({ queryKey: ['creditors', id] });
+						navigate(`/creditors/${id}`);
+					}
+				});
 		} catch (error) {
 			toast.error(getError(error));
 		} finally {
@@ -237,7 +240,9 @@ const EditCredit = () => {
 		}
 	};
 
-	if (isLoading || loading) return <Loader />;
+	if (loading) {
+		return <Loader />;
+	}
 
 	// ---- PAGE RENDER ----
 	return (
@@ -261,7 +266,7 @@ const EditCredit = () => {
 					</li>
 					<li>
 						<Link to={`/creditors/${id}`} className="capitalize text-blue-500">
-							{creditorData?.creditor?.name || ''}
+							{invoiceData?.creditor?.name || ''}
 						</Link>
 					</li>
 				</ul>
@@ -344,147 +349,178 @@ const EditCredit = () => {
 							)}
 						</div>
 					))}
-					<button
-						type="button"
-						onClick={addMaterial}
-						className="hover:bg-green-500 hover:text-white bg-gray-100 text-green-500 rounded-sm w-6 h-6 flex items-center justify-center"
-					>
-						<FaPlus />
-					</button>
 					{/* Material total and date */}
 					<div className="md:flex gap-2">
 						<div className="w-full md:w-1/2">
 							<label>Total cost*</label>
 							<input
-								className="input w-full h-[44px] border px-6 text-base rounded-md"
+								className="input w-full h-[44px] border px-2 text-base rounded-md"
 								type="number"
 								value={total}
 								readOnly
 							/>
 						</div>
 						<div
-							className={`w-full md:w-1/2 ${
+							className={`w-full md:w-1/2 mt-2 md:mt-0 ${
 								dateError ? 'border-b border-red-500' : ''
 							}`}
 						>
-							<label>Date*</label>
-							<input
-								className="input w-full h-[44px] border px-2 text-base rounded-md"
-								type="date"
-								value={date}
-								onChange={(e) => setDate(e.target.value)}
-							/>
+							<label className="mb-0 text-base text-black">
+								Date<span className="text-red-500">*</span>
+							</label>
+							<div className="flex justify-between gap-2 items-center w-full">
+								<input
+									className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
+									type="date"
+									value={date}
+									onChange={(e) => setDate(e.target.value)}
+								/>
+								<button
+									onClick={addMaterial}
+									className="hover:bg-green-500 hover:text-white bg-gray-100 text-green-500 rounded-sm w-6 h-6 flex items-center justify-center"
+								>
+									<FaPlus className="text-xl" />
+								</button>
+							</div>
 						</div>
 					</div>
 				</div>
 			</section>
 			{/* DEPOSITS */}
 			<section className="overflow-hidden rounded-2xl bg-white shadow-lg font-josefin">
-				<div className="flex justify-between px-5 pt-4">
-					<h4 className="text-sm mb-0 font-semibold text-black">Deposit</h4>
-					<button
-						onClick={addDeposit}
-						className="hover:bg-green-500 hover:text-white bg-gray-100 text-green-500 rounded-sm w-6 h-6 flex items-center justify-center"
-					>
-						<FaPlus />
-					</button>
-				</div>
-				{deposits.map((item, idx) => (
-					<div key={idx} className="p-2">
-						<div className="md:flex gap-2">
-							<div className="w-full">
-								<label>
-									Amount<span className="text-red-600">*</span>
-								</label>
-								<input
-									className="input w-full h-[44px] border px-2 text-base rounded-md"
-									type="number"
-									value={item.amount}
-									onChange={(e) =>
-										handleDepositChange(idx, 'amount', e.target.value)
-									}
-								/>
+				<div className="space-y-5 p-4">
+					<div className="p-2 ">
+						<div className="flex justify-between">
+							<h4 className="text-sm mb-0 font-semibold text-black">Deposit</h4>
+						</div>
+						{deposits.map((item, idx) => (
+							<div key={idx} className="p-2">
+								<div className="md:flex gap-2">
+									<div className="w-full">
+										<label>
+											Amount<span className="text-red-600">*</span>
+										</label>
+										<input
+											className="input w-full h-[44px] border px-2 text-base rounded-md"
+											type="number"
+											value={item.amount}
+											onChange={(e) =>
+												handleDepositChange(idx, 'amount', e.target.value)
+											}
+										/>
+									</div>
+									<div className="w-full">
+										<label>
+											Description<span className="text-red-600">*</span>
+										</label>
+										<div className="flex items-center">
+											<input
+												className="input w-full h-[44px] border px-2 text-base rounded-md"
+												type="text"
+												value={item.description}
+												onChange={(e) =>
+													handleDepositChange(
+														idx,
+														'description',
+														e.target.value
+													)
+												}
+											/>
+											<button
+												onClick={() => removeDeposit(idx)}
+												className="text-center h-10 w-10"
+											>
+												<MdDelete className="text-xl text-red-500" />
+											</button>
+										</div>
+									</div>
+								</div>
+								{item.error && (
+									<div className="text-red-500 text-center">{item.error}</div>
+								)}
 							</div>
-							<div className="w-full">
-								<label>
-									Description<span className="text-red-600">*</span>
-								</label>
-								<div className="flex items-center">
-									<input
-										className="input w-full h-[44px] border px-2 text-base rounded-md"
-										type="text"
-										value={item.description}
-										onChange={(e) =>
-											handleDepositChange(idx, 'description', e.target.value)
-										}
-									/>
-									<button
-										onClick={() => removeDeposit(idx)}
-										className="text-center h-10 w-10"
-									>
-										<MdDelete className="text-xl text-red-500" />
-									</button>
+						))}
+						<div className="p-2 ">
+							<div className="md:flex gap-2 items-center justify-between">
+								<div className="w-full">
+									<label className="mb-0 text-base text-black">
+										Total deposit
+									</label>
+									<div className="w-full flex gap-2 items-center justify-between">
+										<input
+											className="input w-full h-[44px] rounded-md border border-gray6 lg:px-2 text-base"
+											type="number"
+											value={amount}
+											readOnly
+											disabled
+										/>
+										<button
+											onClick={addDeposit}
+											className="py-2 px-4 w-fit hover:bg-green-500 hover:text-white bg-gray-100 text-green-500 rounded-sm  flex items-center justify-center"
+										>
+											Add <FaPlus className="text-lg w-6 h-6" />
+										</button>
+									</div>
 								</div>
 							</div>
 						</div>
-						{item.error && (
-							<div className="text-red-500 text-center">{item.error}</div>
-						)}
-					</div>
-				))}
-				<div className="p-2 md:flex gap-2">
-					<div className="w-full">
-						<label>Total deposit</label>
-						<input
-							className="input w-full h-[44px] border px-6 text-base rounded-md"
-							type="number"
-							value={amount}
-							readOnly
-						/>
-					</div>
-					<div className="w-full">
-						<label className="text-blue-500">Grand Total</label>
-						<input
-							className="input w-full h-[44px] border px-2 text-base rounded-md"
-							type="text"
-							value={grandTotal}
-							readOnly
-						/>
 					</div>
 				</div>
 			</section>
-			{/* Info / Save */}
-			<section className="overflow-hidden rounded-2xl bg-white shadow-lg font-josefin p-4">
-				<h4 className="text-sm font-semibold text-black">Information</h4>
-				<div className="md:flex gap-2">
-					<div className="my-2 w-full md:w-1/2">
-						<label htmlFor="vehicleNo">
-							Vehicle No/Desc. <span className="text-red-500">*</span>
-						</label>
-						<input
-							className="input w-full h-[44px] border px-2 text-base rounded-md"
-							type="text"
-							value={vehicleNumber}
-							onChange={(e) => setVehicleNumber(e.target.value)}
-						/>
+			{/* Info / Save */}{' '}
+			<section className="transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-lg transition-all font-josefin">
+				<div className="space-y-5 p-4">
+					<div className="p-2 ">
+						<h4 className="text-sm mb-0 font-semibold text-black">
+							Information
+						</h4>
+						<div className="p-2 md:flex justify-between gap-2 items-center w-full">
+							<div className="mb-2 w-full">
+								<label className="mb-0 text-base text-blue-500">
+									Grand Total
+								</label>
+								<input
+									className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
+									type="text"
+									value={grandTotal}
+									readOnly
+									disabled
+								/>
+							</div>
+							<div className="my-2 w-full md:w-1/2 md:mt-0">
+								<label
+									htmlFor="vehicelNo"
+									className="mb-0 text-base text-black"
+								>
+									Vehicel/Desc. <span className="text-red-500">*</span>
+								</label>
+								<input
+									className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
+									type="text"
+									placeholder="KN9009"
+									value={vehicleNumber}
+									onChange={(e) => setVehicleNumber(e.target.value)}
+								/>
+							</div>
+						</div>
+						<div className="mb-1">
+							<label>Remark</label>
+							<textarea
+								value={description}
+								onChange={(e) => setDescription(e.target.value)}
+								className="input p-2 rounded-md h-[100px] resize-none w-full border border-gray6  text-black"
+							/>
+							<span className="text-tiny leading-4">Add the remark.</span>
+						</div>
+						<button
+							disabled={loading}
+							className="bg-blue-500 hover:bg-blue-700 text-white font-semibold h-10 py-1 w-full rounded-md"
+							onClick={handleSubmit}
+						>
+							<span>{creditId ? 'Update' : 'Add'} Credit</span>
+						</button>
 					</div>
 				</div>
-				<div className="mb-1">
-					<label>Remark</label>
-					<textarea
-						value={description}
-						onChange={(e) => setDescription(e.target.value)}
-						className="input p-2 rounded-md h-[100px] resize-none w-full border border-gray6  text-black"
-					/>
-					<span className="text-tiny leading-4">Add the remark.</span>
-				</div>
-				<button
-					disabled={loading}
-					className="bg-blue-500 hover:bg-blue-700 text-white font-semibold h-10 py-1 w-full rounded-md"
-					onClick={handleSubmit}
-				>
-					<span>{creditId ? 'Update' : 'Add'} Credit</span>
-				</button>
 			</section>
 		</main>
 	);

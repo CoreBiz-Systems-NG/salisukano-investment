@@ -30,7 +30,7 @@ const TransactionDetail = ({ openSideBar }) => {
 	// const [isAddModal, setIsAddModal] = useState(false);
 	const [logoBase64, setLogoBase64] = useState('');
 	const [isDepositModal, setIsDepositModal] = useState(false);
-	const { user } = useContext(AuthContext);
+	const { user, setInvoiceData } = useContext(AuthContext);
 	const { id, creditId } = useParams();
 	const navigate = useNavigate();
 	const { data, isLoading, error } = useQuery({
@@ -210,7 +210,7 @@ const TransactionDetail = ({ openSideBar }) => {
 		if (!data) {
 			return;
 		}
-		console.log(data);
+		setInvoiceData(data);
 		navigate(`/creditors/${id}/edit/${data?.invoice?._id}`);
 	};
 	return (
@@ -274,7 +274,7 @@ const TransactionDetail = ({ openSideBar }) => {
 						</MenuItems>
 					</Menu>
 				</div>
-				<div className="w-full grid sm:grid-cols-2 md:grid-cols-4 gap-5 col-span-12">
+				<div className="w-full grid sm:grid-cols-2 lg:grid-cols-4 md:gap-3 lg:gap-5 col-span-12">
 					<div className="p-5  bg-white flex flex-col md:max-w-xs 2xl:max-w-none w-full rounded-xl gap-2 border border-[#E7E7E7] hover:shadow-xl cursor-pointer">
 						<div
 							className={`flex justify-between ${
@@ -304,7 +304,7 @@ const TransactionDetail = ({ openSideBar }) => {
 							}`}
 						>
 							<span className="text-2xl text-[#10B860] font-bold whitespace-nowrap">
-								₦ {data?.invoice?.totalCredits}
+								₦ {data?.invoice?.totalCredits.toLocaleString() || 0}
 							</span>
 							<img
 								src={`${
@@ -348,7 +348,7 @@ const TransactionDetail = ({ openSideBar }) => {
 							<span
 								className={`text-blue-500 text-2xl font-bold whitespace-nowrap`}
 							>
-								₦ {data?.invoice?.totalDebits}
+								₦ {data?.invoice?.totalDebits?.toLocaleString() || 0}
 							</span>
 							<img
 								src={`${
@@ -392,7 +392,7 @@ const TransactionDetail = ({ openSideBar }) => {
 							<span
 								className={`text-red-500 text-2xl font-bold whitespace-nowrap`}
 							>
-								₦ {data?.invoice?.total}
+								₦ {data?.invoice?.total?.toLocaleString() || 0}
 							</span>
 							<img
 								src={`${

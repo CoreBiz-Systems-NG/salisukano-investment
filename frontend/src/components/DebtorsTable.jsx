@@ -174,7 +174,7 @@ const Table = ({
 										data?.balance > 0 ? 'text-[#FB4949]' : 'text-[#4F80E1]'
 									} w-auto py-2 px-1 text-sm font-normal  whitespace-nowrap cursor-pointer`}
 								>
-									{data?.balance}
+									{data?.balance?.toLocaleString() || 0}
 								</td>
 								<td className="py-2 px-1 text-sm font-normal whitespace-nowrap flex gap-2 justify-center">
 									<span

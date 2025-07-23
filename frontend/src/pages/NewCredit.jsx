@@ -352,14 +352,14 @@ const NewCredit = () => {
 								</div>
 							))}
 						</div>
-						<div className="mb-5 md:flex justify-between gap-2 items-center">
+						<div className="p-2 mb-5 md:flex justify-between gap-2 items-center">
 							<div className="w-full md:w-1/2">
 								<label className="mb-0 text-base ">
 									Total cost<span className="text-red"> *</span>
 								</label>
 								<div className="flex justify-between gap-2 items-center w-full">
 									<input
-										className="input w-full h-[44px] rounded-md border border-gray6 px-6 text-base"
+										className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
 										type="number"
 										value={total}
 										readOnly
@@ -396,130 +396,149 @@ const NewCredit = () => {
 				{/* Deposit */}
 
 				<div className="transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-lg transition-all font-josefin">
-					<div className="flex justify-between px-5 pt-4">
-						<h4 className="text-sm mb-0 font-semibold text-black">Deposit</h4>
-					</div>
-
-					{deposits?.map((item, index) => (
-						<div key={index} className="p-2 ">
-							<div className="md:flex gap-2 ">
-								<div className="w-full">
-									<label className="mb-0 text-base text-black">
-										Amount <span className="text-red-600">*</span>
-									</label>
-									<input
-										className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
-										type="number"
-										value={item.amount}
-										onChange={(e) =>
-											handleDepositeChange(index, 'amount', e.target.value)
-										}
-									/>
-								</div>
-								<div className="mb-2 w-full">
-									<label className="mb-0 text-base text-black">
-										Description <span className="text-red-600">*</span>
-									</label>
-									<div className="flex justify-center items-center">
-										<input
-											className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
-											type="text"
-											value={item.description}
-											onChange={(e) =>
-												handleDepositeChange(
-													index,
-													'description',
-													e.target.value
-												)
-											}
-										/>
-										<button
-											onClick={() => removeDeposit(index)}
-											className="text-center pl-3 py-2 h-10 w-10"
-										>
-											<MdDelete className="text-xl text-red-500 hover:text-red-200" />
-										</button>
-									</div>
-								</div>
+					<div className="space-y-5 p-4">
+						<div className="p-2 ">
+							<div className="flex justify-between">
+								<h4 className="text-sm mb-0 font-semibold text-black">
+									Deposit
+								</h4>
 							</div>
-							{item.error && (
-								<p className="text-red-500 text-center mt-1">{item.error}</p>
-							)}
-						</div>
-					))}
-					<div className="p-2 ">
-						<div className="md:flex gap-2 items-center justify-between">
-							<div className="w-full">
-								<label className="mb-0 text-base text-black">
-									Total deposit
-								</label>
-								<div className="w-full flex gap-2 items-center justify-between">
-									<input
-										className="input w-full h-[44px] rounded-md border border-gray6 lg:px-6 text-base"
-										type="number"
-										value={amount}
-										readOnly
-										disabled
-									/>
-									<button
-										onClick={() =>
-											setDeposits([...deposits, { amount: 0, description: '' }])
-										}
-										className="py-2 px-4 w-fit hover:bg-green-500 hover:text-white bg-gray-100 text-green-500 rounded-sm  flex items-center justify-center"
-									>Add {' '}
-										<FaPlus className="text-lg w-6 h-6" />
-									</button>
+							{deposits?.map((item, index) => (
+								<div key={index} className="p-2 ">
+									<div className="md:flex gap-2 ">
+										<div className="w-full">
+											<label className="mb-0 text-base text-black">
+												Amount <span className="text-red-600">*</span>
+											</label>
+											<input
+												className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
+												type="number"
+												value={item.amount}
+												onChange={(e) =>
+													handleDepositeChange(index, 'amount', e.target.value)
+												}
+											/>
+										</div>
+										<div className="mb-2 w-full">
+											<label className="mb-0 text-base text-black">
+												Description <span className="text-red-600">*</span>
+											</label>
+											<div className="flex justify-center items-center">
+												<input
+													className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
+													type="text"
+													value={item.description}
+													onChange={(e) =>
+														handleDepositeChange(
+															index,
+															'description',
+															e.target.value
+														)
+													}
+												/>
+												<button
+													onClick={() => removeDeposit(index)}
+													className="text-center pl-3 py-2 h-10 w-10"
+												>
+													<MdDelete className="text-xl text-red-500 hover:text-red-200" />
+												</button>
+											</div>
+										</div>
+									</div>
+									{item.error && (
+										<p className="text-red-500 text-center mt-1">
+											{item.error}
+										</p>
+									)}
+								</div>
+							))}
+							<div className="p-2 ">
+								<div className="md:flex gap-2 items-center justify-between">
+									<div className="w-full">
+										<label className="mb-0 text-base text-black">
+											Total deposit
+										</label>
+										<div className="w-full flex gap-2 items-center justify-between">
+											<input
+												className="input w-full h-[44px] rounded-md border border-gray6 lg:px-2 text-base"
+												type="number"
+												value={amount}
+												readOnly
+												disabled
+											/>
+											<button
+												onClick={() =>
+													setDeposits([
+														...deposits,
+														{ amount: 0, description: '' },
+													])
+												}
+												className="py-2 px-4 w-fit hover:bg-green-500 hover:text-white bg-gray-100 text-green-500 rounded-sm  flex items-center justify-center"
+											>
+												Add <FaPlus className="text-lg w-6 h-6" />
+											</button>
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 				{/* <!-- input --> */}
-				<div className="transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-lg transition-all font-josefin p-4">
-					<h4 className="text-sm mb-0 font-semibold text-black">Information</h4>
-					<div className="md:flex justify-between gap-2 items-center w-full">
-						<div className="mb-2 w-full">
-							<label className="mb-0 text-base text-blue-500">
-								Grand Total
-							</label>
-							<input
-								className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
-								type="text"
-								value={grandTotal}
-								readOnly
-								disabled
-							/>
-						</div>
-						<div className="my-2 w-full md:w-1/2 md:mt-0">
-							<label htmlFor="vehicelNo" className="mb-0 text-base text-black">
-								Vehicel/Desc. <span className="text-red-500">*</span>
-							</label>
-							<input
-								className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
-								type="text"
-								placeholder="KN9009"
-								value={vehicleNumber}
-								onChange={(e) => setVehicleNumber(e.target.value)}
-							/>
+				<div className="transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-lg transition-all font-josefin">
+					<div className="space-y-5 p-4">
+						<div className="p-2 ">
+							<h4 className="text-sm mb-0 font-semibold text-black">
+								Information
+							</h4>
+							<div className="p-2 md:flex justify-between gap-2 items-center w-full">
+								<div className="mb-2 w-full">
+									<label className="mb-0 text-base text-blue-500">
+										Grand Total
+									</label>
+									<input
+										className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
+										type="text"
+										value={grandTotal}
+										readOnly
+										disabled
+									/>
+								</div>
+								<div className="my-2 w-full md:w-1/2 md:mt-0">
+									<label
+										htmlFor="vehicelNo"
+										className="mb-0 text-base text-black"
+									>
+										Vehicel/Desc. <span className="text-red-500">*</span>
+									</label>
+									<input
+										className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base"
+										type="text"
+										placeholder="KN9009"
+										value={vehicleNumber}
+										onChange={(e) => setVehicleNumber(e.target.value)}
+									/>
+								</div>
+							</div>
+							<div className="mb-1">
+								<label className="text-black">Remark</label>
+								<textarea
+									value={description}
+									onChange={(e) => setDescription(e.target.value)}
+									className="input p-2 rounded-md h-[200px] resize-none w-full border border-gray6  text-black"
+								></textarea>
+								<span className="text-tiny leading-4">Add the remark.</span>
+							</div>
+							<button
+								disabled={loading}
+								className="bg-blue-500 hover:bg-blue-700 text-white font-semibold h-10 py-1 w-full flex items-center justify-center rounded-md transition-all duration-500 ease-in-out"
+								onClick={handleSubmit}
+							>
+								<span>Add Order</span>
+								<i className="fa-solid fa-delete text-2xl text-primary"></i>
+							</button>
 						</div>
 					</div>
-					<div className="mb-1">
-						<label className="text-black">Remark</label>
-						<textarea
-							value={description}
-							onChange={(e) => setDescription(e.target.value)}
-							className="input p-2 rounded-md h-[200px] resize-none w-full border border-gray6  text-black"
-						></textarea>
-						<span className="text-tiny leading-4">Add the remark.</span>
-					</div>
-					<button
-						disabled={loading}
-						className="bg-blue-500 hover:bg-blue-700 text-white font-semibold h-10 py-1 w-full flex items-center justify-center rounded-md transition-all duration-500 ease-in-out"
-						onClick={handleSubmit}
-					>
-						<span>Add Order</span>
-						<i className="fa-solid fa-delete text-2xl text-primary"></i>
-					</button>
 				</div>
 			</main>
 			{isLoading || (loading && <Loader />)}
