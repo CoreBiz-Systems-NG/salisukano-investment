@@ -560,7 +560,7 @@ export const updateCreditInvoice = async (req, res) => {
 						total: amount,
 						debit: amount,
 						invoiceId: invoice._id,
-						description: description || 'Deposit',
+						description: deposit.description || 'Deposit',
 						vehicleNumber,
 						balance: creditMonth.balance - amount,
 					},

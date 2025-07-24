@@ -457,7 +457,7 @@ const TransactionDetail = ({ openSideBar }) => {
 					<div className="mb-6">
 						<div className=" flex justify-between w-full">
 							<h2 className="font-semibold mb-2">Credits</h2>
-							<buttton>Edit</buttton>
+							{/* <buttton>Edit</buttton> */}
 						</div>
 						<table className="w-full text-sm border mb-6">
 							<thead>
@@ -495,7 +495,7 @@ const TransactionDetail = ({ openSideBar }) => {
 										<th className="p-2 border">Name</th>
 										<th className="p-2 border">Amount</th>
 										<th className="p-2 border">Date</th>
-										<th className="p-2 border w-auto">Action</th>
+										{/* <th className="p-2 border  w-[20px]">Action</th> */}
 									</tr>
 								</thead>
 								<tbody>
@@ -510,7 +510,7 @@ const TransactionDetail = ({ openSideBar }) => {
 											</td>
 											<td className="p-2 border">{formatDate(payment.date)}</td>
 
-											<td className="p-1 border flex justify-center">
+											{/* <td className="p-1 border flex justify-center">
 												<button
 													type="button"
 													className="mr-3 text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline"
@@ -523,7 +523,7 @@ const TransactionDetail = ({ openSideBar }) => {
 												>
 													Delete
 												</button>
-											</td>
+											</td> */}
 										</tr>
 									))}
 								</tbody>
