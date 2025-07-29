@@ -57,11 +57,12 @@ const TransactionDetail = ({ openSideBar }) => {
 	};
 
 	const receiptData = {
-		shopName: 'Salisu Kano Investment Limited',
+		shopName: 'Salisu Kano International Limited',
 		shopUrl: 'salisukano.com',
 		email: 'salisuKano@gmail.com',
 		address: `Block P5, No.: 1-3 Dalar Gyada Market. /n/ Opp. Hajj Camp. Traffic 🚥 By IBB Way, /n/ Kano State - Nigeria.`,
-		phone: '+2349035095173',
+		phone: '+2348067237273',
+		whatsapp: '+2348023239018',
 		orderNumber: '#00001',
 		date: '16 Jul 2025',
 		status: 'Paid',
@@ -108,34 +109,38 @@ const TransactionDetail = ({ openSideBar }) => {
 		doc.setFontSize(12);
 		doc.text(receiptData.shopName, 14, 36);
 		doc.text(receiptData.email, 14, 42);
-		doc.text(receiptData.phone, 14, 48);
+		doc.text(`Call: ${receiptData.phone}`, 14, 48);
+		doc.text(`Chat: ${receiptData.whatsapp}`, 14, 54);
 
 		doc.setFontSize(18);
 		doc.text('Receipt', 150, 30);
 		doc.setFontSize(12);
-		doc.text('Order Number: #00001', 150, 36);
 		doc.text(
-			`Date Created: ${formatDate(data?.invoice?.date || data?.credit?.date)}`,
+			`Vehicle: ${data?.invoice?.credits[0]?.vehicleNumber || 'N/A'}`,
+			150,
+			36
+		);
+		doc.text(
+			`Date: ${formatDate(data?.invoice?.date || data?.credit?.date)}`,
 			150,
 			42
 		);
-		doc.text('Status: Paid', 150, 48);
 
 		// Creditor Info
 		doc.setFontSize(14);
-		doc.text('Creditor:', 14, 60);
+		doc.text('Creditor:', 14, 66);
 
 		doc.setFontSize(12);
-		doc.text(capitalizeText(receiptData.recipient.name), 14, 66);
-		doc.text(receiptData.recipient.phone, 14, 72);
+		doc.text(receiptData?.recipient?.name?.toUpperCase(), 14, 72);
+		doc.text(receiptData.recipient.phone, 14, 78);
 
 		// Credit Materials Table
 		const creditMaterials = data?.invoice?.credits?.[0]?.materials || [];
 
 		doc.setFontSize(14);
-		doc.text('Credits:', 14, 78);
+		doc.text('Credits:', 14, 90);
 		autoTable(doc, {
-			startY: 84,
+			startY: 92,
 			head: [['ITEM DETAIL', 'QTY', 'RATE', 'AMOUNT']],
 			body: creditMaterials.map((item) => [
 				capitalizeText(item.product),
@@ -145,13 +150,13 @@ const TransactionDetail = ({ openSideBar }) => {
 			]),
 		});
 
-		let finalY = doc.lastAutoTable.finalY || 90;
+		let finalY = doc.lastAutoTable.finalY || 98;
 
 		// Debit Transactions Table
 		const debits = data?.invoice?.debits || [];
 		if (debits.length > 0) {
 			doc.setFontSize(14);
-			doc.text('Deposits:', 14, finalY + 10);
+			doc.text('Less:', 14, finalY + 12);
 
 			autoTable(doc, {
 				startY: finalY + 15,
@@ -195,7 +200,7 @@ const TransactionDetail = ({ openSideBar }) => {
 		);
 
 		doc.save(
-			`${receiptData.recipient.name} ${formatDate(
+			`${receiptData?.recipient?.name?.toUpperCase()} ${formatDate(
 				data?.invoice?.date || data?.credit?.date
 			)} receipt.pdf`
 		);
@@ -429,7 +434,8 @@ const TransactionDetail = ({ openSideBar }) => {
 								))}
 							</p>
 
-							<p>{receiptData.phone}</p>
+							<p>Call: {receiptData.phone}</p>
+							<p>Chat: {receiptData.whatsapp}</p>
 						</div>
 						<div className="text-right">
 							<p>
