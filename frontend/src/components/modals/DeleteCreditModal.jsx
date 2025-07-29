@@ -15,7 +15,7 @@ const DeleteModal = ({
 	setLoading,
 	loading,
 	account,
-	debtorId,
+	invoiceId,
 }) => {
 	const { user } = useContext(AuthContext);
 	const apiUrl = import.meta.env.VITE_API_URL;
@@ -24,7 +24,7 @@ const DeleteModal = ({
 			Authorization: `Bearer ${user?.token}`,
 		},
 	};
-	console.log(account);
+	console.log('account', invoiceId);
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
 	const handleSubmit = (e) => {
@@ -32,17 +32,14 @@ const DeleteModal = ({
 		if (!account) {
 			return;
 		}
-		// if (account) {
-		// 	return toast.error('account is required');
-		// }
 		setLoading(true);
 		setShow(false);
-
 		try {
 			axios
-				.delete(`${apiUrl}/creditors/${account?._id}/${debtorId}`, config)
+				.delete(`${apiUrl}/creditors/invoices/${invoiceId}`, config)
 				.then((res) => {
 					if (res.data) {
+						console.log('Transaction deleted successfully', res.data);
 						queryClient.invalidateQueries({
 							queryKey: [
 								'dashboard',
@@ -50,7 +47,7 @@ const DeleteModal = ({
 								'transactions',
 								'customers',
 								'creditors',
-								debtorId,
+								invoiceId,
 								account?._id,
 							],
 						});
@@ -67,7 +64,9 @@ const DeleteModal = ({
 				});
 		} catch (error) {
 			console.log(error);
-			setShow(true);
+			setLoading(false);
+			toast.error(getError(error));
+			navigate(`/creditors/${account?._id}`);
 		}
 	};
 

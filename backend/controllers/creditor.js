@@ -632,7 +632,9 @@ export const createDeposit = async (req, res) => {
 				invoice.monthId
 			).session(session);
 
+			const newbal = Number(transactionMonth.balance) - Number(amount)
 			// Create a new deposit transaction
+			console.log('newbal', newbal);
 			const credit = await Credit.create(
 				[
 					{
@@ -642,7 +644,7 @@ export const createDeposit = async (req, res) => {
 						date,
 						total: amount,
 						debit: amount, // Represents the deposit as a debit
-						balance: transactionMonth.balance,
+						balance: newbal,
 						description,
 						vehicleNumber: description, // Assuming vehicleNumber is passed as description
 						remark,
@@ -654,10 +656,11 @@ export const createDeposit = async (req, res) => {
 			// Update creditor's total balance
 			creditor.balance -= amount;
 			transactionMonth.balance -= amount;
-			invoice.balance -= amount;
 			invoice.credits.push(credit[0]._id);
+			invoice.balance -= amount;
 			await invoice.save({ session });
 			await creditor.save({ session });
+			await transactionMonth.save({ session });
 
 			// Commit the transaction
 			await session.commitTransaction();
@@ -842,11 +845,12 @@ export const deleteCreditInvoice = async (req, res) => {
 			return res.status(400).json({ error: 'Invoice ID is required' });
 		}
 
+		console.log('creditInvoice', invoiceId);
 		const creditInvoice = await CreditInvoice.findById(invoiceId);
 		if (!creditInvoice) {
 			return res.status(404).json({ error: 'Credit Invoice not found' });
 		}
-
+		console.log('creditInvoice', creditInvoice);
 		const [creditor, creditMonth] = await Promise.all([
 			Creditor.findById(creditInvoice.creditorId),
 			CreditMonth.findById(creditInvoice.monthId),

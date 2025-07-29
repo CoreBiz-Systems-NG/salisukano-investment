@@ -568,7 +568,7 @@ const TransactionDetail = ({ openSideBar }) => {
 				setShow={setIsDeleteModal}
 				setLoading={setIsLoading}
 				loading={loading}
-				debtorId={creditId}
+				invoiceId={data?.invoice?._id}
 				account={data?.creditor}
 			/>
 			{isLoading || (loading && <Loader />)}

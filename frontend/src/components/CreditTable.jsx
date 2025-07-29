@@ -123,7 +123,7 @@ const Table = ({ tableData, creditorId }) => {
 									{moment(data?.month).format('MMM YYYY')}
 								</td>
 								<td className="py-2 px-2 text-sm font-normal text-[#10B860] whitespace-nowrap">
-									{data?.balance || '-'}
+									{data?.balance?.toLocaleString() || 0}
 								</td>
 							</tr>
 						))}
