@@ -22,6 +22,8 @@ import React from 'react';
 import formatDate from '../hooks/formatDate';
 import loadImageAsBase64 from '../hooks/loadImageAsBase64.js';
 import image from '../assets/logo.jpg';
+import phoneImage from '../assets/call.png';
+import whatsappImage from '../assets/whatsapp.png';
 import capitalizeText from '../hooks/CapitalizeText.js';
 import { FaMinus } from 'react-icons/fa6';
 
@@ -30,6 +32,8 @@ const TransactionDetail = ({ openSideBar }) => {
 	const [isDeleteModal, setIsDeleteModal] = useState(false);
 	// const [isAddModal, setIsAddModal] = useState(false);
 	const [logoBase64, setLogoBase64] = useState('');
+	const [phoneIcon, setPhoneIcon] = useState('');
+	const [whatsappIcon, setWhatsappIcon] = useState('');
 	const [isDepositModal, setIsDepositModal] = useState(false);
 	const { user, setInvoiceData } = useContext(AuthContext);
 	const { id, creditId } = useParams();
@@ -91,8 +95,12 @@ const TransactionDetail = ({ openSideBar }) => {
 	useEffect(() => {
 		const loadImage = async () => {
 			const logoBase64 = await loadImageAsBase64(image);
+			const whatsappIcon = await loadImageAsBase64(whatsappImage);
+			const phoneIcon = await loadImageAsBase64(phoneImage);
 			// console.log('logoBase64', logoBase64);
 			setLogoBase64(logoBase64);
+			setWhatsappIcon(whatsappIcon);
+			setPhoneIcon(phoneIcon);
 		};
 		loadImage();
 	}, []);
@@ -102,15 +110,19 @@ const TransactionDetail = ({ openSideBar }) => {
 		// ✅ Load logo from assets
 
 		// 🖼️ Add logo image (x, y, width, height)
-		doc.addImage(logoBase64, 'PNG', 14, 10, 30, 20); // Adjust as needed
+		doc.addImage(logoBase64, 'PNG', 14, 10, 30, 22); // Adjust as needed
 
 		// Title and Shop Info
 		doc.setFont('helvetica', 'normal');
 		doc.setFontSize(12);
 		doc.text(receiptData.shopName, 14, 36);
 		doc.text(receiptData.email, 14, 42);
-		doc.text(`Call: ${receiptData.phone}`, 14, 48);
-		doc.text(`Chat: ${receiptData.whatsapp}`, 14, 54);
+
+		doc.addImage(phoneIcon, 'PNG', 14, 45, 5, 5); // icon size 5x5
+		doc.text(receiptData.phone, 20, 48); // text next to icon
+
+		doc.addImage(whatsappIcon, 'PNG', 14, 52, 5, 5); // WhatsApp icon
+		doc.text(receiptData.whatsapp, 20, 56);
 
 		doc.setFontSize(18);
 		doc.text('Receipt', 150, 30);
