@@ -153,12 +153,12 @@ const TransactionDetail = ({ openSideBar }) => {
 		doc.text('Credits:', 14, 90);
 		autoTable(doc, {
 			startY: 92,
-			head: [['ITEM DETAIL', 'QTY', 'RATE', 'AMOUNT']],
+			head: [['ITEM DETAIL', 'QTY', 'RATE NGN', 'AMOUNT NGN']],
 			body: creditMaterials.map((item) => [
 				capitalizeText(item.product),
 				item.qty,
-				`NGN${item.rate.toLocaleString()}`,
-				'NGN' + (item.qty * item.rate).toLocaleString(),
+				`${item.rate.toLocaleString()}`,
+				(item.qty * item.rate).toLocaleString(),
 			]),
 		});
 
@@ -172,11 +172,10 @@ const TransactionDetail = ({ openSideBar }) => {
 
 			autoTable(doc, {
 				startY: finalY + 15,
-				head: [['S/N', 'Description', 'Amount', 'Date']],
-				body: debits.map((d, i) => [
-					i + 1,
+				head: [['Description', 'Amount NGN', 'Date']],
+				body: debits.map((d) => [
 					capitalizeText(d.description || d.remark || '-'),
-					`NGN${d.total.toLocaleString()}`,
+					`${d.total.toLocaleString()}`,
 					new Date(d.date).toLocaleDateString(),
 				]),
 			});
@@ -482,8 +481,8 @@ const TransactionDetail = ({ openSideBar }) => {
 								<tr className="bg-gray-100 text-left">
 									<th className="p-2 border">Item Detail</th>
 									<th className="p-2 border">Qty</th>
-									<th className="p-2 border">Rate</th>
-									<th className="p-2 border">Amount</th>
+									<th className="p-2 border">Rate ₦</th>
+									<th className="p-2 border">Amount ₦</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -493,10 +492,10 @@ const TransactionDetail = ({ openSideBar }) => {
 											<td className="p-2 border capitalize">{item.product}</td>
 											<td className="p-2 border">{item.qty}</td>
 											<td className="p-2 border">
-												₦{item.rate.toLocaleString()}
+												{item.rate.toLocaleString()}
 											</td>
 											<td className="p-2 border row-span-2">
-												₦{calculateAmount(item).toLocaleString()}
+												{calculateAmount(item).toLocaleString()}
 											</td>
 										</tr>
 									))}
@@ -509,39 +508,22 @@ const TransactionDetail = ({ openSideBar }) => {
 							<table className="w-full text-sm border">
 								<thead>
 									<tr className="bg-gray-100">
-										<th className="p-2 border">S/N</th>
-										<th className="p-2 border">Name</th>
-										<th className="p-2 border">Amount</th>
-										<th className="p-2 border">Date</th>
+										<th className="p-2 border text-left">Name</th>
+										<th className="p-2 border text-left">Amount ₦</th>
+										<th className="p-2 border text-left">Date</th>
 										{/* <th className="p-2 border  w-[20px]">Action</th> */}
 									</tr>
 								</thead>
 								<tbody>
 									{data?.invoice?.debits?.map((payment, i) => (
 										<tr key={i}>
-											<td className="p-2 border capitalize">{i + 1}</td>
 											<td className="p-2 border capitalize">
 												{payment.description}
 											</td>
 											<td className="p-2 border">
-												₦{payment.total.toLocaleString()}
+												{payment.total.toLocaleString()}
 											</td>
 											<td className="p-2 border">{formatDate(payment.date)}</td>
-
-											{/* <td className="p-1 border flex justify-center">
-												<button
-													type="button"
-													className="mr-3 text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline"
-												>
-													Edit
-												</button>
-												<button
-													type="button"
-													className="text-sm bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline"
-												>
-													Delete
-												</button>
-											</td> */}
 										</tr>
 									))}
 								</tbody>
