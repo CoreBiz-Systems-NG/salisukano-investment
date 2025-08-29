@@ -153,7 +153,7 @@ const TransactionDetail = ({ openSideBar }) => {
 		doc.text('Credits:', 14, 90);
 		autoTable(doc, {
 			startY: 92,
-			head: [['ITEM DETAIL', 'QTY', 'RATE NGN', 'AMOUNT NGN']],
+			head: [['ITEM DETAIL', 'QTY', 'RATE N', 'AMOUNT N']],
 			body: creditMaterials.map((item) => [
 				capitalizeText(item.product),
 				item.qty,
@@ -172,7 +172,7 @@ const TransactionDetail = ({ openSideBar }) => {
 
 			autoTable(doc, {
 				startY: finalY + 15,
-				head: [['Description', 'Amount NGN', 'Date']],
+				head: [['Description', 'Amount N', 'Date']],
 				body: debits.map((d) => [
 					capitalizeText(d.description || d.remark || '-'),
 					`${d.total.toLocaleString()}`,
