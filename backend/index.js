@@ -24,6 +24,7 @@ import debtorRoutes from './routes/debtor.js';
 import creditorRoutes from './routes/creditors.js';
 import accountRoutes from './routes/account.js';
 import priceRoutes from './routes/price.js';
+import receiptRoutes from './routes/receipt.js';
 // import errorHandler from './middleware/errorHandler.js';
 
 /* CONFIGURATION */
@@ -83,6 +84,7 @@ app.use('/prices', priceRoutes);
 app.use('/customers', customerRoutes);
 app.use('/debtors', debtorRoutes);
 app.use('/creditors', creditorRoutes);
+app.use('/receipt', receiptRoutes);
 // app.use(errorHandler);
 
 /* MONGOOSE SETUP */
