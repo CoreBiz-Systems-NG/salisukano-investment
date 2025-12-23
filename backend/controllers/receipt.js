@@ -93,6 +93,40 @@ export const sendReceipt = async (req, res) => {
 			'Error sending message:',
 			error.response?.data || error.message || error
 		);
-		res.status(500).json({ error: 'Internal Server Error' });
+		res.status(500).json({ error: 'Internal Server Error', error });
+	}
+};
+export const sendNewMessage = async (req, res) => {
+	try {
+		// Log the entire incoming request body to see what you receive
+		console.log('Incoming webhook:', JSON.stringify(req.body, null, 2));
+		// Extract the text message sent by the user
+		// const { message } = req.body;
+		// console.log('Received message:', message);
+
+		// // Prepare WhatsApp message payload (implement this helper to build API format)
+		// const data = getTextMessageInput(process.env.RECIPIENT_WAID, message);
+
+		// // Send the message with WhatsApp API (sendMessage would call the WhatsApp Business API)
+		// const response = await sendMessage(data);
+		const message = await client.messages.create({
+			contentSid: 'HXb5b62575e6e4ff6129ad7c8efe1f983e',
+			contentVariables: JSON.stringify({ 1: '22 July 2026', 2: '3:15pm' }),
+			from: `whatsapp:${from}`,
+			to: `whatsapp:${to}`,
+		});
+
+		console.log(message.body);
+		// Send success response back to client
+		res
+			.status(200)
+			.json({ message: 'Message sent successfully', data: message.body });
+	} catch (error) {
+		// Log error details for debugging and respond with server error status
+		console.error(
+			'Error sending message:',
+			error.response?.data || error.message || error
+		);
+		res.status(500).json({ error: 'Internal Server Error', error });
 	}
 };
