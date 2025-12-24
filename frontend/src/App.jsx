@@ -34,6 +34,9 @@ import NewCredit from './pages/NewCredit';
 import CreditDetails from './pages/CreditDetails';
 import Commission from './pages/Commission';
 import EditCredit from './pages/EditCredit';
+import Invoices from './pages/Invoices';
+import NewInvoice from './pages/NewInvoice';
+import EditInvoice from './pages/EditInvoice';
 // import Receiptt from './pages/Receipt';
 function App() {
 	const [loading, setLoading] = useState(true);
@@ -48,14 +51,18 @@ function App() {
 		<>
 			<Routes>
 				<Route path="/">
-					<Route path="/" element={<Index />} />
+					{/* <Route path="/" element={<Index />} /> */}
 					<Route path="/login" element={<Login />} />
+					<Route path="/forgot-password" element={<ForgotPassword />} />
 					<Route path="/forgot-password" element={<ForgotPassword />} />
 					<Route path="/reset-password/:token" element={<ChangePassword />} />
 					<Route element={<ProtectedRoutes />}>
 						<Route exact path="/" element={<DashboardLayout />}>
 							<Route path="/dashboard" element={<Dashboard />} />
 							<Route path="/companies" element={<Customers />} />
+							<Route path="/invoices" element={<Invoices />} />
+							<Route path="/new-invoice" element={<NewInvoice />} />
+							<Route path="/edit-invoice/:id" element={<EditInvoice />} />
 							<Route
 								path="/companies/payment/:customerId"
 								element={<CustomerAddPayment />}
@@ -63,7 +70,7 @@ function App() {
 							<Route
 								path="/companies/supply/:customerId"
 								element={<CustomerAddSupply />}
-							/>
+							/>  
 							<Route path="/companies/:id" element={<Accounts />} />
 							{/* <Route path="/accounts" element={< />} /> */}
 							<Route path="/accounts/:id" element={<AccountDetail />} />

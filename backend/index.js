@@ -25,6 +25,7 @@ import creditorRoutes from './routes/creditors.js';
 import accountRoutes from './routes/account.js';
 import priceRoutes from './routes/price.js';
 import receiptRoutes from './routes/receipt.js';
+import invoiceRoutes from './routes/invoice.js';
 // import errorHandler from './middleware/errorHandler.js';
 
 /* CONFIGURATION */
@@ -57,7 +58,7 @@ app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
 app.use(morgan('common'));
 app.use(bodyParser.json());
 app.use(express.static('public')); // configure static file to save images locally
-app.use(cookieParser())
+app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors('*'));
 app.use(
@@ -85,6 +86,7 @@ app.use('/customers', customerRoutes);
 app.use('/debtors', debtorRoutes);
 app.use('/creditors', creditorRoutes);
 app.use('/receipt', receiptRoutes);
+app.use('/invoices', invoiceRoutes);
 // app.use(errorHandler);
 
 /* MONGOOSE SETUP */
