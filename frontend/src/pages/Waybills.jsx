@@ -385,7 +385,7 @@ const InvoicesPage = () => {
 			doc.text("For: Salisu Kano Int'l Ltd", pageWidth - 80, footerY + 10);
 
 			if (sealBase64) {
-				doc.addImage(sealBase64, 'PNG', pageWidth - 75, footerY - 20, 30, 30);
+				doc.addImage(sealBase64, 'PNG', pageWidth - 75, footerY - 20, 38, 38);
 			}
 
 			// ===============================

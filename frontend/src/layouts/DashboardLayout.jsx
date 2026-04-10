@@ -39,12 +39,7 @@ const navigationList = [
 		svg: <ScrollText className="h-4 w-4" />,
 		roles: ['admin', 'finance'],
 	},
-	{
-		name: 'Users',
-		link: '/users',
-		svg: <Users className="h-4 w-4" />,
-		roles: ['admin'],
-	},
+
 	{
 		name: 'Invoice',
 		link: '/registered-invoices',
@@ -56,6 +51,12 @@ const navigationList = [
 		link: '/waybills',
 		svg: <FilePlus className="h-4 w-4" />,
 		roles: ['admin', 'operation'],
+	},
+	{
+		name: 'Users',
+		link: '/users',
+		svg: <Users className="h-4 w-4" />,
+		roles: ['admin'],
 	},
 	// {
 	// 	name: 'Payment',
