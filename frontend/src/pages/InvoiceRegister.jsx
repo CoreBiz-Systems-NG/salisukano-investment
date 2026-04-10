@@ -617,7 +617,7 @@ const InvoiceRegister = () => {
 			// SIGNATURE SECTION
 			// ===============================
 
-			const footerY = pageHeight - 30;
+			const footerY = pageHeight - 25;
 
 			doc.setLineWidth(0.4);
 
@@ -629,9 +629,9 @@ const InvoiceRegister = () => {
 			doc.text("For: Salisu Kano Int'l Ltd", pageWidth - 80, footerY + 10);
 
 			if (sealBase64) {
-				doc.addImage(sealBase64, 'PNG', pageWidth - 60, footerY - 20, 38, 38);
+				doc.addImage(sealBase64, 'PNG', pageWidth - 76, footerY - 32, 50, 50);
 			}
-
+			
 			// ===============================
 			// SAVE FILE
 			// ===============================
@@ -1133,11 +1133,11 @@ const InvoiceRegister = () => {
 							<img
 								src={seal}
 								alt="Salisu Seal"
-								width="90"
-								height="90"
+								width="120"
+								height="120"
 								style={{
 									objectFit: 'cover',
-									marginBottom: '-30px',
+									marginBottom: '-40px',
 								}}
 							/>
 
