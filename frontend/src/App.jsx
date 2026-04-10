@@ -37,8 +37,12 @@ import EditCredit from './pages/EditCredit';
 import Invoices from './pages/Invoices';
 import NewInvoice from './pages/NewInvoice';
 import EditInvoice from './pages/EditInvoice';
+import Users from './pages/Users';
 import CompanyCredits from './pages/CompanyCredits';
-// import Receiptt from './pages/Receipt';
+import Waybill from './pages/Waybill';
+import Waybills from './pages/Waybills';
+import Register from './pages/InvoiceRegister';
+import RegisterdInvoices from './pages/RegisterdInvoices';
 function App() {
 	const [loading, setLoading] = useState(true);
 
@@ -111,6 +115,16 @@ function App() {
 								element={<EditCredit />}
 							/>
 							<Route path="/settings" element={<Settings />} />
+							<Route path="/users" element={<Users />} />
+							<Route path="/waybills" element={<Waybills />} />
+							<Route path="/waybill" element={<Waybill />} />
+							<Route path="/waybill/:id" element={<Waybill />} />
+							<Route path="/register-invoices" element={<Register />} />
+							<Route
+								path="/registered-invoices"
+								element={<RegisterdInvoices />}
+							/>
+							<Route path="/register-invoices/:id" element={<Register />} />
 						</Route>
 					</Route>
 				</Route>

@@ -22,7 +22,7 @@ const Table = ({ tableData, handelAddModal, handelEdit }) => {
 				data?._id?.toLowerCase().includes(query.toLowerCase()) ||
 				data?.name?.toLowerCase().includes(query.toLowerCase()) ||
 				data?.phone?.toLowerCase().includes(query.toLowerCase()) ||
-				data?.balance?.toLowerCase().includes(query.toLowerCase()) ||
+				// data?.balance?.toLowerCase()?.includes(query.toLowerCase()) ||
 				moment(data?.createdAt).format('DD-MM-YYYY').includes(query);
 
 			return matchesQuery;

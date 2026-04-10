@@ -26,6 +26,8 @@ import accountRoutes from './routes/account.js';
 import priceRoutes from './routes/price.js';
 import receiptRoutes from './routes/receipt.js';
 import invoiceRoutes from './routes/invoice.js';
+import waybillRoutes from './routes/waybill.js';
+import waybillRegisterRoutes from './routes/waybillregister.js';
 // import errorHandler from './middleware/errorHandler.js';
 
 /* CONFIGURATION */
@@ -45,7 +47,7 @@ const limiter = rateLimit({
 			options.statusCode || 500,
 			`There are too many requests. You are only allowed ${
 				options.max
-			} requests per ${options.windowMs / 60000} minutes`
+			} requests per ${options.windowMs / 60000} minutes`,
 		);
 	},
 });
@@ -69,7 +71,7 @@ app.use(
 			'https://salisukano.com',
 		],
 		credentials: true,
-	})
+	}),
 );
 // connectDB();
 
@@ -87,6 +89,8 @@ app.use('/debtors', debtorRoutes);
 app.use('/creditors', creditorRoutes);
 app.use('/receipt', receiptRoutes);
 app.use('/invoices', invoiceRoutes);
+app.use('/waybill-registers', waybillRegisterRoutes);
+app.use('/waybills', waybillRoutes);
 // app.use(errorHandler);
 
 /* MONGOOSE SETUP */
