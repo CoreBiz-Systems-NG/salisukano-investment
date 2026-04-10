@@ -363,7 +363,7 @@ const Waybill = () => {
 			// SIGNATURE SECTION
 			// ===============================
 
-			const footerY = startY + 35;
+			const footerY = startY + 45;
 
 			doc.setLineWidth(0.4);
 
@@ -375,7 +375,7 @@ const Waybill = () => {
 			doc.text("For: Salisu Kano Int'l Ltd", pageWidth - 80, footerY + 10);
 
 			if (sealBase64) {
-				doc.addImage(sealBase64, 'PNG', pageWidth - 75, footerY - 20, 38, 38);
+				doc.addImage(sealBase64, 'PNG', pageWidth - 86, footerY - 32, 80, 50);
 			}
 
 			// ===============================
@@ -395,11 +395,9 @@ const Waybill = () => {
 
 	return (
 		<>
-			<div className='w-full flex flex-col p-4 justify-center'>
+			<div className="w-full flex flex-col p-4 justify-center">
 				{/* Waybill Preview */}
-				<div
-					className="w-full mx-auto md:w-[800px] bg-white border border-[#E7E7E7] rounded-lg p-4 md:px-8 flex flex-col gap-3"
-				>
+				<div className="w-full mx-auto md:w-[800px] bg-white border border-[#E7E7E7] rounded-lg p-4 md:px-8 flex flex-col gap-3">
 					{/* Header */}
 					<div
 						style={{
@@ -419,8 +417,7 @@ const Waybill = () => {
 							/>
 						</div>
 						<div style={{ flex: 1, textAlign: 'center' }}>
-							<h2 style={{ margin: 0, fontSize: '25px', fontWeight: 'bold' }}
-							>
+							<h2 style={{ margin: 0, fontSize: '25px', fontWeight: 'bold' }}>
 								SALISU KANO INTERNATIONAL LIMITED
 							</h2>
 							<p style={{ margin: 0 }}>
@@ -434,8 +431,7 @@ const Waybill = () => {
 							</p>
 							<div className="flex gap-2 md:hidden justify-center">
 								<Phone size={20} className="text-black whitespace-nowrap" />
-								<p>08067237273, 08030675636, 08164927179
-								</p>
+								<p>08067237273, 08030675636, 08164927179</p>
 							</div>
 						</div>
 						<div className="hidden md:flex justify-center items-center gap-1 ">
@@ -542,7 +538,6 @@ const Waybill = () => {
 								onChange={(e) =>
 									setFormData({ ...formData, gross: e.target.value })
 								}
-
 								className="input w-full h-[44px] rounded-md border border-gray6 px-2 text-base md:ml-2"
 							/>
 						</div>
@@ -638,8 +633,8 @@ const Waybill = () => {
 							<img
 								src={seal}
 								alt="Salisu Seal"
-								width="90"
-								height="90"
+								width="120"
+								height="120"
 								style={{
 									objectFit: 'cover',
 									marginBottom: '-30px',
