@@ -130,13 +130,13 @@ const InvoicesPage = () => {
 			{/* Header */}
 			<div className="flex justify-between items-center mb-6">
 				<h1 className="text-xl md:text-3xl font-bold text-gray-800">
-					<span
+					{/* <span
 						className="text-blue-600"
 						onClick={() => navigate(`/registered-invoices`)}
-					>
+					> */}
 						Invoice
-					</span>{' '}
-					/ <span onClick={() => navigate(`/waybills`)}>Register</span>
+					{/* </span>{' '}
+					/ <span onClick={() => navigate(`/waybills`)}>Register</span> */}
 				</h1>
 				{/* <div className="flex gap-2 flex-col md:flex-row"> */}
 				<button

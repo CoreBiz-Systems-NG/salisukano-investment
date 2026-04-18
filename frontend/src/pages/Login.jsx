@@ -22,7 +22,7 @@ const Login = () => {
 		if (user) {
 			navigate('/dashboard');
 		}
-	});
+	}, [user, navigate]);
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		if (!email.trim() || !password.trim()) {
