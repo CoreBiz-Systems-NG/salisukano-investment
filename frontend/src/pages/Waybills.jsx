@@ -5,7 +5,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import {
-	Eye,
+	RefreshCw,
 	Pencil,
 	Trash2,
 	Search,
@@ -31,6 +31,7 @@ const InvoicesPage = () => {
 	const [logoBase64, setLogoBase64] = useState('');
 	const [sealBase64, setSealBase64] = useState('');
 	const [phoneBase64, setPhoneBase64] = useState('');
+	const [date, setDate] = useState('');
 
 	// State for search and sort
 	const [searchTerm, setSearchTerm] = useState('');
@@ -73,6 +74,12 @@ const InvoicesPage = () => {
 		}
 	};
 
+	// Format date for display
+	const formatDate = (dateString) => {
+		if (!dateString) return '';
+		return format(new Date(dateString), 'dd/MM/yyyy');
+	};
+
 	// Filter and sort data
 	const filteredAndSortedWaybills = useMemo(() => {
 		let filtered = [...waybills];
@@ -85,6 +92,13 @@ const InvoicesPage = () => {
 					inv.name?.toLowerCase().includes(lowerSearch) ||
 					inv.vehicle?.toLowerCase().includes(lowerSearch) ||
 					inv.destination?.toLowerCase().includes(lowerSearch),
+			);
+		}
+
+		// Apply date filter
+		if (date) {
+			filtered = filtered.filter((inv) =>
+				formatDate(inv?.date).includes(formatDate(date)),
 			);
 		}
 
@@ -113,7 +127,22 @@ const InvoicesPage = () => {
 		}
 
 		return filtered;
-	}, [waybills, searchTerm, sortConfig]);
+	}, [waybills, searchTerm, date, sortConfig]);
+
+	// calculate stats from filtered and sorted waybills
+	const gross = filteredAndSortedWaybills.reduce(
+		(acc, inv) => acc + inv.gross,
+		0,
+	);
+	const tare = filteredAndSortedWaybills.reduce(
+		(acc, inv) => acc + inv.tare,
+		0,
+	);
+	const net = filteredAndSortedWaybills.reduce((acc, inv) => acc + inv.net, 0);
+	const dust = filteredAndSortedWaybills.reduce(
+		(acc, inv) => acc + inv.dust,
+		0,
+	);
 
 	// Toggle sort direction
 	const requestSort = (key) => {
@@ -123,10 +152,9 @@ const InvoicesPage = () => {
 		}));
 	};
 
-	// Format date for display
-	const formatDate = (dateString) => {
-		if (!dateString) return '';
-		return format(new Date(dateString), 'dd/MM/yyyy');
+	const handleReset = () => {
+		setDate('');
+		setSearchTerm('');
 	};
 
 	// Load logo as base64
@@ -372,7 +400,7 @@ const InvoicesPage = () => {
 			// ===============================
 			// SIGNATURE SECTION
 			// ===============================
-// 25
+			// 25
 			const footerY = startY + 45;
 
 			doc.setLineWidth(0.4);
@@ -413,11 +441,11 @@ const InvoicesPage = () => {
 			{/* Header */}
 			<div className="flex justify-between items-center mb-6">
 				<h1 className="text-xl md:text-3xl font-bold text-gray-800">
-					<span onClick={() => navigate(`/registered-invoices`)}>Invoice</span>{' '}
+					{/* <span onClick={() => navigate(`/registered-invoices`)}>Invoice</span>{' '}
 					/{' '}
-					<span className="text-blue-600" onClick={() => navigate(`/waybills`)}>
-						Register
-					</span>
+					<span className="text-blue-600" onClick={() => navigate(`/waybills`)}> */}
+					Register
+					{/* </span> */}
 				</h1>
 				{/* <div className="flex gap-2 flex-col md:flex-row">
 					<button
@@ -435,16 +463,89 @@ const InvoicesPage = () => {
 				{/* </div> */}
 			</div>
 
+			<div className="w-full grid sm:grid-cols-2 md:grid-cols-4 gap-5 col-span-12">
+				<div className="p-5 mb-4  bg-white flex flex-col md:max-w-md w-full rounded-xl gap-2 border border-[#E7E7E7] hover:shadow-xl cursor-pointer">
+					<div className={`flex justify-between `}>
+						<span className="text-[#637381] text-sm font-medium">
+							Gross (KG)
+						</span>
+					</div>
+					<div
+						className={`flex gap-4 justify-between flex-nowrap items-center`}
+					>
+						<span className="text-xl font-bold whitespace-nowrap">
+							{gross || 0}
+						</span>
+					</div>
+				</div>
+				<div className="p-5 mb-4  bg-white flex flex-col md:max-w-md w-full rounded-xl gap-2 border border-[#E7E7E7] hover:shadow-xl cursor-pointer">
+					<div className={`flex justify-between `}>
+						<span className="text-[#637381] text-sm font-medium">
+							Tare (KG)
+						</span>
+					</div>
+					<div
+						className={`flex gap-4 justify-between flex-nowrap items-center`}
+					>
+						<span className="text-xl font-bold whitespace-nowrap">
+							{tare || 0}
+						</span>
+					</div>
+				</div>
+				<div className="p-5 mb-4  bg-white flex flex-col md:max-w-md w-full rounded-xl gap-2 border border-[#E7E7E7] hover:shadow-xl cursor-pointer">
+					<div className={`flex justify-between `}>
+						<span className="text-[#637381] text-sm font-medium">
+							Dust (KG)
+						</span>
+					</div>
+					<div
+						className={`flex gap-4 justify-between flex-nowrap items-center`}
+					>
+						<span className="text-xl font-bold whitespace-nowrap">
+							{dust || 0}
+						</span>
+					</div>
+				</div>
+				<div className="p-5 mb-4  bg-white flex flex-col md:max-w-md w-full rounded-xl gap-2 border border-[#E7E7E7] hover:shadow-xl cursor-pointer">
+					<div className={`flex justify-between `}>
+						<span className="text-[#637381] text-sm font-medium">Net (KG)</span>
+					</div>
+					<div
+						className={`flex gap-4 justify-between flex-nowrap items-center`}
+					>
+						<span className="text-xl font-bold whitespace-nowrap">
+							{net || 0}
+						</span>
+					</div>
+				</div>
+			</div>
+
 			{/* Search Bar */}
-			<div className="mb-4 flex items-center bg-white rounded-md shadow-sm border border-gray-200 p-2">
-				<Search className="text-gray-400 ml-2" size={20} />
-				<input
-					type="text"
-					placeholder="Search by customer, vehicle or destination..."
-					value={searchTerm}
-					onChange={(e) => setSearchTerm(e.target.value)}
-					className="w-full p-2 outline-none"
-				/>
+			<div className="w-full grid sm:grid-cols-2 md:grid-cols-4 gap-4 col-span-12 items-center mb-4">
+				<div className=" flex items-center bg-white rounded-md shadow-sm border border-gray-200 p-0.5">
+					<Search className="text-gray-400 ml-2" size={20} />
+					<input
+						type="text"
+						placeholder="Search by customer, vehicle or destination..."
+						value={searchTerm}
+						onChange={(e) => setSearchTerm(e.target.value)}
+						className="w-full p-2 outline-none"
+					/>
+				</div>
+				<div className="flex gap-2">
+					<input
+						type="date"
+						value={date}
+						onChange={(e) => setDate(e.target.value)}
+						className="input w-full h-[46px] rounded-md border border-gray6 px-2 text-base"
+					/>
+					<button
+						className="px-2 py-2 bg-blue-600 text-white w-fit rounded-md hover:bg-blue-700 transition-colors"
+						onClick={handleReset}
+					>
+						<RefreshCw size={18} />
+					</button>
+				</div>
 			</div>
 
 			{/* Invoices Table */}

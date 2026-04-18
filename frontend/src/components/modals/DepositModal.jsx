@@ -23,6 +23,8 @@ const DepositeModal = ({ show, setShow, setLoading, loading, invoiceId, account 
 	};
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
+
+	// console.log('account?._id', account?._id);
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		// AMOUNT MUST BE A VALID DEGIT
@@ -35,7 +37,7 @@ const DepositeModal = ({ show, setShow, setLoading, loading, invoiceId, account 
 			axios
 				.post(
 					`${apiUrl}/creditors/deposit`,
-					{ invoiceId, amount, date, description, remark },
+					{ invoiceId, amount, date, description, remark,  creditorId: account._id },
 					config
 				)
 				.then((res) => {
