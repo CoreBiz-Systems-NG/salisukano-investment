@@ -74,7 +74,7 @@ const DepositeModal = ({ show, setShow, setLoading, loading, invoiceId, account 
 				<div className="space-y-2 p-4">
 					<div className="flex justify-between">
 						<div>
-							<h2 className="font-semibold text-lg text-blue-500">Deposit</h2>
+							<h2 className="font-semibold text-lg text-blue-500">Payment</h2>
 						</div>
 						<button
 							onClick={() => setShow(false)}

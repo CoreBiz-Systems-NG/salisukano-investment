@@ -152,7 +152,7 @@ const InvoicesPage = () => {
 				<Search className="text-gray-400 ml-2" size={20} />
 				<input
 					type="text"
-					placeholder="Search by customer, vehicle or destination..."
+					placeholder="Search by customer or vehicle ..."
 					value={searchTerm}
 					onChange={(e) => setSearchTerm(e.target.value)}
 					className="w-full p-2 outline-none"

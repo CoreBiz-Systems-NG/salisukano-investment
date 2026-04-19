@@ -17,6 +17,7 @@ const Creditor = () => {
 	const [loading, setIsLoading] = useState(false);
 	// const [isAddModal, setIsAddModal] = useState(false);
 	const [isDepositModal, setIsDepositModal] = useState(false);
+	const [activeTab, setActiveTab] = useState('monthly');
 	// const [tableData, setTableDate] = useState([]);
 	const { user } = useContext(AuthContext);
 
@@ -93,7 +94,7 @@ const Creditor = () => {
 								onClick={() => navigate(`/creditors/${id}/new-credit`)}
 							>
 								<FaPlus className="text-blue-500" />
-								Credit
+								Supply
 							</MenuItem>
 							<MenuItem
 								as="button"
@@ -101,7 +102,7 @@ const Creditor = () => {
 								onClick={() => setIsDepositModal(true)}
 							>
 								<MdSaveAlt className="text-green-500" />
-								Deposit
+								Payment
 							</MenuItem>
 							<MenuItem
 								as="button"
@@ -138,59 +139,81 @@ const Creditor = () => {
 						/>
 					</div>
 				</div>
-				<div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4 w-full md:gap-2 ">
-					{data?.companyData?.length > 0 &&
-						data?.companyData?.map((item, index) => (
-							<Link
-								to={
-									item?.company?._id
-										? `./months/${item?.month?._id}/${item?.company?._id}`
-										: `./months/${item?.month?._id}`
-								}
-								key={index}
-								className="p-5 mb-4  bg-white flex flex-col justify-end md:max-w-md w-full rounded-xl gap-2 border border-[#E7E7E7] hover:shadow-xl cursor-pointer"
-							>
-								{item?.company ? (
-									<>
-										<div className={`md:flex justify-between `}>
-											<span className="text-[#637381] text-sm font-medium">
-												Company:
-											</span>
-											<div className="flex gap-1 items-center">
-												<span className="">{item?.company?.name}</span>
-											</div>
-										</div>
-										<div className={`md:flex justify-between `}>
-											<span className="text-[#637381] text-sm font-medium">
-												Phone:
-											</span>
-											<div className="flex gap-1 items-center">
-												<span className="">{item?.company?.phone}</span>
-											</div>
-										</div>
-									</>
-								) : (
-									<span className="text-red-500">No Company Linked</span>
-								)}
-								<div
-									className={`flex gap-4 justify-between flex-nowrap items-center`}
-								>
-									<span className="text-lg font-semibold whitespace-nowrap">
-										₦ {item.balance?.toLocaleString() || 0}
-									</span>
-								</div>
-								<div className="flex gap-4 justify-between flex-nowrap items-center">
-									<span className="text-lg whitespace-nowrap">
-										Month: {formatMonth(item?.month?.month)}
-									</span>
-								</div>
-							</Link>
-						))}
+
+				<div className="grid grid-cols-2 mb-6 bg-white border  ">
+					<button
+						onClick={() => setActiveTab('monthly')}
+						className={`${activeTab === 'monthly' ? 'bg-blue-600 text-white' : ''} p-1`}
+					>
+						Monthly
+					</button>
+					<button
+						onClick={() => setActiveTab('company')}
+						className={`${activeTab === 'company' ? 'bg-blue-600 text-white' : ''} p-1`}
+					>
+						By Company
+					</button>
 				</div>
-				<CreditorTable
-					tableData={data?.monthlyData || []}
-					creditorId={data?.creditor?._id}
-				/>
+
+				{activeTab === 'company' && (
+					<div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4 w-full smd:gap-2 ">
+						{data?.companyData?.length > 0 &&
+							data?.companyData?.map((item, index) => (
+								<Link
+									to={
+										item?.company?._id
+											? `./months/${item?.month?._id}/${item?.company?._id}`
+											: `./months/${item?.month?._id}`
+									}
+									key={index}
+									className="p-5 mb-4  bg-white flex flex-col justify-end md:max-w-md w-full rounded-xl gap-2 border border-[#E7E7E7] hover:shadow-xl cursor-pointer"
+								>
+									{item?.company ? (
+										<>
+											<div className={`md:flex justify-between `}>
+												<span className="text-[#637381] text-sm font-medium">
+													Company:
+												</span>
+												<div className="flex gap-1 items-center">
+													<span className="">{item?.company?.name}</span>
+												</div>
+											</div>
+											<div className={`md:flex justify-between `}>
+												<span className="text-[#637381] text-sm font-medium">
+													Phone:
+												</span>
+												<div className="flex gap-1 items-center">
+													<span className="">{item?.company?.phone}</span>
+												</div>
+											</div>
+										</>
+									) : (
+										<span className="text-red-500">No Company Linked</span>
+									)}
+									<div
+										className={`flex gap-4 justify-between flex-nowrap items-center`}
+									>
+										<span className="text-lg font-semibold whitespace-nowrap">
+											₦ {item.balance?.toLocaleString() || 0}
+										</span>
+									</div>
+									<div className="flex gap-4 justify-between flex-nowrap items-center">
+										<span className="text-lg whitespace-nowrap">
+											Month: {formatMonth(item?.month?.month)}
+										</span>
+									</div>
+								</Link>
+							))}
+					</div>
+				)}
+				{activeTab === 'monthly' && (
+					<div>
+						<CreditorTable
+							tableData={data?.monthlyData || []}
+							creditorId={data?.creditor?._id}
+						/>
+					</div>
+				)}
 			</main>
 			<DepositeModal
 				show={isDepositModal}

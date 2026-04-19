@@ -41,7 +41,7 @@ import Users from './pages/Users';
 import CompanyCredits from './pages/CompanyCredits';
 import Waybill from './pages/Waybill';
 import Waybills from './pages/Waybills';
-import Register from './pages/InvoiceRegister';
+import InvoiceRegister from './pages/InvoiceRegister';
 import RegisterdInvoices from './pages/RegisterdInvoices';
 function App() {
 	const [loading, setLoading] = useState(true);
@@ -119,12 +119,12 @@ function App() {
 							<Route path="/waybills" element={<Waybills />} />
 							<Route path="/waybill" element={<Waybill />} />
 							<Route path="/waybill/:id" element={<Waybill />} />
-							<Route path="/register-invoices" element={<Register />} />
+							<Route path="/register-invoices" element={<InvoiceRegister />} />
 							<Route
 								path="/registered-invoices"
 								element={<RegisterdInvoices />}
 							/>
-							<Route path="/register-invoices/:id" element={<Register />} />
+							<Route path="/register-invoices/:id" element={<InvoiceRegister />} />
 						</Route>
 					</Route>
 				</Route>
